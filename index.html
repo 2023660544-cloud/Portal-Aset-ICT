@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Aset YPKT - V21 (Firebase Live)</title>
+    <title>Sistem Aset YPKT - V23 (Manual Receiver)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- STYLE ASAL KEKAL (TIDAK BERUBAH) --- */
@@ -15,6 +15,7 @@
             --red: #ef4444;
             --green: #10b981;
             --orange: #f97316;
+            --purple: #8b5cf6;
         }
         body { font-family: 'Inter', sans-serif; margin: 0; background: var(--light); height: 100vh; overflow: hidden; }
         * { box-sizing: border-box; }
@@ -57,7 +58,6 @@
         .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
         .nav-item.active { background: var(--primary); color: white; }
         
-        /* Kredit di Sidebar */
         .sidebar-footer {
             padding: 20px; text-align: center; font-size: 0.75rem; color: #64748b;
             border-top: 1px solid #334155; background: rgba(0,0,0,0.2);
@@ -88,6 +88,7 @@
         .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 1rem; }
         .btn-blue { background: var(--primary); }
         .btn-green { background: var(--green); }
+        .btn-purple { background: var(--purple); }
         
         .canvas-wrapper {
             border: 2px dashed #94a3b8; border-radius: 8px; height: 180px; background: white;
@@ -118,11 +119,36 @@
         .log-item { padding: 8px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.9rem; }
         .log-item:last-child { border-bottom: none; }
 
-        /* Kredit Landing Page */
         .landing-credit {
             position: absolute; bottom: 20px; width: 100%; text-align: center;
             color: rgba(255,255,255,0.3); font-size: 0.8rem; letter-spacing: 0.5px;
         }
+
+        /* --- STYLE SEARCH (WOW EFFECT) --- */
+        .search-hero {
+            background: white; border-radius: 16px; padding: 30px; 
+            text-align: center; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+        .search-input-group {
+            position: relative; max-width: 400px; margin: 20px auto 0;
+        }
+        .search-input {
+            width: 100%; padding: 18px 20px; padding-right: 60px;
+            font-size: 1.1rem; border-radius: 50px; 
+            border: 2px solid #e2e8f0; outline: none; transition: 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .search-btn-icon {
+            position: absolute; right: 8px; top: 8px; height: 44px; width: 44px;
+            background: var(--primary); color: white; border-radius: 50%;
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: 0.2s;
+        }
+        .search-btn-icon:hover { transform: scale(1.1); background: #1d4ed8; }
+        .result-card { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
 
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100%; left: -260px; width: 260px; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
@@ -145,13 +171,13 @@
                 <button onclick="closeModal()" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer">Tutup</button>
             </div>
             <div id="m-body"></div>
-            <button class="btn btn-blue" onclick="closeModal()" style="margin-top:15px">OK</button>
+            <div id="m-actions" style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:15px"></div>
         </div>
     </div>
 
     <div id="landing-page">
         <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1>
-        <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">Versi 21 - Online (Firebase)</p>
+      <p></p>
 
         <div class="landing-grid">
             <div class="landing-card" onclick="openMode('public')">
@@ -168,9 +194,7 @@
             </div>
         </div>
 
-        <div class="landing-credit">
-            Developed by: Nurul Syuhaida (Intern)
-        </div>
+        <div class="landing-credit">Developed by: Nurul Syuhaida (Intern)</div>
     </div>
 
     <div id="app-container">
@@ -186,9 +210,7 @@
                 <div class="nav-item" onclick="downloadExcelAll()" style="color:#4ade80">📊 Download Excel</div>
                 <div class="nav-item" onclick="location.reload()" style="color:#f87171">🚪 Log Keluar</div>
             </div>
-            <div class="sidebar-footer">
-                Dev: Nurul Syuhaida (Intern)
-            </div>
+            <div class="sidebar-footer">Dev: Nurul Syuhaida (Intern)</div>
         </div>
 
         <div class="main-content">
@@ -233,11 +255,21 @@
                 </div>
 
                 <div id="page-fast-track" class="page-section">
-                    <div class="card" style="border-left:5px solid var(--green)">
-                        <h2 style="margin-top:0; color:var(--green)">📦 Fast Track: Serahan Pulang</h2>
-                        <p>Senarai aset siap dibaiki yang sedia untuk diambil.</p>
+                    <div class="search-hero">
+                        <div style="font-size:3rem; margin-bottom:10px">📦</div>
+                        <h2 style="margin:0; color:var(--dark)">Sistem Serahan Pintar</h2>
+                        <p style="color:#64748b; margin-top:5px">Cari aset anda untuk pengesahan pengambilan.</p>
+                        
+                        <div class="search-input-group">
+                            <input type="text" id="search-keyword" class="search-input" placeholder="Taip Nama Pemilik Aset...">
+                            <button class="search-btn-icon" onclick="searchMyAsset()">🔍</button>
+                        </div>
+                        <div style="margin-top:10px; font-size:0.8rem; color:#94a3b8">
+                            *Hanya aset berstatus <b>SIAP (Completed)</b> akan dipaparkan.
+                        </div>
                     </div>
-                    <div id="list-fast-track">Loading data...</div>
+                    
+                    <div id="search-results-area" style="margin-top:30px"></div>
                 </div>
 
                 <div id="adm-terima" class="page-section">
@@ -249,29 +281,33 @@
                     <h2 style="margin-top:0">📍 Jejak & Kemaskini Aset</h2>
                     
                     <div class="card" style="background:#eff6ff; border:1px solid #bfdbfe">
-                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Kemaskini Status (Update)</h3>
+                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Kemaskini Log (Nota Sahaja)</h3>
                         <p style="font-size:0.85rem; color:#64748b; margin-bottom:15px">
-                            Pilih aset, tulis lokasi/status baru, dan tekan butang Update. Info ini akan masuk ke dalam sejarah aset.
+                            Gunakan ini untuk tulis nota progres. <br>
+                            <b>Untuk tandakan SIAP, sila klik pada kad aset di bawah.</b>
                         </p>
                         
                         <label>Pilih Aset:</label>
                         <select id="track-sel" style="background:white"></select>
                         
-                        <label>Catatan Status / Lokasi Terkini:</label>
+                        <label>Catatan Log:</label>
                         <div style="display:flex; gap:10px">
-                            <input id="track-txt" placeholder="Cth: Hantar repair kedai, Sedang format, Menunggu sparepart...">
-                            <button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:auto">Update</button>
+                            <input id="track-txt" placeholder="Cth: Hantar repair kedai, Menunggu sparepart...">
+                            <button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:auto">Simpan</button>
                         </div>
                     </div>
 
                     <p style="text-align:center; font-size:0.85rem; color:#64748b; margin-top:30px; margin-bottom:10px">
-                        👇 Klik pada kad aset di bawah untuk lihat <b>SEMUA DATA</b> (Cikgu, Admin, Tracking, Pulang) 👇
+                        👇 Klik pada kad aset di bawah untuk <b>INFO PENUH & TANDAKAN SIAP (COMPLETE)</b> 👇
                     </p>
                     <div id="list-jejak">Loading data...</div>
                 </div>
 
                 <div id="adm-pulang" class="page-section">
-                    <h2>📦 Pengurusan Serahan Pulang</h2>
+                    <h2>📦 Senarai Sedia Untuk Diambil (Completed)</h2>
+                    <p style="color:#64748b; margin-top:-10px; margin-bottom:20px; font-size:0.9rem">
+                        Hanya aset yang telah ditanda <b>COMPLETED (SIAP)</b> akan muncul di sini.
+                    </p>
                     <div id="list-pulang-admin">Loading data...</div>
                 </div>
 
@@ -290,7 +326,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // CONFIG FIREBASE (SAYA DAH MASUKKAN KEY DARI GAMBAR TUAN)
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
             authDomain: "aset-ypkt.firebaseapp.com",
@@ -304,29 +340,27 @@
         const app = initializeApp(firebaseConfig);
         const dbRef = getDatabase(app);
 
-        // JADIKAN GLOBAL SUPAYA FUNCTION BIASA BOLEH GUNA
+        // GLOBAL EXPORT
         window.dbRef = dbRef;
         window.push = push;
         window.ref = ref;
         window.update = update;
-        window.db = []; // GANTI LOCALSTORAGE DENGAN ARRAY LIVE
+        window.db = []; 
 
-        // DENGAR DATA DARI FIREBASE (REALTIME)
+        // REALTIME SYNC
         onValue(ref(dbRef, 'assets'), (snapshot) => {
             const data = snapshot.val();
-            // Tukar format Firebase ke Array biasa
             window.db = data ? Object.keys(data).map(key => ({...data[key], id: key})) : [];
             
-            // Auto Render page yang sedang aktif
+            // Auto Render
             if(document.getElementById('adm-terima').classList.contains('active')) window.renderTerima();
             if(document.getElementById('adm-jejak').classList.contains('active')) window.renderJejak();
             if(document.getElementById('adm-pulang').classList.contains('active')) window.renderListPulang('list-pulang-admin');
-            if(document.getElementById('page-fast-track').classList.contains('active')) window.renderListPulang('list-fast-track');
         });
     </script>
 
     <script>
-        // --- NAVIGASI & AUTH (KEKAL) ---
+        // --- NAVIGASI & AUTH ---
         function openMode(mode) {
             document.getElementById('landing-page').style.transform = 'translateY(-100%)';
             setTimeout(() => {
@@ -356,7 +390,8 @@
                     
                     document.getElementById('page-fast-track').classList.add('active');
                     document.getElementById('header-title').innerText = 'Fast Track Pulang';
-                    renderListPulang('list-fast-track');
+                    document.getElementById('search-keyword').value = '';
+                    document.getElementById('search-results-area').innerHTML = '';
                 }, 300);
             } else { alert("Password Salah!"); }
         }
@@ -377,17 +412,15 @@
         function navTo(pageId, el) {
             document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             if(el) el.classList.add('active');
-
             document.getElementById('sidebar').classList.remove('open');
             document.querySelector('.overlay').classList.remove('active');
 
             if(pageId === 'adm-terima') renderTerima();
             if(pageId === 'adm-jejak') renderJejak();
             if(pageId === 'adm-pulang') renderListPulang('list-pulang-admin');
-            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v21') || '';
+            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v23') || '';
         }
 
         function toggleSidebar() {
@@ -395,33 +428,107 @@
             document.querySelector('.overlay').classList.toggle('active');
         }
 
-        // --- LOGIC: CIKGU SUBMIT (GUNA FIREBASE) ---
+        // --- SEARCH FAST TRACK (EDITED: NAMA PENERIMA KOSONG) ---
+        function searchMyAsset() {
+            let keyword = document.getElementById('search-keyword').value.trim().toLowerCase();
+            let div = document.getElementById('search-results-area');
+            div.innerHTML = '';
+
+            if(keyword.length < 3) return alert("Sila masukkan sekurang-kurangnya 3 huruf nama pemilik.");
+            div.innerHTML = '<p style="text-align:center; color:#64748b">Sedang mencari...</p>';
+
+            // Cari aset berdasarkan nama PEMILIK
+            let matches = window.db.filter(x => 
+                x.status === 'COMPLETED' && 
+                x.name.toLowerCase().includes(keyword)
+            );
+
+            div.innerHTML = '';
+            
+            if(matches.length === 0) {
+                div.innerHTML = `
+                <div style="text-align:center; padding:40px; background:white; border-radius:12px; border:1px dashed #cbd5e1">
+                    <div style="font-size:2rem">🤷‍♂️</div>
+                    <p>Maaf, tiada aset SIAP atas nama <b>"${keyword}"</b>.</p>
+                    <small style="color:#94a3b8">Mungkin aset masih dalam proses baiki (Received) atau ejaan salah.</small>
+                </div>`;
+            } else {
+                let now = new Date().toLocaleString();
+                matches.forEach(i => {
+                    // DI SINI PERUBAHANNYA: VALUE INPUT NAMA PENERIMA KOSONG
+                    div.innerHTML += `
+                    <div class="card result-card" style="border-left:5px solid #8b5cf6; border-top:1px solid #e2e8f0">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+                            <div style="background:#f3e8ff; color:#6b21a8; padding:5px 10px; border-radius:20px; font-size:0.8rem; font-weight:bold">✅ Sedia Diambil</div>
+                        </div>
+                        <h3 style="margin:0">${i.type} (${i.serial})</h3>
+                        <p style="margin-top:5px; color:#475569">Milik: <b>${i.name}</b> (${i.loc})</p>
+                        <hr>
+                        <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0">
+                            <h4 style="margin-top:0; color:#1e293b">Pengesahan Serahan</h4>
+                            <label>Tarikh Serahan</label>
+                            <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
+                            
+                            <label>Nama Penerima / Wakil</label>
+                            <input id="ret_n_pub_${i.id}" value="" placeholder="Masukkan nama penerima (Pemandu/Wakil)...">
+                            
+                            <label>Tandatangan Digital</label>
+                            <div class="canvas-wrapper" style="height:140px">
+                                <canvas id="cvs_ret_pub_${i.id}"></canvas>
+                                <div class="btn-clear-sign" onclick="clearCanvas('cvs_ret_pub_${i.id}')">Padam</div>
+                            </div>
+                            <button class="btn btn-green" onclick="savePulangPublic('${i.id}')">SAHKAN PENGAMBILAN</button>
+                        </div>
+                    </div>`;
+                    setTimeout(()=>initCanvas(`cvs_ret_pub_${i.id}`),100);
+                });
+            }
+        }
+
+        function savePulangPublic(id) {
+            let n = document.getElementById(`ret_n_pub_${id}`).value;
+            if(!n) return alert("Sila isikan nama penerima/wakil!"); // Wajib isi
+            
+            let item = window.db.find(x => x.id === id);
+            let currentLogs = item.logs || [];
+            currentLogs.push({text: `Diambil oleh wakil/sendiri: ${n}`, time: new Date().toLocaleString()});
+
+            window.update(window.ref(window.dbRef, 'assets/' + id), {
+                status: 'RETURNED',
+                retName: n,
+                retTime: new Date().toLocaleString(),
+                logs: currentLogs
+            }).then(() => {
+                alert("Terima kasih! Serahan telah direkodkan.");
+                document.getElementById('search-results-area').innerHTML = ''; 
+                document.getElementById('search-keyword').value = '';
+            });
+        }
+
+        // --- SUBMIT CIKGU ---
         function submitCikgu() {
             let n = document.getElementById('c_name').value;
             let l = document.getElementById('c_loc').value;
             let s = document.getElementById('c_serial').value;
             if(!n || !l || !s) return alert("Sila isi maklumat wajib!");
 
-            // HANTAR KE CLOUD
             window.push(window.ref(window.dbRef, 'assets'), {
                 date: document.getElementById('c_date').value,
                 name: n, loc: l, type: document.getElementById('c_type').value,
                 serial: s, issue: document.getElementById('c_issue').value,
                 status: 'PENDING',
-                logs: [{text: "Borang dihantar", time: new Date().toLocaleString()}], // Log awal
-                admName: '', admTime: '',
-                retName: '', retTime: ''
+                logs: [{text: "Borang dihantar", time: new Date().toLocaleString()}],
+                admName: '', admTime: '', retName: '', retTime: ''
             }).then(() => {
-                alert("Borang Berjaya Dihantar Ke HQ (Online)!");
+                alert("Borang Berjaya Dihantar Ke HQ!");
                 location.reload();
             }).catch(e => alert("Error internet: " + e));
         }
 
-        // --- LOGIC: ADMIN TERIMA ---
+        // --- ADMIN TERIMA ---
         function renderTerima() {
             let div = document.getElementById('list-terima');
             div.innerHTML = '';
-            // Guna window.db yang dah sync
             let list = window.db.filter(x => x.status === 'PENDING').reverse();
             if(list.length === 0) div.innerHTML = '<p class="text-center">Tiada data baru.</p>';
             
@@ -442,7 +549,7 @@
                         <canvas id="cvs_adm_${i.id}"></canvas>
                         <div class="btn-clear-sign" onclick="clearCanvas('cvs_adm_${i.id}')">Padam</div>
                     </div>
-                    <button class="btn btn-blue" onclick="saveTerima('${i.id}')">Terima</button>
+                    <button class="btn btn-blue" onclick="saveTerima('${i.id}')">Terima (Received)</button>
                 </div>`;
                 setTimeout(()=>initCanvas(`cvs_adm_${i.id}`),100);
             });
@@ -452,12 +559,10 @@
             let n = document.getElementById(`adm_n_${id}`).value;
             if(!n) return alert("Nama Admin wajib isi!");
             
-            // Cari data asal untuk update logs
             let item = window.db.find(x => x.id === id);
             let currentLogs = item.logs || [];
             currentLogs.push({text: `Diterima Admin: ${n}`, time: new Date().toLocaleString()});
 
-            // UPDATE FIREBASE
             window.update(window.ref(window.dbRef, 'assets/' + id), {
                 status: 'RECEIVED',
                 admName: n,
@@ -466,11 +571,11 @@
             });
         }
 
-        // --- LOGIC: JEJAK ASET ---
+        // --- JEJAK ASET ---
         function renderJejak() {
             let sel = document.getElementById('track-sel');
             sel.innerHTML = '<option value="">-- Pilih Aset --</option>';
-            window.db.filter(x => x.status === 'RECEIVED').forEach(x => {
+            window.db.filter(x => x.status !== 'RETURNED' && x.status !== 'PENDING').forEach(x => {
                 sel.innerHTML += `<option value="${x.id}">${x.type} - ${x.name} (${x.serial})</option>`;
             });
             
@@ -478,20 +583,21 @@
             div.innerHTML = '';
             
             window.db.filter(x => x.status !== 'PENDING').reverse().forEach(i => {
-                let statusColor = i.status === 'RETURNED' ? 'green' : 'blue';
-                let statusText = i.status === 'RETURNED' ? 'SUDAH PULANG' : 'DALAM PROSES';
+                let sColor = '#3b82f6'; let sText = 'DALAM PROSES';
+                if(i.status === 'COMPLETED') { sColor = '#8b5cf6'; sText = 'SIAP (READY)'; }
+                if(i.status === 'RETURNED') { sColor = '#10b981'; sText = 'SUDAH PULANG'; }
 
                 div.innerHTML += `
-                <div class="card card-track-clickable" onclick="showDetails('${i.id}')">
+                <div class="card card-track-clickable" onclick="showDetails('${i.id}')" style="border-left:5px solid ${sColor}">
                     <div style="display:flex; justify-content:space-between; align-items:center">
                         <b>${i.type} (${i.serial})</b>
-                        <span style="font-size:0.7rem; background:${statusColor=='green'?'#dcfce7':'#dbeafe'}; color:${statusColor}; padding:3px 8px; border-radius:4px; font-weight:bold">${statusText}</span>
+                        <span style="font-size:0.7rem; background:${sColor}20; color:${sColor}; padding:3px 8px; border-radius:4px; font-weight:bold">${sText}</span>
                     </div>
                     <div style="font-size:0.9rem; margin-top:5px; color:#475569">
                         Milik: ${i.name} (${i.loc})
                     </div>
                     <div style="font-size:0.8rem; color:#64748b; margin-top:10px; font-style:italic">
-                        Klik kad ini untuk info penuh & sejarah.
+                        Klik untuk info & update.
                     </div>
                 </div>`;
             });
@@ -508,81 +614,84 @@
 
             window.update(window.ref(window.dbRef, 'assets/' + id), { logs: currentLogs });
             document.getElementById('track-txt').value = '';
-            alert("Status dikemaskini!");
+            alert("Nota log disimpan.");
         }
 
-        // FUNGSI POPUP (SHOW ALL DATA)
+        // --- FUNGSI POPUP + BUTANG COMPLETE ---
         function showDetails(id) {
             let item = window.db.find(x => x.id == id);
             if(!item) return;
 
-            // HANDLE LOGS (Tukar dari array object ke HTML)
             let logsHTML = '';
             if(item.logs && Array.isArray(item.logs)) {
                 item.logs.forEach(log => {
-                    // Support format lama (string) & baru (object)
-                    let t = log.text || log; 
-                    let d = log.time || '-';
-                    logsHTML += `<div class="log-item">👉 ${t} <small style="color:#aaa">(${d})</small></div>`;
+                    logsHTML += `<div class="log-item">👉 ${log.text} <small style="color:#aaa">(${log.time})</small></div>`;
                 });
-            } else {
-                logsHTML = '<div class="log-item">Tiada rekod lagi.</div>';
             }
 
             let html = `
                 <div class="info-block" style="border-left:4px solid #2563eb">
-                    <span class="info-label">MAKLUMAT ASAL (CIKGU)</span>
-                    <span class="info-val">Nama: ${item.name}</span>
-                    <span class="info-val">Lokasi: ${item.loc}</span>
+                    <span class="info-label">INFO ASAL</span>
+                    <span class="info-val"><b>${item.name}</b> (${item.loc})</span>
                     <span class="info-val">Aset: ${item.type} (${item.serial})</span>
                     <span class="info-val" style="color:red">Masalah: ${item.issue}</span>
-                    <span class="info-val">Tarikh Lapor: ${item.date}</span>
                 </div>
-
-                <div class="info-block" style="border-left:4px solid #f59e0b">
-                    <span class="info-label">STATUS PENERIMAAN</span>
-                    <span class="info-val">Diterima Oleh: ${item.admName || '-'}</span>
-                    <span class="info-val">Tarikh: ${item.admTime || '-'}</span>
-                    <span class="info-val">Status Semasa: <b>${item.status}</b></span>
+                <div class="info-block">
+                    <span class="info-label">SEJARAH LOG</span>
+                    <div style="max-height:150px; overflow-y:auto">${logsHTML}</div>
                 </div>
-
-                <div class="info-block" style="border-left:4px solid #64748b">
-                    <span class="info-label">SEJARAH JEJAK & UPDATE</span>
-                    <div style="max-height:150px; overflow-y:auto">
-                        ${logsHTML}
-                    </div>
-                </div>
-
-                ${item.status === 'RETURNED' ? `
-                <div class="info-block" style="border-left:4px solid #10b981">
-                    <span class="info-label">MAKLUMAT PEMULANGAN</span>
-                    <span class="info-val">Dipulangkan Kepada: ${item.retName}</span>
-                    <span class="info-val">Tarikh: ${item.retTime}</span>
-                </div>` : ''}
             `;
 
-            document.getElementById('m-title').innerText = `Info Penuh: ${item.type}`;
+            document.getElementById('m-title').innerText = `Info: ${item.type}`;
             document.getElementById('m-body').innerHTML = html;
+            
+            let btnArea = document.getElementById('m-actions');
+            if(item.status === 'RECEIVED') {
+                btnArea.innerHTML = `
+                    <p style="font-size:0.85rem; color:#64748b; margin-bottom:10px">Adakah aset ini sudah siap dibaiki sepenuhnya?</p>
+                    <button class="btn btn-purple" onclick="markAsComplete('${item.id}')">✅ TANDA ASET SEBAGAI SIAP (COMPLETE)</button>
+                `;
+            } else if (item.status === 'COMPLETED') {
+                btnArea.innerHTML = `<div style="text-align:center; color:#8b5cf6; font-weight:bold">Status: SIAP (Menunggu Pengambilan)</div>`;
+            } else {
+                btnArea.innerHTML = '';
+            }
+
             document.getElementById('detail-modal').classList.add('active');
+        }
+
+        function markAsComplete(id) {
+            if(!confirm("Anda pasti aset ini telah SIAP dan boleh diambil user?")) return;
+            let item = window.db.find(x => x.id === id);
+            let currentLogs = item.logs || [];
+            currentLogs.push({text: "STATUS: SIAP (COMPLETED). Sedia diambil.", time: new Date().toLocaleString()});
+
+            window.update(window.ref(window.dbRef, 'assets/' + id), {
+                status: 'COMPLETED',
+                logs: currentLogs
+            }).then(() => {
+                alert("Aset ditanda SIAP! Kini boleh dilihat di skrin Serahan Pulang.");
+                closeModal();
+            });
         }
 
         function closeModal() { document.getElementById('detail-modal').classList.remove('active'); }
 
-        // --- LOGIC: SERAHAN PULANG ---
+        // --- LIST PULANG ADMIN ---
         function renderListPulang(targetId) {
             let div = document.getElementById(targetId);
             div.innerHTML = '';
-            let list = window.db.filter(x => x.status === 'RECEIVED').reverse();
+            let list = window.db.filter(x => x.status === 'COMPLETED').reverse();
             let now = new Date().toLocaleString(); 
             
-            if(list.length === 0) div.innerHTML = '<p>Tiada aset sedia dipulangkan.</p>';
+            if(list.length === 0) div.innerHTML = '<p>Tiada aset berstatus SIAP (Completed) untuk diambil.</p>';
 
             list.forEach(i => {
                 div.innerHTML += `
-                <div class="card" style="border-left:5px solid #10b981">
+                <div class="card" style="border-left:5px solid #8b5cf6">
                     <h3>${i.type} (${i.serial})</h3>
                     <p>Milik: ${i.name} (${i.loc})</p>
-                    <div style="background:#f0fdf4; padding:10px; border-radius:8px">
+                    <div style="background:#f3e8ff; padding:10px; border-radius:8px">
                         <label>Tarikh Serahan (Auto)</label>
                         <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
                         <label>Nama Penerima</label>
@@ -612,39 +721,29 @@
             });
         }
 
-        // --- EXCEL (KEKAL) ---
+        // --- EXCEL ---
         function downloadExcelAll() {
             if(window.db.length === 0) return alert("Tiada data.");
-            
-            let headers = ["ID", "Tarikh Lapor", "Nama Cikgu", "Lokasi", "Jenis", "No Siri", "Masalah", "Status", "Admin Terima", "Tarikh Terima", "Penerima Akhir", "Tarikh Pulang"];
-            let csvRows = [];
-            csvRows.push(headers.join(","));
-
+            let headers = ["ID", "Tarikh", "Nama", "Lokasi", "Jenis", "Siri", "Masalah", "Status", "Admin", "Penerima", "Tarikh Pulang"];
+            let csvRows = [headers.join(",")];
             window.db.forEach(row => {
-                const clean = (text) => {
-                    if(!text) return "";
-                    let str = String(text).replace(/"/g, '""'); 
-                    str = str.replace(/(\r\n|\n|\r)/gm, " "); 
-                    return `"${str}"`; 
-                };
+                const clean = (t) => `"${String(t||'').replace(/"/g, '""').replace(/\n/g, ' ')}"`;
                 let values = [
                     row.id, clean(row.date), clean(row.name), clean(row.loc), clean(row.type),
                     clean(row.serial), clean(row.issue), clean(row.status), clean(row.admName),
-                    clean(row.admTime), clean(row.retName), clean(row.retTime)
+                    clean(row.retName), clean(row.retTime)
                 ];
                 csvRows.push(values.join(","));
             });
-
-            let csvString = csvRows.join("\n");
             let a = document.createElement('a');
-            a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString);
+            a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvRows.join("\n"));
             a.download = 'Data_Aset_Lengkap.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
-        function saveNote() { localStorage.setItem('nota_v21', document.getElementById('notepad').value); }
+        function saveNote() { localStorage.setItem('nota_v23', document.getElementById('notepad').value); }
 
         function initCanvas(id) {
             let c = document.getElementById(id);
@@ -653,23 +752,13 @@
             c.width = rect.width; c.height = rect.height;
             let ctx = c.getContext('2d');
             ctx.lineWidth = 2; ctx.strokeStyle = '#000';
-            
             let drawing = false;
             const getPos = (e) => {
                 let r = c.getBoundingClientRect();
-                return { 
-                    x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
-                    y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
-                };
+                return { x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top };
             };
-            ['mousedown','touchstart'].forEach(evt => c.addEventListener(evt, (e)=>{ 
-                if(evt=='touchstart') e.preventDefault();
-                drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); 
-            }));
-            ['mousemove','touchmove'].forEach(evt => c.addEventListener(evt, (e)=>{ 
-                if(evt=='touchmove') e.preventDefault();
-                if(drawing){ ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); } 
-            }));
+            ['mousedown','touchstart'].forEach(evt => c.addEventListener(evt, (e)=>{ if(evt=='touchstart') e.preventDefault(); drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }));
+            ['mousemove','touchmove'].forEach(evt => c.addEventListener(evt, (e)=>{ if(evt=='touchmove') e.preventDefault(); if(drawing){ ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); } }));
             ['mouseup','touchend'].forEach(evt => c.addEventListener(evt, ()=>{ drawing=false; }));
         }
         function clearCanvas(id) { let c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
