@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal Aset ICT (Hybrid V7)</title>
+    <title>Portal Aset ICT - Nurul Syuhaida</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
@@ -40,6 +40,8 @@
         .menu-text-box { text-align: left; }
         .menu-title { font-weight: 700; font-size: 1.2rem; }
         .menu-sub { font-size: 0.9rem; color: #cbd5e1; opacity: 0.8; }
+        
+        .footer-credit { margin-top: 50px; font-size: 0.8rem; color: #94a3b8; text-align: center; opacity: 0.7; }
 
         /* ===========================
            2. APP STRUCTURE (SISTEM DALAM)
@@ -74,13 +76,22 @@
         }
         .sidebar-overlay.show { display: block; opacity: 1; }
 
-        .brand { font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 50px; display: flex; align-items: center; gap: 12px; }
+        .brand { font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 40px; display: flex; align-items: center; gap: 12px; }
         .brand-icon { color: var(--primary); font-size: 1.8rem; }
         .nav-item { padding: 16px; margin-bottom: 10px; color: #64748b; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 15px; transition: 0.2s; cursor: pointer; font-size: 0.95rem;}
         .nav-item:hover { background: #f8fafc; color: var(--primary); }
         .nav-item.active { background: #eff6ff; color: var(--primary); }
-        .nav-home { margin-top: auto; background: var(--dark); color: white !important; }
+        .nav-home { margin-top: 10px; background: var(--dark); color: white !important; }
         .nav-home:hover { background: #334155 !important; }
+
+        /* CREATOR CREDIT IN SIDEBAR */
+        .dev-badge {
+            margin-top: auto; /* Push to bottom */
+            background: #f8fafc; padding: 15px; border-radius: 12px; 
+            border: 1px solid #e2e8f0; text-align: center;
+        }
+        .dev-badge p { margin: 0; font-size: 0.75rem; color: #64748b; }
+        .dev-badge b { color: var(--primary); display: block; font-size: 0.9rem; margin-top: 2px;}
 
         /* --- MAIN CONTENT AREA --- */
         .main-content-wrapper { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 25px; position: relative; }
@@ -116,6 +127,7 @@
             .menu-grid { grid-template-columns: repeat(3, 1fr); margin-top: 0; }
             .menu-card { flex-direction: column; text-align: center; padding: 40px 30px; }
             .menu-text-box { text-align: center; }
+            .footer-credit { position: absolute; bottom: 30px; left: 50px; text-align: left; }
             
             /* Ubah Sistem Dalam jadi Sidebar Kekal */
             #app-container { flex-direction: row; } /* Susun memanjang ke tepi */
@@ -145,6 +157,7 @@
             <h1 style="margin:0; font-size:2.8rem; line-height:1.2">Portal Aset ICT</h1>
             <p style="color:#cbd5e1; margin-top:10px; font-size:1.1rem;">Sistem Pengurusan Berpusat</p>
         </div>
+        
         <div class="menu-grid">
             <div class="menu-card" onclick="enterSystem('page-cikgu')">
                 <span class="menu-icon">📝</span>
@@ -159,6 +172,10 @@
                 <div class="menu-text-box"><div class="menu-title">Memo</div><div class="menu-sub">Catatan Pantas</div></div>
             </div>
         </div>
+
+        <div class="footer-credit">
+            Dibangunkan oleh: <b>Nurul Syuhaida (Intern)</b>
+        </div>
     </div>
 
     <div id="app-container">
@@ -172,13 +189,19 @@
         <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
         <div class="sidebar" id="sidebar">
-            <div class="brand"><span class="brand-icon">🚀</span> E-Aset Pro V7</div>
+            <div class="brand"><span class="brand-icon">🚀</span> E-Aset Pro</div>
             
             <div class="nav-item" id="nav-cikgu" onclick="switchTab('page-cikgu')"><span>📝</span> Borang Serahan</div>
             <div class="nav-item" id="nav-admin" onclick="checkAdmin()"><span>🛠️</span> Dashboard IT</div>
             <div class="nav-item" id="nav-note" onclick="switchTab('page-notepad')"><span>📌</span> Notepad</div>
 
             <div class="nav-item nav-home" onclick="exitSystem()">🏠 Menu Utama</div>
+
+            <div class="dev-badge">
+                <p>Designed by</p>
+                <b>Nurul Syuhaida</b>
+                <p>Student Intern</p>
+            </div>
         </div>
 
         <div class="main-content-wrapper">
@@ -271,7 +294,6 @@
 <script>
     // --- 1. UI & RESPONSIVE LOGIC ---
     function toggleSidebar() {
-        // Hanya berfungsi di mobile
         if(window.innerWidth < 1024) {
             document.getElementById('sidebar').classList.toggle('open');
             document.querySelector('.sidebar-overlay').classList.toggle('show');
@@ -289,7 +311,7 @@
 
     function exitSystem() {
         document.getElementById('app-container').classList.remove('active');
-        if(window.innerWidth < 1024) toggleSidebar(); // Tutup sidebar jika di mobile
+        if(window.innerWidth < 1024) toggleSidebar(); 
         setTimeout(() => {
             document.getElementById('landing-page').style.transform = 'translateY(0)';
         }, 300);
@@ -307,18 +329,18 @@
         const titles = {'page-cikgu':'Borang Aset', 'page-admin':'Dashboard IT', 'page-notepad':'Nota', 'page-process':'Proses IT'};
         document.getElementById('header-title').innerText = titles[id] || 'Menu';
 
-        if(window.innerWidth < 1024) { // Auto close sidebar di mobile
+        if(window.innerWidth < 1024) { 
             document.getElementById('sidebar').classList.remove('open');
             document.querySelector('.sidebar-overlay').classList.remove('show');
         }
-        setTimeout(() => { resizeCanvas('cvs-cikgu'); resizeCanvas('cvs-it'); }, 150); // Fix canvas size
+        setTimeout(() => { resizeCanvas('cvs-cikgu'); resizeCanvas('cvs-it'); }, 150); 
     }
 
     // --- 2. CANVAS (SIGNATURE) ---
     function resizeCanvas(id) {
         const c = document.getElementById(id);
         c.width = c.parentElement.offsetWidth;
-        c.height = 150; // Tetapkan tinggi
+        c.height = 150; 
     }
 
     function setupCanvas(id) {
@@ -344,7 +366,7 @@
         }));
         ['mouseup', 'touchend'].forEach(evt => c.addEventListener(evt, ()=>{ isDrawing=false }));
         
-        window.addEventListener('resize', ()=>resizeCanvas(id)); // Resize jika screen berubah
+        window.addEventListener('resize', ()=>resizeCanvas(id)); 
     }
     setupCanvas('cvs-cikgu'); setupCanvas('cvs-it');
     function clearCvs(id) { 
@@ -352,9 +374,9 @@
         c.getContext('2d').clearRect(0,0,c.width,c.height); 
     }
 
-    // --- 3. DATA LOGIC ---
-    let db = JSON.parse(localStorage.getItem('asetDB_v7')) || [];
-    let notes = JSON.parse(localStorage.getItem('notesDB_v7')) || [];
+    // --- 3. DATA LOGIC (NEW DB NAME FOR INTERN PROJECT) ---
+    let db = JSON.parse(localStorage.getItem('asetDB_final')) || [];
+    let notes = JSON.parse(localStorage.getItem('notesDB_final')) || [];
     let currentId = null;
     document.getElementById('c_date').valueAsDate = new Date();
 
@@ -371,7 +393,7 @@
             note: document.getElementById('c_note').value,
             status: 'PENDING', itName: '-'
         });
-        localStorage.setItem('asetDB_v7', JSON.stringify(db));
+        localStorage.setItem('asetDB_final', JSON.stringify(db));
         alert("✅ Borang berjaya dihantar!");
         document.getElementById('c_name').value = "";
         document.getElementById('c_serial').value = "";
@@ -420,7 +442,7 @@
         if(idx !== -1) {
             db[idx].itName = document.getElementById('it_name').value;
             db[idx].status = document.getElementById('it_status').value;
-            localStorage.setItem('asetDB_v7', JSON.stringify(db));
+            localStorage.setItem('asetDB_final', JSON.stringify(db));
             alert("✅ Data disimpan!");
             switchTab('page-admin'); renderAdmin();
         }
@@ -430,20 +452,20 @@
         const txt = document.getElementById('note-text').value;
         if(txt) {
             notes.push({id:Date.now(), text:txt});
-            localStorage.setItem('notesDB_v7', JSON.stringify(notes));
+            localStorage.setItem('notesDB_final', JSON.stringify(notes));
             document.getElementById('note-text').value=""; renderNotes();
         }
     }
     function renderNotes() {
         document.getElementById('note-grid').innerHTML = notes.slice().reverse().map(n => `<div style="background:#fff; padding:20px; border-radius:16px; box-shadow:0 4px 10px rgba(0,0,0,0.03); display:flex; justify-content:space-between; align-items:center; border:1px solid #f1f5f9"><span style="font-weight:500; color:#334155">${n.text}</span><span onclick="delNote(${n.id})" style="color:#ef4444; font-weight:bold; cursor:pointer; background:#fee2e2; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%">✕</span></div>`).join('');
     }
-    function delNote(id) { notes=notes.filter(n=>n.id!==id); localStorage.setItem('notesDB_v7', JSON.stringify(notes)); renderNotes(); }
+    function delNote(id) { notes=notes.filter(n=>n.id!==id); localStorage.setItem('notesDB_final', JSON.stringify(notes)); renderNotes(); }
 
     function downloadExcel() {
         let csv = "ID,Tarikh,Nama,Aset,Serial,Masalah,Status IT,Nama IT\n" + db.map(r => `${r.id},"${r.date}","${r.name}","${r.asset}","${r.serial}","${r.note}","${r.status}","${r.itName}"`).join("\n");
         const link = document.createElement('a');
         link.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-        link.download = 'Laporan_Aset_V7.csv'; link.click();
+        link.download = 'Laporan_Aset_Syuhaida.csv'; link.click();
     }
     
     // Init
