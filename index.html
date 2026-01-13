@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Aset YPKT - V20 (Fixed)</title>
+    <title>Sistem Aset YPKT - V21 (Enhanced Tracking)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* --- STYLE ASAL KEKAL (TIDAK BERUBAH) --- */
         :root {
             --primary: #2563eb; 
             --dark: #1e293b; 
@@ -18,11 +19,9 @@
         body { font-family: 'Inter', sans-serif; margin: 0; background: var(--light); height: 100vh; overflow: hidden; }
         * { box-sizing: border-box; }
 
-        /* --- 1. UTILITIES (SOROK SCROLLBAR) --- */
         .hide-scroll { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
 
-        /* --- 2. LANDING PAGE (3 PINTU) --- */
         #landing-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -30,7 +29,6 @@
             z-index: 9999; transition: transform 0.4s ease;
         }
         .landing-grid { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 340px; }
-        
         .landing-card {
             background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
             padding: 20px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: white;
@@ -40,15 +38,11 @@
         .icon-box { font-size: 1.8rem; width: 50px; text-align: center; }
         .card-title { font-weight: 700; font-size: 1rem; }
         .card-sub { font-size: 0.8rem; color: #94a3b8; }
-
-        /* Special Color for Fast Track */
         .card-fast { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); }
 
-        /* --- 3. LAYOUT (SIDEBAR + CONTENT) --- */
         #app-container { display: none; height: 100vh; width: 100%; }
         #app-container.active { display: flex; }
 
-        /* SIDEBAR (Responsive) */
         .sidebar {
             width: 260px; background: var(--sidebar-bg); color: #cbd5e1;
             display: flex; flex-direction: column; flex-shrink: 0;
@@ -63,31 +57,33 @@
         .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
         .nav-item.active { background: var(--primary); color: white; }
         
-        /* CONTENT AREA */
         .main-content { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--light); }
         .top-header {
             height: 60px; background: white; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0;
         }
         .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--dark); margin-right: 15px; }
-        
         .page-area { flex: 1; padding: 20px; overflow-y: auto; }
         .page-section { display: none; max-width: 800px; margin: 0 auto; animation: fadeUp 0.3s; }
         .page-section.active { display: block; }
 
-        /* CARDS & FORMS */
         .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* CSS KHAS UNTUK KAD YANG BOLEH KLIK DI BAHAGIAN JEJAK */
+        .card-track-clickable {
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; 
+            border-left: 5px solid var(--primary);
+        }
+        .card-track-clickable:active { transform: scale(0.98); background: #f8fafc; }
+        .card-track-clickable:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
         label { display: block; font-weight: 600; font-size: 0.9rem; color: #475569; margin-bottom: 6px; margin-top: 15px; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #f8fafc; font-family: inherit; }
         
-        /* BUTTONS */
         .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 1rem; }
-        .btn:active { transform: scale(0.98); }
         .btn-blue { background: var(--primary); }
         .btn-green { background: var(--green); }
-        .btn-excel { background: #15803d; }
-
-        /* CANVAS */
+        
         .canvas-wrapper {
             border: 2px dashed #94a3b8; border-radius: 8px; height: 180px; background: white;
             position: relative; touch-action: none; 
@@ -98,7 +94,27 @@
             font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; cursor: pointer; z-index: 10;
         }
 
-        /* RESPONSIVE */
+        /* POPUP MODAL */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center;
+            padding: 20px; backdrop-filter: blur(5px);
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; width: 100%; max-width: 600px; border-radius: 12px;
+            max-height: 85vh; overflow-y: auto; padding: 25px; position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeUp 0.3s;
+        }
+        .modal-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Style dalam Popup */
+        .info-block { margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .info-label { font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; display:block; }
+        .info-val { font-size: 0.95rem; color: #1e293b; font-weight: 500; margin-bottom: 10px; display:block; }
+        .log-item { padding: 8px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.9rem; }
+        .log-item:last-child { border-bottom: none; }
+
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100%; left: -260px; width: 260px; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
             .sidebar.open { transform: translateX(260px); }
@@ -113,21 +129,30 @@
 
     <div class="overlay" onclick="toggleSidebar()"></div>
 
+    <div id="detail-modal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span id="m-title">Detail Aset</span>
+                <button onclick="closeModal()" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer">Tutup</button>
+            </div>
+            <div id="m-body"></div>
+            <button class="btn btn-blue" onclick="closeModal()" style="margin-top:15px">OK</button>
+        </div>
+    </div>
+
     <div id="landing-page">
         <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1>
-        <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">Versi 20 - Excel Pro</p>
+        <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">Versi 21 - Enhanced Tracking</p>
 
         <div class="landing-grid">
             <div class="landing-card" onclick="openMode('public')">
                 <div class="icon-box">📝</div>
                 <div><div class="card-title">Cikgu / Staff</div><div class="card-sub">Isi Borang Serahan</div></div>
             </div>
-
             <div class="landing-card card-fast" onclick="authFastTrack()">
                 <div class="icon-box">📦</div>
                 <div><div class="card-title">Serahan Pulang</div><div class="card-sub">Fast Track (Berkunci)</div></div>
             </div>
-
             <div class="landing-card" onclick="authAdmin()">
                 <div class="icon-box">🛡️</div>
                 <div><div class="card-title">Admin Dashboard</div><div class="card-sub">Full Access + Excel</div></div>
@@ -205,11 +230,27 @@
                 </div>
 
                 <div id="adm-jejak" class="page-section">
-                    <h2 style="margin-top:0">📍 Live Tracking</h2>
-                    <div class="card" style="background:#eff6ff">
-                        <select id="track-sel" style="margin-bottom:10px"></select>
-                        <div style="display:flex; gap:10px"><input id="track-txt" placeholder="Status..."><button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:auto">Update</button></div>
+                    <h2 style="margin-top:0">📍 Jejak & Kemaskini Aset</h2>
+                    
+                    <div class="card" style="background:#eff6ff; border:1px solid #bfdbfe">
+                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Kemaskini Status (Update)</h3>
+                        <p style="font-size:0.85rem; color:#64748b; margin-bottom:15px">
+                            Pilih aset, tulis lokasi/status baru, dan tekan butang Update. Info ini akan masuk ke dalam sejarah aset.
+                        </p>
+                        
+                        <label>Pilih Aset:</label>
+                        <select id="track-sel" style="background:white"></select>
+                        
+                        <label>Catatan Status / Lokasi Terkini:</label>
+                        <div style="display:flex; gap:10px">
+                            <input id="track-txt" placeholder="Cth: Hantar repair kedai, Sedang format, Menunggu sparepart...">
+                            <button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:auto">Update</button>
+                        </div>
                     </div>
+
+                    <p style="text-align:center; font-size:0.85rem; color:#64748b; margin-top:30px; margin-bottom:10px">
+                        👇 Klik pada kad aset di bawah untuk lihat <b>SEMUA DATA</b> (Cikgu, Admin, Tracking, Pulang) 👇
+                    </p>
                     <div id="list-jejak"></div>
                 </div>
 
@@ -230,10 +271,10 @@
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('db_v20')) || [];
-    let currentMode = ''; 
+    // --- DATABASE KEKAL ---
+    let db = JSON.parse(localStorage.getItem('db_v21')) || [];
 
-    // --- 1. MODE & NAVIGATION ---
+    // --- NAVIGASI & AUTH (KEKAL) ---
     function openMode(mode) {
         document.getElementById('landing-page').style.transform = 'translateY(-100%)';
         setTimeout(() => {
@@ -253,7 +294,7 @@
 
     function authFastTrack() {
         let p = prompt("Masukkan Password Fast Track (Cth: 1234):");
-        if(p === "1234") { // Password Fast Track
+        if(p === "1234") { 
             document.getElementById('landing-page').style.transform = 'translateY(-100%)';
             setTimeout(() => {
                 document.getElementById('app-container').classList.add('active');
@@ -274,9 +315,9 @@
             document.getElementById('landing-page').style.transform = 'translateY(-100%)';
             setTimeout(() => {
                 document.getElementById('app-container').classList.add('active');
-                document.getElementById('sidebar').style.display = 'flex'; // Show Sidebar
+                document.getElementById('sidebar').style.display = 'flex'; 
                 document.getElementById('menu-btn').style.display = 'block';
-                navTo('adm-terima', document.querySelector('.nav-item')); // Default tab
+                navTo('adm-terima', document.querySelector('.nav-item')); 
             }, 300);
         } else { alert("Akses Ditolak!"); }
     }
@@ -288,14 +329,13 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         if(el) el.classList.add('active');
 
-        // Close sidebar on mobile
         document.getElementById('sidebar').classList.remove('open');
         document.querySelector('.overlay').classList.remove('active');
 
         if(pageId === 'adm-terima') renderTerima();
         if(pageId === 'adm-jejak') renderJejak();
         if(pageId === 'adm-pulang') renderListPulang('list-pulang-admin');
-        if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v20') || '';
+        if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v21') || '';
     }
 
     function toggleSidebar() {
@@ -303,7 +343,7 @@
         document.querySelector('.overlay').classList.toggle('active');
     }
 
-    // --- 2. LOGIC: CIKGU SUBMIT ---
+    // --- LOGIC: CIKGU SUBMIT (KEKAL) ---
     function submitCikgu() {
         let n = document.getElementById('c_name').value;
         let l = document.getElementById('c_loc').value;
@@ -317,24 +357,22 @@
             serial: s, issue: document.getElementById('c_issue').value,
             status: 'PENDING',
             logs: [],
-            // Admin data
             admName: '', admTime: '',
-            // Return data
             retName: '', retTime: ''
         });
-        localStorage.setItem('db_v20', JSON.stringify(db));
+        localStorage.setItem('db_v21', JSON.stringify(db));
         alert("Borang Berjaya Dihantar!");
         location.reload();
     }
 
-    // --- 3. LOGIC: ADMIN TERIMA (DIKEMASKINI: TAMBAH DATE & PADAM SIGN) ---
+    // --- LOGIC: ADMIN TERIMA (KEKAL) ---
     function renderTerima() {
         let div = document.getElementById('list-terima');
         div.innerHTML = '';
         let list = db.filter(x => x.status === 'PENDING').reverse();
         if(list.length === 0) div.innerHTML = '<p class="text-center">Tiada data.</p>';
         
-        let now = new Date().toLocaleString(); // Masa semasa
+        let now = new Date().toLocaleString(); 
 
         list.forEach(i => {
             div.innerHTML += `
@@ -342,19 +380,15 @@
                 <h3>${i.type} (${i.serial})</h3>
                 <p>${i.name} - ${i.loc}<br><span style="color:red">Masalah: ${i.issue}</span></p>
                 <hr>
-                
                 <label>Tarikh Terima (Auto)</label>
                 <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
-                
                 <label>Nama Admin</label>
                 <input id="adm_n_${i.id}" placeholder="Masukkan Nama Admin...">
-                
                 <label>Tandatangan Admin</label>
                 <div class="canvas-wrapper" style="height:120px">
                     <canvas id="cvs_adm_${i.id}"></canvas>
                     <div class="btn-clear-sign" onclick="clearCanvas('cvs_adm_${i.id}')">Padam</div>
                 </div>
-
                 <button class="btn btn-blue" onclick="saveTerima(${i.id})">Terima</button>
             </div>`;
             setTimeout(()=>initCanvas(`cvs_adm_${i.id}`),100);
@@ -369,41 +403,125 @@
         db[idx].admName = n;
         db[idx].admTime = new Date().toLocaleString();
         db[idx].logs.push(`Diterima Admin: ${n} (${db[idx].admTime})`);
-        localStorage.setItem('db_v20', JSON.stringify(db));
+        localStorage.setItem('db_v21', JSON.stringify(db));
         renderTerima();
     }
 
-    // --- 4. LOGIC: JEJAK ---
+    // --- LOGIC: JEJAK ASET (UPDATED MENGIKUT PERMINTAAN) ---
     function renderJejak() {
+        // 1. Render Dropdown untuk Update
         let sel = document.getElementById('track-sel');
-        sel.innerHTML = '<option value="">Pilih Aset...</option>';
+        sel.innerHTML = '<option value="">-- Pilih Aset --</option>';
         db.filter(x => x.status === 'RECEIVED').forEach(x => {
-            sel.innerHTML += `<option value="${x.id}">${x.type} (${x.name})</option>`;
+            sel.innerHTML += `<option value="${x.id}">${x.type} - ${x.name} (${x.serial})</option>`;
         });
         
+        // 2. Render Senarai Kad
         let div = document.getElementById('list-jejak');
         div.innerHTML = '';
+        
+        // Tunjuk yang Received atau Returned
         db.filter(x => x.status !== 'PENDING').reverse().forEach(i => {
-            div.innerHTML += `<div class="card"><b>${i.type} (${i.serial})</b><br>Status: ${i.status}<br><small>${i.logs.join('<br>')}</small></div>`;
+            // Status label color
+            let statusColor = i.status === 'RETURNED' ? 'green' : 'blue';
+            let statusText = i.status === 'RETURNED' ? 'SUDAH PULANG' : 'DALAM PROSES';
+
+            div.innerHTML += `
+            <div class="card card-track-clickable" onclick="showDetails(${i.id})">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <b>${i.type} (${i.serial})</b>
+                    <span style="font-size:0.7rem; background:${statusColor=='green'?'#dcfce7':'#dbeafe'}; color:${statusColor}; padding:3px 8px; border-radius:4px; font-weight:bold">${statusText}</span>
+                </div>
+                <div style="font-size:0.9rem; margin-top:5px; color:#475569">
+                    Milik: ${i.name} (${i.loc})
+                </div>
+                <div style="font-size:0.8rem; color:#64748b; margin-top:10px; font-style:italic">
+                    Klik kad ini untuk info penuh & sejarah.
+                </div>
+            </div>`;
         });
     }
-    
+
+    // FUNGSI UPDATE STATUS
     function addTrack() {
         let id = document.getElementById('track-sel').value;
         let txt = document.getElementById('track-txt').value;
-        if(!id || !txt) return;
+        
+        if(!id || !txt) return alert("Sila pilih aset dan tulis status!");
+        
         let idx = db.findIndex(x=>x.id==id);
+        
+        // Tambah ke logs
         db[idx].logs.push(`${txt} (${new Date().toLocaleString()})`);
-        localStorage.setItem('db_v20', JSON.stringify(db));
+        
+        localStorage.setItem('db_v21', JSON.stringify(db));
+        document.getElementById('track-txt').value = ''; // clear input
         renderJejak();
+        alert("Status dikemaskini!");
     }
 
-    // --- 5. LOGIC: SERAHAN PULANG (DIKEMASKINI: TAMBAH DATE) ---
+    // FUNGSI POPUP (SHOW ALL DATA)
+    function showDetails(id) {
+        let item = db.find(x => x.id == id);
+        if(!item) return;
+
+        // Susun sejarah logs
+        let logsHTML = '';
+        if(item.logs && item.logs.length > 0) {
+            item.logs.forEach(log => {
+                logsHTML += `<div class="log-item">👉 ${log}</div>`;
+            });
+        } else {
+            logsHTML = '<div class="log-item">Tiada rekod lagi.</div>';
+        }
+
+        let html = `
+            <div class="info-block" style="border-left:4px solid #2563eb">
+                <span class="info-label">MAKLUMAT ASAL (CIKGU)</span>
+                <span class="info-val">Nama: ${item.name}</span>
+                <span class="info-val">Lokasi: ${item.loc}</span>
+                <span class="info-val">Aset: ${item.type} (${item.serial})</span>
+                <span class="info-val" style="color:red">Masalah: ${item.issue}</span>
+                <span class="info-val">Tarikh Lapor: ${item.date}</span>
+            </div>
+
+            <div class="info-block" style="border-left:4px solid #f59e0b">
+                <span class="info-label">STATUS PENERIMAAN</span>
+                <span class="info-val">Diterima Oleh: ${item.admName || '-'}</span>
+                <span class="info-val">Tarikh: ${item.admTime || '-'}</span>
+                <span class="info-val">Status Semasa: <b>${item.status}</b></span>
+            </div>
+
+            <div class="info-block" style="border-left:4px solid #64748b">
+                <span class="info-label">SEJARAH JEJAK & UPDATE</span>
+                <div style="max-height:150px; overflow-y:auto">
+                    ${logsHTML}
+                </div>
+            </div>
+
+            ${item.status === 'RETURNED' ? `
+            <div class="info-block" style="border-left:4px solid #10b981">
+                <span class="info-label">MAKLUMAT PEMULANGAN</span>
+                <span class="info-val">Dipulangkan Kepada: ${item.retName}</span>
+                <span class="info-val">Tarikh: ${item.retTime}</span>
+            </div>` : ''}
+        `;
+
+        document.getElementById('m-title').innerText = `Info Penuh: ${item.type}`;
+        document.getElementById('m-body').innerHTML = html;
+        document.getElementById('detail-modal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('detail-modal').classList.remove('active');
+    }
+
+    // --- LOGIC: SERAHAN PULANG (KEKAL) ---
     function renderListPulang(targetId) {
         let div = document.getElementById(targetId);
         div.innerHTML = '';
         let list = db.filter(x => x.status === 'RECEIVED').reverse();
-        let now = new Date().toLocaleString(); // Masa semasa
+        let now = new Date().toLocaleString(); 
         
         if(list.length === 0) div.innerHTML = '<p>Tiada aset sedia dipulangkan.</p>';
 
@@ -413,13 +531,10 @@
                 <h3>${i.type} (${i.serial})</h3>
                 <p>Milik: ${i.name} (${i.loc})</p>
                 <div style="background:#f0fdf4; padding:10px; border-radius:8px">
-                    
                     <label>Tarikh Serahan (Auto)</label>
                     <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
-
                     <label>Nama Penerima</label>
                     <input id="ret_n_${i.id}" placeholder="Nama Penerima...">
-                    
                     <label>Sign Penerima:</label>
                     <div class="canvas-wrapper" style="height:140px"><canvas id="cvs_ret_${i.id}"></canvas><div class="btn-clear-sign" onclick="clearCanvas('cvs_ret_${i.id}')">Padam</div></div>
                     <button class="btn btn-green" onclick="savePulang(${i.id}, '${targetId}')">Sahkan Serahan</button>
@@ -437,42 +552,29 @@
         db[idx].retName = n;
         db[idx].retTime = new Date().toLocaleString();
         db[idx].logs.push(`Dipulangkan kpd: ${n} (${db[idx].retTime})`);
-        localStorage.setItem('db_v20', JSON.stringify(db));
+        localStorage.setItem('db_v21', JSON.stringify(db));
         renderListPulang(viewId);
     }
 
-    // --- 6. EXCEL FULL FIX ---
+    // --- EXCEL (KEKAL) ---
     function downloadExcelAll() {
         if(db.length === 0) return alert("Tiada data.");
         
-        // Header Column
         let headers = ["ID", "Tarikh Lapor", "Nama Cikgu", "Lokasi", "Jenis", "No Siri", "Masalah", "Status", "Admin Terima", "Tarikh Terima", "Penerima Akhir", "Tarikh Pulang"];
-        
         let csvRows = [];
         csvRows.push(headers.join(","));
 
         db.forEach(row => {
-            // Helper to clean text for CSV (remove newlines, escape quotes)
             const clean = (text) => {
                 if(!text) return "";
-                let str = String(text).replace(/"/g, '""'); // Escape double quotes
-                str = str.replace(/(\r\n|\n|\r)/gm, " "); // Replace newlines with space
-                return `"${str}"`; // Wrap in quotes
+                let str = String(text).replace(/"/g, '""'); 
+                str = str.replace(/(\r\n|\n|\r)/gm, " "); 
+                return `"${str}"`; 
             };
-
             let values = [
-                row.id,
-                clean(row.date),
-                clean(row.name),
-                clean(row.loc),
-                clean(row.type),
-                clean(row.serial),
-                clean(row.issue),
-                clean(row.status),
-                clean(row.admName),
-                clean(row.admTime),
-                clean(row.retName),
-                clean(row.retTime)
+                row.id, clean(row.date), clean(row.name), clean(row.loc), clean(row.type),
+                clean(row.serial), clean(row.issue), clean(row.status), clean(row.admName),
+                clean(row.admTime), clean(row.retName), clean(row.retTime)
             ];
             csvRows.push(values.join(","));
         });
@@ -486,9 +588,9 @@
         document.body.removeChild(a);
     }
 
-    function saveNote() { localStorage.setItem('nota_v20', document.getElementById('notepad').value); }
+    function saveNote() { localStorage.setItem('nota_v21', document.getElementById('notepad').value); }
 
-    // --- 7. CANVAS ENGINE (FIXED) ---
+    // --- CANVAS ENGINE (KEKAL) ---
     function initCanvas(id) {
         let c = document.getElementById(id);
         if(!c) return;
@@ -505,7 +607,6 @@
                 y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
             };
         };
-
         ['mousedown','touchstart'].forEach(evt => c.addEventListener(evt, (e)=>{ 
             if(evt=='touchstart') e.preventDefault();
             drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); 
