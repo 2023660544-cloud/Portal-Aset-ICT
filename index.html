@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Aset YPKT - V23 (Manual Receiver)</title>
+    <title>Sistem Aset YPKT - V24 (Multi-Log)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- STYLE ASAL KEKAL (TIDAK BERUBAH) --- */
@@ -124,7 +124,7 @@
             color: rgba(255,255,255,0.3); font-size: 0.8rem; letter-spacing: 0.5px;
         }
 
-        /* --- STYLE SEARCH (WOW EFFECT) --- */
+        /* --- STYLE SEARCH --- */
         .search-hero {
             background: white; border-radius: 16px; padding: 30px; 
             text-align: center; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
@@ -177,7 +177,7 @@
 
     <div id="landing-page">
         <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1>
-      <p></p>
+        <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">Versi 24 - Log & Nota (Firebase)</p>
 
         <div class="landing-grid">
             <div class="landing-card" onclick="openMode('public')">
@@ -281,19 +281,22 @@
                     <h2 style="margin-top:0">📍 Jejak & Kemaskini Aset</h2>
                     
                     <div class="card" style="background:#eff6ff; border:1px solid #bfdbfe">
-                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Kemaskini Log (Nota Sahaja)</h3>
+                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Kemaskini Log & Nota (Multiple)</h3>
                         <p style="font-size:0.85rem; color:#64748b; margin-bottom:15px">
-                            Gunakan ini untuk tulis nota progres. <br>
-                            <b>Untuk tandakan SIAP, sila klik pada kad aset di bawah.</b>
+                            Pilih aset untuk melihat sejarah nota dan menambah nota baru.
                         </p>
                         
                         <label>Pilih Aset:</label>
-                        <select id="track-sel" style="background:white"></select>
+                        <select id="track-sel" style="background:white" onchange="previewLogs()"></select>
                         
-                        <label>Catatan Log:</label>
-                        <div style="display:flex; gap:10px">
-                            <input id="track-txt" placeholder="Cth: Hantar repair kedai, Menunggu sparepart...">
-                            <button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:auto">Simpan</button>
+                        <div id="log-preview" style="margin-top:10px; padding:10px; background:white; border-radius:6px; border:1px dashed #94a3b8; max-height:120px; overflow-y:auto; display:none;">
+                            <small style="color:#94a3b8"><i>Pilih aset untuk lihat sejarah nota...</i></small>
+                        </div>
+
+                        <label>Tambah Catatan Baru:</label>
+                        <div style="display:flex; gap:10px; align-items:flex-start">
+                            <textarea id="track-txt" rows="2" placeholder="Cth: Hantar repair, Menunggu barang, Siap format..." style="resize:none"></textarea>
+                            <button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:120px; height:auto">Simpan</button>
                         </div>
                     </div>
 
@@ -340,19 +343,16 @@
         const app = initializeApp(firebaseConfig);
         const dbRef = getDatabase(app);
 
-        // GLOBAL EXPORT
         window.dbRef = dbRef;
         window.push = push;
         window.ref = ref;
         window.update = update;
         window.db = []; 
 
-        // REALTIME SYNC
         onValue(ref(dbRef, 'assets'), (snapshot) => {
             const data = snapshot.val();
             window.db = data ? Object.keys(data).map(key => ({...data[key], id: key})) : [];
             
-            // Auto Render
             if(document.getElementById('adm-terima').classList.contains('active')) window.renderTerima();
             if(document.getElementById('adm-jejak').classList.contains('active')) window.renderJejak();
             if(document.getElementById('adm-pulang').classList.contains('active')) window.renderListPulang('list-pulang-admin');
@@ -360,7 +360,7 @@
     </script>
 
     <script>
-        // --- NAVIGASI & AUTH ---
+        // --- NAVIGASI ---
         function openMode(mode) {
             document.getElementById('landing-page').style.transform = 'translateY(-100%)';
             setTimeout(() => {
@@ -420,7 +420,7 @@
             if(pageId === 'adm-terima') renderTerima();
             if(pageId === 'adm-jejak') renderJejak();
             if(pageId === 'adm-pulang') renderListPulang('list-pulang-admin');
-            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v23') || '';
+            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v24') || '';
         }
 
         function toggleSidebar() {
@@ -428,7 +428,7 @@
             document.querySelector('.overlay').classList.toggle('active');
         }
 
-        // --- SEARCH FAST TRACK (EDITED: NAMA PENERIMA KOSONG) ---
+        // --- SEARCH FAST TRACK (KEKAL: NAMA PENERIMA KOSONG) ---
         function searchMyAsset() {
             let keyword = document.getElementById('search-keyword').value.trim().toLowerCase();
             let div = document.getElementById('search-results-area');
@@ -437,7 +437,6 @@
             if(keyword.length < 3) return alert("Sila masukkan sekurang-kurangnya 3 huruf nama pemilik.");
             div.innerHTML = '<p style="text-align:center; color:#64748b">Sedang mencari...</p>';
 
-            // Cari aset berdasarkan nama PEMILIK
             let matches = window.db.filter(x => 
                 x.status === 'COMPLETED' && 
                 x.name.toLowerCase().includes(keyword)
@@ -455,7 +454,6 @@
             } else {
                 let now = new Date().toLocaleString();
                 matches.forEach(i => {
-                    // DI SINI PERUBAHANNYA: VALUE INPUT NAMA PENERIMA KOSONG
                     div.innerHTML += `
                     <div class="card result-card" style="border-left:5px solid #8b5cf6; border-top:1px solid #e2e8f0">
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
@@ -487,7 +485,7 @@
 
         function savePulangPublic(id) {
             let n = document.getElementById(`ret_n_pub_${id}`).value;
-            if(!n) return alert("Sila isikan nama penerima/wakil!"); // Wajib isi
+            if(!n) return alert("Sila isikan nama penerima/wakil!"); 
             
             let item = window.db.find(x => x.id === id);
             let currentLogs = item.logs || [];
@@ -505,7 +503,6 @@
             });
         }
 
-        // --- SUBMIT CIKGU ---
         function submitCikgu() {
             let n = document.getElementById('c_name').value;
             let l = document.getElementById('c_loc').value;
@@ -525,15 +522,12 @@
             }).catch(e => alert("Error internet: " + e));
         }
 
-        // --- ADMIN TERIMA ---
         function renderTerima() {
             let div = document.getElementById('list-terima');
             div.innerHTML = '';
             let list = window.db.filter(x => x.status === 'PENDING').reverse();
             if(list.length === 0) div.innerHTML = '<p class="text-center">Tiada data baru.</p>';
-            
             let now = new Date().toLocaleString(); 
-
             list.forEach(i => {
                 div.innerHTML += `
                 <div class="card" style="border-left:5px solid #f59e0b">
@@ -558,27 +552,25 @@
         function saveTerima(id) {
             let n = document.getElementById(`adm_n_${id}`).value;
             if(!n) return alert("Nama Admin wajib isi!");
-            
             let item = window.db.find(x => x.id === id);
             let currentLogs = item.logs || [];
             currentLogs.push({text: `Diterima Admin: ${n}`, time: new Date().toLocaleString()});
-
             window.update(window.ref(window.dbRef, 'assets/' + id), {
-                status: 'RECEIVED',
-                admName: n,
-                admTime: new Date().toLocaleString(),
-                logs: currentLogs
+                status: 'RECEIVED', admName: n, admTime: new Date().toLocaleString(), logs: currentLogs
             });
         }
 
-        // --- JEJAK ASET ---
+        // --- JEJAK ASET (LOGIC BARU: PREVIEW LOG) ---
         function renderJejak() {
             let sel = document.getElementById('track-sel');
-            sel.innerHTML = '<option value="">-- Pilih Aset --</option>';
+            // Simpan value lama kalau ada (supaya tak refresh hilang selection)
+            let oldVal = sel.value;
+            sel.innerHTML = '<option value="">-- Pilih Aset Untuk Tambah Nota --</option>';
             window.db.filter(x => x.status !== 'RETURNED' && x.status !== 'PENDING').forEach(x => {
                 sel.innerHTML += `<option value="${x.id}">${x.type} - ${x.name} (${x.serial})</option>`;
             });
-            
+            sel.value = oldVal; // Restore selection
+
             let div = document.getElementById('list-jejak');
             div.innerHTML = '';
             
@@ -601,6 +593,32 @@
                     </div>
                 </div>`;
             });
+
+            // Update preview kalau ada selection
+            if(sel.value) previewLogs();
+        }
+
+        // FUNGSI BARU: TUNJUK LOG BILA PILIH DROPDOWN
+        window.previewLogs = function() {
+            let id = document.getElementById('track-sel').value;
+            let previewDiv = document.getElementById('log-preview');
+            
+            if(!id) {
+                previewDiv.style.display = 'none';
+                return;
+            }
+
+            let item = window.db.find(x => x.id === id);
+            if(item && item.logs) {
+                previewDiv.style.display = 'block';
+                previewDiv.innerHTML = '<strong style="display:block; margin-bottom:5px; font-size:0.8rem; color:#64748b">SEJARAH NOTA (TERKINI DI ATAS):</strong>';
+                // Clone array, reverse to show newest first
+                [...item.logs].reverse().forEach(l => {
+                    previewDiv.innerHTML += `<div style="font-size:0.85rem; border-bottom:1px solid #eee; padding:4px 0;">👉 ${l.text} <span style="color:#aaa; font-size:0.75rem">(${l.time})</span></div>`;
+                });
+            } else {
+                previewDiv.style.display = 'none';
+            }
         }
 
         function addTrack() {
@@ -610,21 +628,23 @@
             
             let item = window.db.find(x => x.id === id);
             let currentLogs = item.logs || [];
+            // Multiple Notes: Push to array, don't overwrite
             currentLogs.push({text: txt, time: new Date().toLocaleString()});
 
-            window.update(window.ref(window.dbRef, 'assets/' + id), { logs: currentLogs });
-            document.getElementById('track-txt').value = '';
-            alert("Nota log disimpan.");
+            window.update(window.ref(window.dbRef, 'assets/' + id), { logs: currentLogs }).then(() => {
+                document.getElementById('track-txt').value = ''; // Clear input only
+                previewLogs(); // Refresh preview immediately
+            });
         }
 
-        // --- FUNGSI POPUP + BUTANG COMPLETE ---
         function showDetails(id) {
             let item = window.db.find(x => x.id == id);
             if(!item) return;
 
             let logsHTML = '';
             if(item.logs && Array.isArray(item.logs)) {
-                item.logs.forEach(log => {
+                // Show newest first in detail view too
+                [...item.logs].reverse().forEach(log => {
                     logsHTML += `<div class="log-item">👉 ${log.text} <small style="color:#aaa">(${log.time})</small></div>`;
                 });
             }
@@ -637,7 +657,7 @@
                     <span class="info-val" style="color:red">Masalah: ${item.issue}</span>
                 </div>
                 <div class="info-block">
-                    <span class="info-label">SEJARAH LOG</span>
+                    <span class="info-label">SEJARAH LOG (MULTIPLE)</span>
                     <div style="max-height:150px; overflow-y:auto">${logsHTML}</div>
                 </div>
             `;
@@ -677,7 +697,6 @@
 
         function closeModal() { document.getElementById('detail-modal').classList.remove('active'); }
 
-        // --- LIST PULANG ADMIN ---
         function renderListPulang(targetId) {
             let div = document.getElementById(targetId);
             div.innerHTML = '';
@@ -721,7 +740,6 @@
             });
         }
 
-        // --- EXCEL ---
         function downloadExcelAll() {
             if(window.db.length === 0) return alert("Tiada data.");
             let headers = ["ID", "Tarikh", "Nama", "Lokasi", "Jenis", "Siri", "Masalah", "Status", "Admin", "Penerima", "Tarikh Pulang"];
@@ -743,7 +761,7 @@
             document.body.removeChild(a);
         }
 
-        function saveNote() { localStorage.setItem('nota_v23', document.getElementById('notepad').value); }
+        function saveNote() { localStorage.setItem('nota_v24', document.getElementById('notepad').value); }
 
         function initCanvas(id) {
             let c = document.getElementById(id);
