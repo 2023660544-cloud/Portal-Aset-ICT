@@ -3,110 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Aset YPKT - V20</title>
+    <title>Sistem Aset YPKT - V21 Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb; 
-            --dark: #1e293b; 
-            --sidebar-bg: #0f172a;
-            --light: #f3f4f6;
-            --red: #ef4444;
-            --green: #10b981;
-            --orange: #f97316;
+            --primary: #2563eb; --dark: #1e293b; --sidebar-bg: #0f172a;
+            --light: #f3f4f6; --red: #dc2626; --green: #10b981;
         }
         body { font-family: 'Inter', sans-serif; margin: 0; background: var(--light); height: 100vh; overflow: hidden; }
         * { box-sizing: border-box; }
 
-        /* --- 1. UTILITIES (SOROK SCROLLBAR) --- */
-        .hide-scroll { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
+        /* --- UTILS --- */
+        .hide-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-        /* --- 2. LANDING PAGE (3 PINTU) --- */
+        /* --- LANDING PAGE --- */
         #landing-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; transition: transform 0.4s ease;
+            z-index: 9999; transition: transform 0.4s ease; padding: 20px;
         }
-        .landing-grid { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 340px; }
-        
+        .landing-grid { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; }
         .landing-card {
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: white;
-            backdrop-filter: blur(10px); transition: 0.2s;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 15px; color: white;
+            cursor: pointer; backdrop-filter: blur(5px);
         }
-        .landing-card:active { transform: scale(0.96); background: rgba(255,255,255,0.15); }
-        .icon-box { font-size: 1.8rem; width: 50px; text-align: center; }
-        .card-title { font-weight: 700; font-size: 1rem; }
-        .card-sub { font-size: 0.8rem; color: #94a3b8; }
+        .landing-card:active { background: rgba(255,255,255,0.2); transform: scale(0.98); }
 
-        /* Special Color for Fast Track */
-        .card-fast { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); }
-
-        /* --- 3. LAYOUT (SIDEBAR + CONTENT) --- */
+        /* --- LAYOUT --- */
         #app-container { display: none; height: 100vh; width: 100%; }
         #app-container.active { display: flex; }
 
-        /* SIDEBAR (Responsive) */
+        /* SIDEBAR */
         .sidebar {
             width: 260px; background: var(--sidebar-bg); color: #cbd5e1;
-            display: flex; flex-direction: column; flex-shrink: 0;
-            transition: transform 0.3s ease; z-index: 1000;
+            display: flex; flex-direction: column; flex-shrink: 0; z-index: 1000;
+            transition: transform 0.3s ease;
         }
-        .brand { padding: 25px; font-size: 1.2rem; font-weight: 700; color: white; border-bottom: 1px solid #334155; }
-        .nav-links { padding: 20px 10px; flex: 1; }
-        .nav-item {
-            padding: 14px; margin-bottom: 5px; border-radius: 8px; cursor: pointer;
-            display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s;
-        }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item { padding: 15px; cursor: pointer; border-radius: 8px; margin-bottom: 5px; }
         .nav-item.active { background: var(--primary); color: white; }
         
-        /* CONTENT AREA */
-        .main-content { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--light); }
+        /* CONTENT */
+        .main-content { flex: 1; display: flex; flex-direction: column; background: var(--light); position: relative; width: 100%; }
         .top-header {
-            height: 60px; background: white; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0;
+            height: 60px; background: white; padding: 0 15px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-shrink: 0;
         }
-        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--dark); margin-right: 15px; }
-        
-        .page-area { flex: 1; padding: 20px; overflow-y: auto; }
-        .page-section { display: none; max-width: 800px; margin: 0 auto; animation: fadeUp 0.3s; }
+        .page-area { flex: 1; padding: 15px; overflow-y: auto; padding-bottom: 80px; } /* Extra padding bottom for mobile scroll */
+        .page-section { display: none; max-width: 800px; margin: 0 auto; }
         .page-section.active { display: block; }
 
-        /* CARDS & FORMS */
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        label { display: block; font-weight: 600; font-size: 0.9rem; color: #475569; margin-bottom: 6px; margin-top: 15px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #f8fafc; font-family: inherit; }
+        /* CARDS */
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; position: relative; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 5px; margin-bottom: 15px; font-size: 16px; /* Prevents zoom on iPhone */ }
         
-        /* BUTTONS */
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 1rem; }
-        .btn:active { transform: scale(0.98); }
-        .btn-blue { background: var(--primary); }
-        .btn-green { background: var(--green); }
-        .btn-excel { background: #15803d; }
-
-        /* CANVAS */
+        /* CANVAS SIGNATURE */
         .canvas-wrapper {
-            border: 2px dashed #94a3b8; border-radius: 8px; height: 180px; background: white;
-            position: relative; touch-action: none; 
+            border: 2px dashed #94a3b8; border-radius: 8px; height: 160px; background: #fff;
+            position: relative; touch-action: none; overflow: hidden; margin-bottom: 15px;
         }
         canvas { width: 100%; height: 100%; display: block; }
+        
+        /* FIXED: BUTANG PADAM SIGN YANG JELAS */
         .btn-clear-sign {
-            position: absolute; bottom: 8px; right: 8px; background: #ef4444; color: white;
-            font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; cursor: pointer; z-index: 10;
+            position: absolute; bottom: 10px; right: 10px;
+            background: var(--red); color: white; font-size: 12px; font-weight: bold;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer; 
+            z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* RESPONSIVE */
+        /* BUTTONS */
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; color: white; font-weight: 600; font-size: 1rem; cursor: pointer; }
+        .btn-blue { background: var(--primary); }
+        .btn-green { background: var(--green); }
+        .btn-orange { background: #f97316; margin-top: 10px; }
+
+        /* RESPONSIVE MOBILE */
         @media (max-width: 768px) {
-            .sidebar { position: fixed; height: 100%; left: -260px; width: 260px; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
+            .sidebar { position: fixed; height: 100%; left: -260px; width: 260px; box-shadow: 5px 0 15px rgba(0,0,0,0.3); }
             .sidebar.open { transform: translateX(260px); }
-            .menu-toggle { display: block; }
-            .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 900; }
+            .overlay {
+                display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); z-index: 900;
+            }
             .overlay.active { display: block; }
+            .menu-toggle { display: block !important; font-size: 1.5rem; margin-right: 15px; cursor: pointer; }
+            
+            /* Better Card Spacing on Mobile */
+            .card { padding: 15px; }
+            h2 { font-size: 1.3rem; }
         }
-        @keyframes fadeUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+        .menu-toggle { display: none; }
     </style>
 </head>
 <body>
@@ -114,58 +102,59 @@
     <div class="overlay" onclick="toggleSidebar()"></div>
 
     <div id="landing-page">
-        <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1>
-        <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">Versi 20 - Excel Pro</p>
+        <h1 style="color:white; text-align:center; margin-bottom:5px">Sistem Aset YPKT</h1>
+        <p style="color:#cbd5e1; margin-top:0; margin-bottom:30px; text-align:center; font-size:0.9rem">V21 Mobile Fix & Data Tools</p>
 
         <div class="landing-grid">
-            <div class="landing-card" onclick="openMode('public')">
-                <div class="icon-box">📝</div>
-                <div><div class="card-title">Cikgu / Staff</div><div class="card-sub">Isi Borang Serahan</div></div>
+            <div class="landing-card" onclick="openPublic()">
+                <div style="font-size:1.8rem">📝</div>
+                <div><b>Cikgu / Staff</b><br><small style="opacity:0.7">Isi Borang</small></div>
             </div>
-
-            <div class="landing-card card-fast" onclick="authFastTrack()">
-                <div class="icon-box">📦</div>
-                <div><div class="card-title">Serahan Pulang</div><div class="card-sub">Fast Track (Berkunci)</div></div>
+            <div class="landing-card" style="border-color:var(--green); background:rgba(16,185,129,0.1)" onclick="authFast()">
+                <div style="font-size:1.8rem">📦</div>
+                <div><b>Fast Track</b><br><small style="opacity:0.7">Serahan Pulang (Berkunci)</small></div>
             </div>
-
             <div class="landing-card" onclick="authAdmin()">
-                <div class="icon-box">🛡️</div>
-                <div><div class="card-title">Admin Dashboard</div><div class="card-sub">Full Access + Excel</div></div>
+                <div style="font-size:1.8rem">🛡️</div>
+                <div><b>Admin IT</b><br><small style="opacity:0.7">Dashboard & Data</small></div>
             </div>
+        </div>
+        
+        <div style="margin-top:30px; color:#64748b; font-size:0.75rem; text-align:center; max-width:300px">
+            ⚠️ Nota: Data disimpan dalam device ini sahaja. Gunakan menu Admin untuk Backup/Restore jika perlu pindah data.
         </div>
     </div>
 
     <div id="app-container">
         
-        <div class="sidebar" id="sidebar" style="display:none">
-            <div class="brand">Admin Panel 🔒</div>
-            <div class="nav-links hide-scroll">
+        <div class="sidebar" id="sidebar">
+            <div style="padding:20px; font-weight:700; color:white; border-bottom:1px solid #334155">Admin Panel</div>
+            <div class="hide-scroll" style="padding:10px">
                 <div class="nav-item active" onclick="navTo('adm-terima', this)">📥 1. Penerimaan</div>
-                <div class="nav-item" onclick="navTo('adm-jejak', this)">📍 2. Jejak Aset</div>
-                <div class="nav-item" onclick="navTo('adm-pulang', this)">📦 3. Serahan Pulang</div>
-                <div class="nav-item" onclick="navTo('adm-nota', this)">📌 4. Nota (Sulit)</div>
-                <hr style="border-color:#334155">
-                <div class="nav-item" onclick="downloadExcelAll()" style="color:#4ade80">📊 Download Excel</div>
+                <div class="nav-item" onclick="navTo('adm-jejak', this)">📍 2. Jejak</div>
+                <div class="nav-item" onclick="navTo('adm-pulang', this)">📦 3. Serahan</div>
+                <div class="nav-item" onclick="navTo('adm-data', this)">💾 Backup / Restore Data</div>
+                <div class="nav-item" onclick="downloadExcel()" style="color:#4ade80; margin-top:20px">📊 Download Excel</div>
                 <div class="nav-item" onclick="location.reload()" style="color:#f87171">🚪 Log Keluar</div>
             </div>
         </div>
 
         <div class="main-content">
             <div class="top-header">
-                <div style="display:flex; align-items:center;">
-                    <div class="menu-toggle" id="menu-btn" onclick="toggleSidebar()">☰</div>
-                    <h3 style="margin:0" id="header-title">Menu</h3>
+                <div style="display:flex; align-items:center">
+                    <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+                    <b id="page-title">Menu</b>
                 </div>
-                <button onclick="location.reload()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer">🏠 Menu Utama</button>
+                <button onclick="location.reload()" style="background:none; border:none; color:var(--primary); font-weight:600">🏠 Home</button>
             </div>
 
-            <div class="page-area hide-scroll">
+            <div class="page-area">
                 
                 <div id="page-cikgu" class="page-section">
                     <div class="card">
-                        <h2 style="color:var(--primary); margin-top:0">📝 Borang Serahan</h2>
-                        <label>Nama Cikgu / Staff</label><input type="text" id="c_name">
-                        <label>Lokasi YPKT</label>
+                        <h2 style="color:var(--primary); margin-top:0">Borang Serahan</h2>
+                        <label>Nama</label><input id="c_name" type="text">
+                        <label>Lokasi</label>
                         <select id="c_loc">
                             <option value="">-- Pilih --</option>
                             <option>YPKT Ibu Pejabat</option>
@@ -177,51 +166,69 @@
                             <option>YPKT Besut</option>
                             <option>YPKT Setiu</option>
                         </select>
-                        <label>Jenis Aset</label><select id="c_type"><option>Laptop</option><option>PC</option><option>Printer</option><option>Lain-lain</option></select>
-                        <label>No Siri</label><input type="text" id="c_serial">
+                        <label>Jenis Aset</label><select id="c_type"><option>Laptop</option><option>PC</option><option>Printer</option></select>
+                        <label>No Siri</label><input id="c_serial" type="text">
                         <label>Masalah</label><textarea id="c_issue" rows="3"></textarea>
-                        <label>Tarikh</label><input type="text" id="c_date" readonly>
                         
                         <label>Tandatangan</label>
                         <div class="canvas-wrapper">
                             <canvas id="cvs_cikgu"></canvas>
-                            <div class="btn-clear-sign" onclick="clearCanvas('cvs_cikgu')">Padam</div>
+                            <div class="btn-clear-sign" onclick="clearCvs('cvs_cikgu')">PADAM</div>
                         </div>
                         <button class="btn btn-blue" onclick="submitCikgu()">HANTAR</button>
                     </div>
                 </div>
 
-                <div id="page-fast-track" class="page-section">
+                <div id="page-fast" class="page-section">
                     <div class="card" style="border-left:5px solid var(--green)">
-                        <h2 style="margin-top:0; color:var(--green)">📦 Fast Track: Serahan Pulang</h2>
-                        <p>Senarai aset siap dibaiki yang sedia untuk diambil.</p>
+                        <h2 style="margin-top:0; color:var(--green)">📦 Fast Track Pulang</h2>
+                        <div id="list-fast"></div>
                     </div>
-                    <div id="list-fast-track"></div>
                 </div>
 
                 <div id="adm-terima" class="page-section">
-                    <h2 style="margin-top:0">📥 Menunggu Penerimaan</h2>
+                    <h3 style="margin-top:0">📥 Pengesahan Penerimaan</h3>
                     <div id="list-terima"></div>
                 </div>
 
                 <div id="adm-jejak" class="page-section">
-                    <h2 style="margin-top:0">📍 Live Tracking</h2>
-                    <div class="card" style="background:#eff6ff">
+                    <h3 style="margin-top:0">📍 Kemaskini Status</h3>
+                    <div class="card">
                         <select id="track-sel" style="margin-bottom:10px"></select>
-                        <div style="display:flex; gap:10px"><input id="track-txt" placeholder="Status..."><button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:auto">Update</button></div>
+                        <input id="track-txt" placeholder="Status..." style="margin-bottom:10px">
+                        <button class="btn btn-blue" onclick="addTrack()">Update</button>
                     </div>
                     <div id="list-jejak"></div>
                 </div>
 
                 <div id="adm-pulang" class="page-section">
-                    <h2>📦 Pengurusan Serahan Pulang</h2>
-                    <div id="list-pulang-admin"></div>
+                    <h3 style="margin-top:0">📦 Serahan Pulang (Admin)</h3>
+                    <div id="list-pulang-adm"></div>
                 </div>
 
-                <div id="adm-nota" class="page-section">
+                <div id="adm-data" class="page-section">
                     <div class="card">
-                        <h2>📌 Nota Sulit Admin</h2>
-                        <textarea id="notepad" rows="15" oninput="saveNote()"></textarea>
+                        <h2 style="margin-top:0">💾 Pengurusan Data</h2>
+                        <p style="font-size:0.9rem; color:#64748b">
+                            Kerana sistem ini tiada server online, data di telefon dan PC tidak bersambung.
+                            Gunakan fungsi ini untuk memindahkan data secara manual.
+                        </p>
+                        
+                        <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #bae6fd">
+                            <strong>Langkah Pindah (Phone -> PC):</strong>
+                            <ol style="padding-left:20px; margin:10px 0">
+                                <li>Tekan "Backup Data" di Phone. (Akan download file .json)</li>
+                                <li>Send file itu ke PC (WhatsApp/Email).</li>
+                                <li>Buka sistem di PC, masuk Admin, tekan "Restore Data" dan pilih file tadi.</li>
+                            </ol>
+                        </div>
+
+                        <button class="btn btn-blue" onclick="backupData()">⬇️ Backup Data (Download)</button>
+                        <input type="file" id="restore-file" style="display:none" onchange="restoreData(this)">
+                        <button class="btn btn-orange" onclick="document.getElementById('restore-file').click()">⬆️ Restore Data (Upload)</button>
+                        
+                        <br><br>
+                        <button class="btn" style="background:#ef4444" onclick="resetAll()">⚠️ Reset/Padam Semua Data</button>
                     </div>
                 </div>
 
@@ -230,274 +237,209 @@
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('db_v20')) || [];
-    let currentMode = ''; 
-
-    // --- 1. MODE & NAVIGATION ---
-    function openMode(mode) {
+    let db = JSON.parse(localStorage.getItem('db_v21')) || [];
+    
+    // --- NAV ---
+    function openPublic() {
+        showApp('page-cikgu', 'Borang Cikgu');
+        document.getElementById('sidebar').style.display = 'none';
+        document.querySelector('.menu-toggle').style.display = 'none';
+        setTimeout(()=>initCvs('cvs_cikgu'), 300);
+    }
+    function authFast() {
+        if(prompt("Pass Fast Track:") == "1234") {
+            showApp('page-fast', 'Fast Track');
+            document.getElementById('sidebar').style.display = 'none';
+            document.querySelector('.menu-toggle').style.display = 'none';
+            renderPulang('list-fast');
+        } else alert("Salah!");
+    }
+    function authAdmin() {
+        if(prompt("Pass Admin:") == "admin123") {
+            showApp('adm-terima', 'Admin Panel');
+            document.getElementById('sidebar').style.display = 'flex';
+            document.querySelector('.menu-toggle').style.display = 'block';
+            renderTerima();
+        } else alert("Salah!");
+    }
+    function showApp(id, title) {
         document.getElementById('landing-page').style.transform = 'translateY(-100%)';
         setTimeout(() => {
             document.getElementById('app-container').classList.add('active');
             document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-
-            if(mode === 'public') {
-                document.getElementById('sidebar').style.display = 'none';
-                document.getElementById('menu-btn').style.display = 'none';
-                document.getElementById('page-cikgu').classList.add('active');
-                document.getElementById('header-title').innerText = 'Borang Cikgu';
-                document.getElementById('c_date').value = new Date().toLocaleString();
-                initCanvas('cvs_cikgu');
-            }
+            document.getElementById(id).classList.add('active');
+            document.getElementById('page-title').innerText = title;
         }, 300);
     }
-
-    function authFastTrack() {
-        let p = prompt("Masukkan Password Fast Track :");
-        if(p === "1234") { // Password Fast Track
-            document.getElementById('landing-page').style.transform = 'translateY(-100%)';
-            setTimeout(() => {
-                document.getElementById('app-container').classList.add('active');
-                document.getElementById('sidebar').style.display = 'none';
-                document.getElementById('menu-btn').style.display = 'none';
-                document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-                
-                document.getElementById('page-fast-track').classList.add('active');
-                document.getElementById('header-title').innerText = 'Fast Track Pulang';
-                renderListPulang('list-fast-track');
-            }, 300);
-        } else { alert("Password Salah!"); }
-    }
-
-    function authAdmin() {
-        let p = prompt("Masukkan Password Admin:");
-        if(p === "admin123") {
-            document.getElementById('landing-page').style.transform = 'translateY(-100%)';
-            setTimeout(() => {
-                document.getElementById('app-container').classList.add('active');
-                document.getElementById('sidebar').style.display = 'flex'; // Show Sidebar
-                document.getElementById('menu-btn').style.display = 'block';
-                navTo('adm-terima', document.querySelector('.nav-item')); // Default tab
-            }, 300);
-        } else { alert("Akses Ditolak!"); }
-    }
-
-    function navTo(pageId, el) {
+    function navTo(id, el) {
         document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        
+        document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        if(el) el.classList.add('active');
+        el.classList.add('active');
+        toggleSidebar(false); // Close sidebar
 
-        // Close sidebar on mobile
-        document.getElementById('sidebar').classList.remove('open');
-        document.querySelector('.overlay').classList.remove('active');
-
-        if(pageId === 'adm-terima') renderTerima();
-        if(pageId === 'adm-jejak') renderJejak();
-        if(pageId === 'adm-pulang') renderListPulang('list-pulang-admin');
-        if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v20') || '';
+        if(id=='adm-terima') renderTerima();
+        if(id=='adm-jejak') renderJejak();
+        if(id=='adm-pulang') renderPulang('list-pulang-adm');
+    }
+    function toggleSidebar(forceOpen) {
+        let s = document.getElementById('sidebar');
+        let o = document.querySelector('.overlay');
+        if(typeof forceOpen === 'boolean') {
+            if(!forceOpen) { s.classList.remove('open'); o.classList.remove('active'); }
+        } else {
+            s.classList.toggle('open'); o.classList.toggle('active');
+        }
     }
 
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.querySelector('.overlay').classList.toggle('active');
-    }
-
-    // --- 2. LOGIC: CIKGU SUBMIT ---
+    // --- LOGIC ---
     function submitCikgu() {
-        let n = document.getElementById('c_name').value;
-        let l = document.getElementById('c_loc').value;
-        let s = document.getElementById('c_serial').value;
-        if(!n || !l || !s) return alert("Sila isi maklumat wajib!");
-
+        let n=document.getElementById('c_name').value;
+        let s=document.getElementById('c_serial').value;
+        if(!n || !s) return alert("Isi Nama & No Siri!");
+        
         db.push({
             id: Date.now(),
-            date: document.getElementById('c_date').value,
-            name: n, loc: l, type: document.getElementById('c_type').value,
+            date: new Date().toLocaleString(),
+            name: n, loc: document.getElementById('c_loc').value,
+            type: document.getElementById('c_type').value,
             serial: s, issue: document.getElementById('c_issue').value,
-            status: 'PENDING',
-            logs: [],
-            // Admin data
-            admName: '', admTime: '',
-            // Return data
-            retName: '', retTime: ''
+            status: 'PENDING', logs: [],
+            admName: '', admTime: '', retName: '', retTime: ''
         });
-        localStorage.setItem('db_v20', JSON.stringify(db));
-        alert("Borang Berjaya Dihantar!");
-        location.reload();
+        saveDB(); alert("Berjaya!"); location.reload();
     }
 
-    // --- 3. LOGIC: ADMIN TERIMA ---
     function renderTerima() {
-        let div = document.getElementById('list-terima');
-        div.innerHTML = '';
-        let list = db.filter(x => x.status === 'PENDING').reverse();
-        if(list.length === 0) div.innerHTML = '<p class="text-center">Tiada data.</p>';
-        
-        list.forEach(i => {
-            div.innerHTML += `
+        let d = document.getElementById('list-terima'); d.innerHTML='';
+        let list = db.filter(x=>x.status=='PENDING').reverse();
+        if(list.length==0) d.innerHTML='<p>Tiada data baru.</p>';
+        list.forEach(i=>{
+            d.innerHTML += `
             <div class="card" style="border-left:5px solid #f59e0b">
-                <h3>${i.type} (${i.serial})</h3>
-                <p>${i.name} - ${i.loc}<br><span style="color:red">Masalah: ${i.issue}</span></p>
+                <b>${i.type} (${i.serial})</b><br>${i.name}<br>Masalah: ${i.issue}
                 <hr>
-                <input id="adm_n_${i.id}" placeholder="Nama Admin...">
-                <div class="canvas-wrapper" style="height:120px"><canvas id="cvs_adm_${i.id}"></canvas></div>
-                <button class="btn btn-blue" onclick="saveTerima(${i.id})">Terima</button>
+                <input id="an_${i.id}" placeholder="Nama Admin">
+                <div class="canvas-wrapper">
+                    <canvas id="cvs_a_${i.id}"></canvas>
+                    <div class="btn-clear-sign" onclick="clearCvs('cvs_a_${i.id}')">PADAM</div>
+                </div>
+                <button class="btn btn-blue" onclick="saveT(${i.id})">TERIMA</button>
             </div>`;
-            setTimeout(()=>initCanvas(`cvs_adm_${i.id}`),100);
+            setTimeout(()=>initCvs(`cvs_a_${i.id}`), 200);
         });
     }
-
-    function saveTerima(id) {
-        let n = document.getElementById(`adm_n_${id}`).value;
-        if(!n) return alert("Nama Admin wajib isi!");
-        let idx = db.findIndex(x => x.id === id);
-        db[idx].status = 'RECEIVED';
-        db[idx].admName = n;
-        db[idx].admTime = new Date().toLocaleString();
-        db[idx].logs.push(`Diterima Admin: ${n} (${db[idx].admTime})`);
-        localStorage.setItem('db_v20', JSON.stringify(db));
-        renderTerima();
+    function saveT(id) {
+        let n=document.getElementById(`an_${id}`).value;
+        if(!n) return alert("Nama Admin?");
+        let x = db.find(i=>i.id==id);
+        x.status='RECEIVED'; x.admName=n; x.admTime=new Date().toLocaleString();
+        saveDB(); renderTerima();
     }
 
-    // --- 4. LOGIC: JEJAK ---
-    function renderJejak() {
-        let sel = document.getElementById('track-sel');
-        sel.innerHTML = '<option value="">Pilih Aset...</option>';
-        db.filter(x => x.status === 'RECEIVED').forEach(x => {
-            sel.innerHTML += `<option value="${x.id}">${x.type} (${x.name})</option>`;
-        });
-        
-        let div = document.getElementById('list-jejak');
-        div.innerHTML = '';
-        db.filter(x => x.status !== 'PENDING').reverse().forEach(i => {
-            div.innerHTML += `<div class="card"><b>${i.type} (${i.serial})</b><br>Status: ${i.status}<br><small>${i.logs.join('<br>')}</small></div>`;
-        });
-    }
-    
-    function addTrack() {
-        let id = document.getElementById('track-sel').value;
-        let txt = document.getElementById('track-txt').value;
-        if(!id || !txt) return;
-        let idx = db.findIndex(x=>x.id==id);
-        db[idx].logs.push(`${txt} (${new Date().toLocaleString()})`);
-        localStorage.setItem('db_v20', JSON.stringify(db));
-        renderJejak();
-    }
-
-    // --- 5. LOGIC: SERAHAN PULANG (FAST TRACK & ADMIN) ---
-    function renderListPulang(targetId) {
-        let div = document.getElementById(targetId);
-        div.innerHTML = '';
-        let list = db.filter(x => x.status === 'RECEIVED').reverse();
-        
-        if(list.length === 0) div.innerHTML = '<p>Tiada aset sedia dipulangkan.</p>';
-
-        list.forEach(i => {
-            div.innerHTML += `
+    function renderPulang(divId) {
+        let d = document.getElementById(divId); d.innerHTML='';
+        let list = db.filter(x=>x.status=='RECEIVED').reverse();
+        if(list.length==0) d.innerHTML='<p>Tiada aset siap.</p>';
+        list.forEach(i=>{
+            d.innerHTML += `
             <div class="card" style="border-left:5px solid #10b981">
-                <h3>${i.type} (${i.serial})</h3>
-                <p>Milik: ${i.name} (${i.loc})</p>
-                <div style="background:#f0fdf4; padding:10px; border-radius:8px">
-                    <input id="ret_n_${i.id}" placeholder="Nama Penerima...">
-                    <label>Sign Penerima:</label>
-                    <div class="canvas-wrapper" style="height:140px"><canvas id="cvs_ret_${i.id}"></canvas><div class="btn-clear-sign" onclick="clearCanvas('cvs_ret_${i.id}')">Padam</div></div>
-                    <button class="btn btn-green" onclick="savePulang(${i.id}, '${targetId}')">Sahkan Serahan</button>
+                <b>${i.type} (${i.serial})</b><br>Milik: ${i.name}
+                <div style="background:#f0fdf4; padding:10px; margin-top:10px; border-radius:8px">
+                    <input id="rn_${i.id}" placeholder="Nama Penerima">
+                    <div class="canvas-wrapper">
+                        <canvas id="cvs_r_${i.id}"></canvas>
+                        <div class="btn-clear-sign" onclick="clearCvs('cvs_r_${i.id}')">PADAM</div>
+                    </div>
+                    <button class="btn btn-green" onclick="saveR(${i.id}, '${divId}')">SERAH</button>
                 </div>
             </div>`;
-            setTimeout(()=>initCanvas(`cvs_ret_${i.id}`),100);
+            setTimeout(()=>initCvs(`cvs_r_${i.id}`), 200);
         });
     }
-
-    function savePulang(id, viewId) {
-        let n = document.getElementById(`ret_n_${id}`).value;
-        if(!n) return alert("Nama Penerima wajib isi!");
-        let idx = db.findIndex(x => x.id === id);
-        db[idx].status = 'RETURNED';
-        db[idx].retName = n;
-        db[idx].retTime = new Date().toLocaleString();
-        db[idx].logs.push(`Dipulangkan kpd: ${n} (${db[idx].retTime})`);
-        localStorage.setItem('db_v20', JSON.stringify(db));
-        renderListPulang(viewId);
+    function saveR(id, divId) {
+        let n=document.getElementById(`rn_${id}`).value;
+        if(!n) return alert("Nama Penerima?");
+        let x = db.find(i=>i.id==id);
+        x.status='RETURNED'; x.retName=n; x.retTime=new Date().toLocaleString();
+        saveDB(); renderPulang(divId);
     }
 
-    // --- 6. EXCEL FULL FIX ---
-    function downloadExcelAll() {
-        if(db.length === 0) return alert("Tiada data.");
-        
-        // Header Column
-        let headers = ["ID", "Tarikh Lapor", "Nama Cikgu", "Lokasi", "Jenis", "No Siri", "Masalah", "Status", "Admin Terima", "Tarikh Terima", "Penerima Akhir", "Tarikh Pulang"];
-        
-        let csvRows = [];
-        csvRows.push(headers.join(","));
+    function renderJejak() {
+        let s = document.getElementById('track-sel'); s.innerHTML='<option value="">Pilih...</option>';
+        db.filter(x=>x.status=='RECEIVED').forEach(x=> s.innerHTML+=`<option value="${x.id}">${x.type} (${x.name})</option>`);
+        let d = document.getElementById('list-jejak'); d.innerHTML='';
+        db.filter(x=>x.status!='PENDING').reverse().forEach(i=> d.innerHTML+=`<div class="card"><b>${i.type}</b> (${i.status})<br>${i.logs.join('<br>')}</div>`);
+    }
+    function addTrack() {
+        let id=document.getElementById('track-sel').value;
+        let t=document.getElementById('track-txt').value;
+        if(id && t) {
+            db.find(x=>x.id==id).logs.push(t + ` (${new Date().toLocaleTimeString()})`);
+            saveDB(); renderJejak();
+        }
+    }
 
-        db.forEach(row => {
-            // Helper to clean text for CSV (remove newlines, escape quotes)
-            const clean = (text) => {
-                if(!text) return "";
-                let str = String(text).replace(/"/g, '""'); // Escape double quotes
-                str = str.replace(/(\r\n|\n|\r)/gm, " "); // Replace newlines with space
-                return `"${str}"`; // Wrap in quotes
-            };
-
-            let values = [
-                row.id,
-                clean(row.date),
-                clean(row.name),
-                clean(row.loc),
-                clean(row.type),
-                clean(row.serial),
-                clean(row.issue),
-                clean(row.status),
-                clean(row.admName),
-                clean(row.admTime),
-                clean(row.retName),
-                clean(row.retTime)
-            ];
-            csvRows.push(values.join(","));
-        });
-
-        let csvString = csvRows.join("\n");
-        let a = document.createElement('a');
-        a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString);
-        a.download = 'Data_Aset_Lengkap.csv';
-        document.body.appendChild(a);
+    // --- DATA TOOLS ---
+    function saveDB() { localStorage.setItem('db_v21', JSON.stringify(db)); }
+    
+    function backupData() {
+        let str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        let a = document.createElement('a'); a.href = str; a.download = "backup_aset_ypkt.json";
         a.click();
-        document.body.removeChild(a);
+    }
+    function restoreData(input) {
+        let file = input.files[0];
+        if(!file) return;
+        let r = new FileReader();
+        r.onload = function(e) {
+            try {
+                let data = JSON.parse(e.target.result);
+                if(confirm("Ini akan menggantikan data sedia ada. Teruskan?")) {
+                    db = data; saveDB(); alert("Data berjaya dipulihkan!"); location.reload();
+                }
+            } catch(err) { alert("File rosak!"); }
+        };
+        r.readAsText(file);
+    }
+    function resetAll() { if(confirm("Padam SEMUA data?")) { localStorage.removeItem('db_v21'); location.reload(); } }
+    
+    function downloadExcel() {
+        // Simple CSV Logic
+        let head = "ID,Tarikh,Nama,Lokasi,Jenis,Siri,Masalah,Status,Admin,MasaTerima,Penerima,MasaPulang\n";
+        let rows = db.map(r => 
+            [r.id, `"${r.date}"`, `"${r.name}"`, `"${r.loc}"`, `"${r.type}"`, `"${r.serial}"`, `"${r.issue}"`, r.status, `"${r.admName}"`, `"${r.admTime}"`, `"${r.retName}"`, `"${r.retTime}"`].join(",")
+        ).join("\n");
+        let a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(head+rows);
+        a.download = 'Data_Full.csv'; a.click();
     }
 
-    function saveNote() { localStorage.setItem('nota_v20', document.getElementById('notepad').value); }
-
-    // --- 7. CANVAS ENGINE (FIXED) ---
-    function initCanvas(id) {
-        let c = document.getElementById(id);
-        if(!c) return;
+    // --- CANVAS ENGINE (FIXED RESIZE & CLEAR) ---
+    function initCvs(id) {
+        let c = document.getElementById(id); if(!c) return;
         let rect = c.getBoundingClientRect();
         c.width = rect.width; c.height = rect.height;
-        let ctx = c.getContext('2d');
-        ctx.lineWidth = 2; ctx.strokeStyle = '#000';
-        
+        let ctx = c.getContext('2d'); ctx.lineWidth=2; ctx.strokeStyle='#000';
         let drawing = false;
-        const getPos = (e) => {
+        
+        const getXY = (e) => {
             let r = c.getBoundingClientRect();
-            return { 
-                x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
-                y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
-            };
-        };
-
-        ['mousedown','touchstart'].forEach(evt => c.addEventListener(evt, (e)=>{ 
-            if(evt=='touchstart') e.preventDefault();
-            drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); 
+            return { x: (e.touches?e.touches[0].clientX:e.clientX)-r.left, y: (e.touches?e.touches[0].clientY:e.clientY)-r.top };
+        }
+        ['mousedown','touchstart'].forEach(e=> c.addEventListener(e, (ev)=>{
+            if(e=='touchstart') ev.preventDefault();
+            drawing=true; ctx.beginPath(); ctx.moveTo(getXY(ev).x, getXY(ev).y);
         }));
-        ['mousemove','touchmove'].forEach(evt => c.addEventListener(evt, (e)=>{ 
-            if(evt=='touchmove') e.preventDefault();
-            if(drawing){ ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); } 
+        ['mousemove','touchmove'].forEach(e=> c.addEventListener(e, (ev)=>{
+            if(e=='touchmove') ev.preventDefault();
+            if(drawing) { ctx.lineTo(getXY(ev).x, getXY(ev).y); ctx.stroke(); }
         }));
-        ['mouseup','touchend'].forEach(evt => c.addEventListener(evt, ()=>{ drawing=false; }));
+        ['mouseup','touchend'].forEach(e=> c.addEventListener(e, ()=>drawing=false));
     }
-    function clearCanvas(id) { let c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
-
+    function clearCvs(id) {
+        let c = document.getElementById(id);
+        if(c) c.getContext('2d').clearRect(0,0,c.width,c.height);
+    }
 </script>
 </body>
 </html>
