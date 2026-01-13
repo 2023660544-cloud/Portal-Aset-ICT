@@ -6,7 +6,7 @@
     <title>Sistem Aset YPKT - V21 (Firebase Live)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- STYLE ASAL KEKAL --- */
+        /* --- STYLE ASAL KEKAL (TIDAK BERUBAH) --- */
         :root {
             --primary: #2563eb; 
             --dark: #1e293b; 
@@ -57,24 +57,18 @@
         .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
         .nav-item.active { background: var(--primary); color: white; }
         
-        .main-content { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--light); }
-        
-        /* --- HEADER DIPERBAIKI UNTUK PHONE --- */
-        .top-header {
-            height: 60px; background: white; padding: 0 20px; 
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0; z-index: 900;
+        /* Kredit di Sidebar */
+        .sidebar-footer {
+            padding: 20px; text-align: center; font-size: 0.75rem; color: #64748b;
+            border-top: 1px solid #334155; background: rgba(0,0,0,0.2);
         }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-toggle { display: none; font-size: 1.6rem; cursor: pointer; color: var(--dark); padding: 5px; }
-        .header-title { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--dark); }
-        .btn-home {
-            background: none; border: 2px solid var(--primary); color: var(--primary);
-            padding: 6px 15px; border-radius: 20px; font-weight: 600; cursor: pointer;
-            font-size: 0.9rem; transition: 0.2s;
-        }
-        .btn-home:hover { background: var(--primary); color: white; }
 
+        .main-content { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--light); }
+        .top-header {
+            height: 60px; background: white; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0;
+        }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--dark); margin-right: 15px; }
         .page-area { flex: 1; padding: 20px; overflow-y: auto; }
         .page-section { display: none; max-width: 800px; margin: 0 auto; animation: fadeUp 0.3s; }
         .page-section.active { display: block; }
@@ -124,18 +118,18 @@
         .log-item { padding: 8px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.9rem; }
         .log-item:last-child { border-bottom: none; }
 
+        /* Kredit Landing Page */
+        .landing-credit {
+            position: absolute; bottom: 20px; width: 100%; text-align: center;
+            color: rgba(255,255,255,0.3); font-size: 0.8rem; letter-spacing: 0.5px;
+        }
+
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100%; left: -260px; width: 260px; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
             .sidebar.open { transform: translateX(260px); }
+            .menu-toggle { display: block; }
             .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 900; }
             .overlay.active { display: block; }
-            
-            /* TWEAK KHAS UNTUK HEADER PHONE */
-            .menu-toggle { display: block; } /* Tunjuk menu */
-            .top-header { padding: 0 15px; } /* Kurangkan padding sikit */
-            .header-left { gap: 10px; }
-            .header-title { font-size: 1rem; } /* Kecilkan sikit font tajuk */
-            .btn-home { font-size: 0.8rem; padding: 5px 12px; } /* Kecilkan butang home */
         }
         @keyframes fadeUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
     </style>
@@ -156,7 +150,8 @@
     </div>
 
     <div id="landing-page">
-        <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1><br><br>
+        <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1>
+        <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">Versi 21 - Online (Firebase)</p>
 
         <div class="landing-grid">
             <div class="landing-card" onclick="openMode('public')">
@@ -172,8 +167,12 @@
                 <div><div class="card-title">Admin Dashboard</div><div class="card-sub">Full Access + Excel</div></div>
             </div>
         </div>
+
+        <div class="landing-credit">
+            Developed by: Nurul Syuhaida (Intern)
+        </div>
     </div>
- <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">credit to Nurul syuhaida (intern)</p>
+
     <div id="app-container">
         
         <div class="sidebar" id="sidebar" style="display:none">
@@ -187,15 +186,18 @@
                 <div class="nav-item" onclick="downloadExcelAll()" style="color:#4ade80">📊 Download Excel</div>
                 <div class="nav-item" onclick="location.reload()" style="color:#f87171">🚪 Log Keluar</div>
             </div>
+            <div class="sidebar-footer">
+                Dev: Nurul Syuhaida (Intern)
+            </div>
         </div>
 
         <div class="main-content">
             <div class="top-header">
-                <div class="header-left">
+                <div style="display:flex; align-items:center;">
                     <div class="menu-toggle" id="menu-btn" onclick="toggleSidebar()">☰</div>
-                    <h3 class="header-title" id="header-title">Menu</h3>
+                    <h3 style="margin:0" id="header-title">Menu</h3>
                 </div>
-                <button class="btn-home" onclick="location.reload()">🏠 Home</button>
+                <button onclick="location.reload()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer">🏠 Menu Utama</button>
             </div>
 
             <div class="page-area hide-scroll">
@@ -288,6 +290,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
+        // CONFIG FIREBASE (SAYA DAH MASUKKAN KEY DARI GAMBAR TUAN)
         const firebaseConfig = {
             apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
             authDomain: "aset-ypkt.firebaseapp.com",
@@ -301,16 +304,20 @@
         const app = initializeApp(firebaseConfig);
         const dbRef = getDatabase(app);
 
+        // JADIKAN GLOBAL SUPAYA FUNCTION BIASA BOLEH GUNA
         window.dbRef = dbRef;
         window.push = push;
         window.ref = ref;
         window.update = update;
-        window.db = [];
+        window.db = []; // GANTI LOCALSTORAGE DENGAN ARRAY LIVE
 
+        // DENGAR DATA DARI FIREBASE (REALTIME)
         onValue(ref(dbRef, 'assets'), (snapshot) => {
             const data = snapshot.val();
+            // Tukar format Firebase ke Array biasa
             window.db = data ? Object.keys(data).map(key => ({...data[key], id: key})) : [];
             
+            // Auto Render page yang sedang aktif
             if(document.getElementById('adm-terima').classList.contains('active')) window.renderTerima();
             if(document.getElementById('adm-jejak').classList.contains('active')) window.renderJejak();
             if(document.getElementById('adm-pulang').classList.contains('active')) window.renderListPulang('list-pulang-admin');
@@ -319,6 +326,7 @@
     </script>
 
     <script>
+        // --- NAVIGASI & AUTH (KEKAL) ---
         function openMode(mode) {
             document.getElementById('landing-page').style.transform = 'translateY(-100%)';
             setTimeout(() => {
@@ -387,18 +395,20 @@
             document.querySelector('.overlay').classList.toggle('active');
         }
 
+        // --- LOGIC: CIKGU SUBMIT (GUNA FIREBASE) ---
         function submitCikgu() {
             let n = document.getElementById('c_name').value;
             let l = document.getElementById('c_loc').value;
             let s = document.getElementById('c_serial').value;
             if(!n || !l || !s) return alert("Sila isi maklumat wajib!");
 
+            // HANTAR KE CLOUD
             window.push(window.ref(window.dbRef, 'assets'), {
                 date: document.getElementById('c_date').value,
                 name: n, loc: l, type: document.getElementById('c_type').value,
                 serial: s, issue: document.getElementById('c_issue').value,
                 status: 'PENDING',
-                logs: [{text: "Borang dihantar", time: new Date().toLocaleString()}], 
+                logs: [{text: "Borang dihantar", time: new Date().toLocaleString()}], // Log awal
                 admName: '', admTime: '',
                 retName: '', retTime: ''
             }).then(() => {
@@ -407,9 +417,11 @@
             }).catch(e => alert("Error internet: " + e));
         }
 
+        // --- LOGIC: ADMIN TERIMA ---
         function renderTerima() {
             let div = document.getElementById('list-terima');
             div.innerHTML = '';
+            // Guna window.db yang dah sync
             let list = window.db.filter(x => x.status === 'PENDING').reverse();
             if(list.length === 0) div.innerHTML = '<p class="text-center">Tiada data baru.</p>';
             
@@ -440,10 +452,12 @@
             let n = document.getElementById(`adm_n_${id}`).value;
             if(!n) return alert("Nama Admin wajib isi!");
             
+            // Cari data asal untuk update logs
             let item = window.db.find(x => x.id === id);
             let currentLogs = item.logs || [];
             currentLogs.push({text: `Diterima Admin: ${n}`, time: new Date().toLocaleString()});
 
+            // UPDATE FIREBASE
             window.update(window.ref(window.dbRef, 'assets/' + id), {
                 status: 'RECEIVED',
                 admName: n,
@@ -452,6 +466,7 @@
             });
         }
 
+        // --- LOGIC: JEJAK ASET ---
         function renderJejak() {
             let sel = document.getElementById('track-sel');
             sel.innerHTML = '<option value="">-- Pilih Aset --</option>';
@@ -496,13 +511,16 @@
             alert("Status dikemaskini!");
         }
 
+        // FUNGSI POPUP (SHOW ALL DATA)
         function showDetails(id) {
             let item = window.db.find(x => x.id == id);
             if(!item) return;
 
+            // HANDLE LOGS (Tukar dari array object ke HTML)
             let logsHTML = '';
             if(item.logs && Array.isArray(item.logs)) {
                 item.logs.forEach(log => {
+                    // Support format lama (string) & baru (object)
                     let t = log.text || log; 
                     let d = log.time || '-';
                     logsHTML += `<div class="log-item">👉 ${t} <small style="color:#aaa">(${d})</small></div>`;
@@ -550,6 +568,7 @@
 
         function closeModal() { document.getElementById('detail-modal').classList.remove('active'); }
 
+        // --- LOGIC: SERAHAN PULANG ---
         function renderListPulang(targetId) {
             let div = document.getElementById(targetId);
             div.innerHTML = '';
@@ -593,6 +612,7 @@
             });
         }
 
+        // --- EXCEL (KEKAL) ---
         function downloadExcelAll() {
             if(window.db.length === 0) return alert("Tiada data.");
             
