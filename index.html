@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal Aset ICT - Nurul Syuhaida</title>
+    <title>Sistem Aset ICT - Nurul Syuhaida</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-
         :root {
-            --primary: #2563eb;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --sidebar-width: 280px;
-            --header-height: 60px;
+            --primary: #3b82f6; /* Biru Moden */
+            --primary-dark: #2563eb;
+            --sidebar-bg: #1e293b; /* Dark Blue untuk Sidebar (Nampak Pro) */
+            --sidebar-text: #e2e8f0;
+            --bg-body: #f3f4f6;
+            --sidebar-width: 260px;
         }
 
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--light); height: 100vh; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg-body); height: 100vh; overflow: hidden; }
         * { box-sizing: border-box; }
 
         /* ===========================
@@ -23,268 +23,288 @@
            =========================== */
         #landing-page {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, var(--dark) 0%, #334155 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; z-index: 2000; transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            color: white; z-index: 2000; transition: transform 0.5s ease-in-out;
             padding: 20px;
         }
-        .landing-content { text-align: center; max-width: 500px; width: 100%; }
+        .landing-box { text-align: center; max-width: 600px; width: 100%; animation: floatUp 0.8s ease-out; }
+        @keyframes floatUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
         .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 40px; }
-        .menu-card {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
-            padding: 25px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 20px;
-            backdrop-filter: blur(10px); transition: 0.3s;
-        }
-        .menu-card:hover { background: rgba(255,255,255,0.2); transform: translateY(-5px); border-color: var(--primary); }
-        .menu-icon { font-size: 2.5rem; }
-        .menu-text-box { text-align: left; }
-        .menu-title { font-weight: 700; font-size: 1.2rem; }
-        .menu-sub { font-size: 0.9rem; color: #cbd5e1; opacity: 0.8; }
         
-        .footer-credit { margin-top: 50px; font-size: 0.8rem; color: #94a3b8; text-align: center; opacity: 0.7; }
+        /* Menu Card Design */
+        .menu-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px; border-radius: 15px; cursor: pointer; display: flex; align-items: center; gap: 15px;
+            transition: 0.3s;
+        }
+        .menu-card:hover { background: rgba(255,255,255,0.15); transform: translateY(-5px); border-color: var(--primary); }
+        
+        .footer-credit { margin-top: 60px; color: #64748b; font-size: 0.85rem; letter-spacing: 0.5px; }
 
         /* ===========================
-           2. APP STRUCTURE (SISTEM DALAM)
+           2. APP LAYOUT (DASHBOARD)
            =========================== */
         #app-container {
-            display: flex; height: 100vh; width: 100%; position: absolute; top: 0; left: 0;
-            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); opacity: 0;
-            flex-direction: column; /* Default Mobile Direction */
-            background: var(--light);
+            display: none; height: 100vh; width: 100%; position: absolute; top: 0; left: 0;
+            background: var(--bg-body);
         }
-        #app-container.active { transform: translateY(0); opacity: 1; }
+        #app-container.active { display: block; }
 
-        /* --- MOBILE HEADER (Only for Phone) --- */
+        /* --- MOBILE HEADER --- */
         .mobile-header {
-            background: #fff; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.05); height: var(--header-height); z-index: 50; flex-shrink: 0;
+            background: white; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+            height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; z-index: 50;
         }
-        .hamburger-btn { font-size: 1.8rem; background: none; border: none; cursor: pointer; color: var(--dark); padding: 5px; }
-        .page-title-header { font-weight: 700; color: var(--dark); font-size: 1.1rem; }
-
-        /* --- SIDEBAR (Responsive) --- */
+        .hamburger { font-size: 1.5rem; background: none; border: none; cursor: pointer; color: #334155; }
+        
+        /* --- SIDEBAR (DESIGN PRO) --- */
         .sidebar { 
             position: fixed; top: 0; left: 0; height: 100%; width: var(--sidebar-width);
-            background: #fff; z-index: 1000; transform: translateX(-100%); transition: transform 0.3s ease;
-            box-shadow: 5px 0 25px rgba(0,0,0,0.05); display: flex; flex-direction: column; padding: 30px;
-            border-right: 1px solid #f1f5f9;
+            background: var(--sidebar-bg); color: var(--sidebar-text);
+            z-index: 1000; transition: transform 0.3s ease;
+            display: flex; flex-direction: column; padding: 25px;
+            /* Mobile Default: Hidden */
+            transform: translateX(-100%);
         }
-        .sidebar.open { transform: translateX(0); } /* Class untuk buka di mobile */
-        .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); 
-            z-index: 900; display: none; opacity: 0; transition: opacity 0.3s;
+        .sidebar.open { transform: translateX(0); } /* Class untuk Mobile Open */
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:900; display:none; }
+        .overlay.show { display:block; }
+
+        .brand-logo { font-size: 1.3rem; font-weight: 700; color: white; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        
+        .nav-link { 
+            padding: 14px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; 
+            color: #94a3b8; transition: 0.2s; font-weight: 500;
         }
-        .sidebar-overlay.show { display: block; opacity: 1; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-link.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        
+        .creator-badge { margin-top: auto; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .creator-badge small { color: #64748b; font-size: 0.7rem; display: block; margin-bottom: 3px; }
+        .creator-badge b { color: white; font-size: 0.9rem; }
 
-        .brand { font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 40px; display: flex; align-items: center; gap: 12px; }
-        .brand-icon { color: var(--primary); font-size: 1.8rem; }
-        .nav-item { padding: 16px; margin-bottom: 10px; color: #64748b; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 15px; transition: 0.2s; cursor: pointer; font-size: 0.95rem;}
-        .nav-item:hover { background: #f8fafc; color: var(--primary); }
-        .nav-item.active { background: #eff6ff; color: var(--primary); }
-        .nav-home { margin-top: 10px; background: var(--dark); color: white !important; }
-        .nav-home:hover { background: #334155 !important; }
-
-        /* CREATOR CREDIT IN SIDEBAR */
-        .dev-badge {
-            margin-top: auto; /* Push to bottom */
-            background: #f8fafc; padding: 15px; border-radius: 12px; 
-            border: 1px solid #e2e8f0; text-align: center;
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 20px; height: calc(100vh - 60px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+            transition: margin 0.3s;
         }
-        .dev-badge p { margin: 0; font-size: 0.75rem; color: #64748b; }
-        .dev-badge b { color: var(--primary); display: block; font-size: 0.9rem; margin-top: 2px;}
-
-        /* --- MAIN CONTENT AREA --- */
-        .main-content-wrapper { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 25px; position: relative; }
-        .page-section { display: none; animation: fadeIn 0.4s ease; max-width: 1000px; margin: 0 auto; }
-        .page-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- CARDS & FORMS --- */
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); margin-bottom: 25px; border: 1px solid #f1f5f9; }
-        h2 { margin-top: 0; color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 25px; font-size: 1.5rem; }
-        
-        .form-row { display: grid; grid-template-columns: 1fr; gap: 20px; } /* Default Mobile: 1 Column */
-        
-        label { font-weight: 600; font-size: 0.9rem; color: #475569; margin-bottom: 8px; display: block; margin-top: 20px; }
-        input, select, textarea { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; background: #fcfdfe; transition: 0.3s; font-family: inherit; font-size: 1rem; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-        
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 700; margin-top: 30px; font-size: 1rem; color: white; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--primary); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
-        .btn-primary:hover { transform: translateY(-2px); }
+        .page-section { display: none; animation: fadeIn 0.3s ease; max-width: 1000px; margin: 0 auto; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        .sig-container { background: #f8fafc; padding: 5px; border-radius: 12px; border: 2px dashed #cbd5e1; }
-        .sig-pad { width: 100%; height: 150px; background: #fff; border-radius: 8px; cursor: crosshair; touch-action: none; display: block; }
-        .del-sign-btn { color: #ef4444; text-align: right; margin-top: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: inline-block; float: right; padding: 5px; }
+        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 20px; border: 1px solid #e5e7eb; }
+        h2 { margin-top: 0; color: #1e293b; font-size: 1.4rem; margin-bottom: 25px; border-bottom: 2px solid #f3f4f6; padding-bottom: 15px; }
+
+        .input-group { margin-bottom: 15px; }
+        label { font-weight: 600; font-size: 0.85rem; color: #475569; margin-bottom: 6px; display: block; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 0.95rem; background: #f8fafc; transition: 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 20px; } /* Mobile 1 col */
+
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 600; color: white; cursor: pointer; margin-top: 20px; font-size: 1rem; }
+        .btn-primary { background: var(--primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .canvas-box { border: 2px dashed #cbd5e1; border-radius: 10px; background: #fff; padding: 4px; }
+        canvas { width: 100%; height: 150px; display: block; background: #fff; cursor: crosshair; touch-action: none; }
 
         /* =========================================
-           RESPONSIVE DESIGN (PENTING UNTUK LAPTOP)
+           LAPTOP / PC VIEW (YANG PENTING NI!)
            ========================================= */
         @media (min-width: 1024px) {
-            /* Ubah Landing Page jadi sebelah-sebelah */
-            #landing-page { flex-direction: row; padding: 50px; gap: 50px; }
-            .landing-content { text-align: left; }
-            .menu-grid { grid-template-columns: repeat(3, 1fr); margin-top: 0; }
-            .menu-card { flex-direction: column; text-align: center; padding: 40px 30px; }
-            .menu-text-box { text-align: center; }
-            .footer-credit { position: absolute; bottom: 30px; left: 50px; text-align: left; }
-            
-            /* Ubah Sistem Dalam jadi Sidebar Kekal */
-            #app-container { flex-direction: row; } /* Susun memanjang ke tepi */
-            .mobile-header { display: none; } /* Sorok header mobile */
-            .hamburger-btn { display: none; } /* Sorok button hamburger */
-            .sidebar-overlay { display: none !important; } /* Tak perlu overlay gelap */
+            /* Landing Page: Split Screen */
+            #landing-page { flex-direction: row; gap: 60px; }
+            .landing-box { text-align: left; }
+            .menu-grid { grid-template-columns: repeat(3, 1fr); max-width: 900px; }
+            .menu-card { flex-direction: column; text-align: center; padding: 30px; }
 
+            /* Dashboard: Fixed Sidebar Layout */
+            .mobile-header { display: none; } /* Sorok header mobile */
+            
             .sidebar { 
-                position: relative; /* Bukan lagi fixed */
                 transform: translateX(0); /* Sentiasa nampak */
-                box-shadow: none; /* Hilangkan bayang timbul */
-                height: 100vh;
+                box-shadow: 5px 0 20px rgba(0,0,0,0.05); /* Bayang cantik */
             }
 
-            .main-content-wrapper { padding: 40px; } /* Tambah padding untuk skrin besar */
-            
-            /* Ubah form jadi 2 column di laptop */
-            .form-row { grid-template-columns: 1fr 1fr; gap: 30px; }
+            .main-content {
+                margin-left: var(--sidebar-width); /* Tolak content ke kanan */
+                height: 100vh; /* Full height */
+                padding: 40px; /* Ruang luas */
+            }
+
+            .grid-2 { grid-template-columns: 1fr 1fr; } /* Form jadi 2 column */
         }
     </style>
 </head>
 <body>
 
     <div id="landing-page">
-        <div class="landing-content">
-            <div style="font-size:3rem; margin-bottom:10px">🏫</div>
-            <h1 style="margin:0; font-size:2.8rem; line-height:1.2">Portal Aset ICT</h1>
-            <p style="color:#cbd5e1; margin-top:10px; font-size:1.1rem;">Sistem Pengurusan Berpusat</p>
-        </div>
-        
-        <div class="menu-grid">
-            <div class="menu-card" onclick="enterSystem('page-cikgu')">
-                <span class="menu-icon">📝</span>
-                <div class="menu-text-box"><div class="menu-title">Borang Aset</div><div class="menu-sub">Serahan Peralatan</div></div>
-            </div>
-            <div class="menu-card" onclick="enterSystem('page-admin-check')">
-                <span class="menu-icon">🔐</span>
-                <div class="menu-text-box"><div class="menu-title">Admin IT</div><div class="menu-sub">Login Pegawai</div></div>
-            </div>
-            <div class="menu-card" onclick="enterSystem('page-notepad')">
-                <span class="menu-icon">📌</span>
-                <div class="menu-text-box"><div class="menu-title">Memo</div><div class="menu-sub">Catatan Pantas</div></div>
+        <div class="landing-box">
+            <h1 style="font-size:3rem; margin:0; line-height:1.1;">Portal Aset ICT</h1>
+            <p style="color:#94a3b8; font-size:1.1rem; margin-top:15px">Sistem Pengurusan & Laporan Kerosakan</p>
+            
+            <div class="footer-credit">
+                Dibangunkan oleh: <br><strong style="color:white; font-size:1rem">Nurul Syuhaida (Student Intern)</strong>
             </div>
         </div>
 
-        <div class="footer-credit">
-            Dibangunkan oleh: <b>Nurul Syuhaida (Intern)</b>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="enterSystem('page-cikgu')">
+                <div style="font-size:2rem">📝</div>
+                <div><div style="font-weight:700; color:white">Borang Aset</div><small style="color:#94a3b8">Isi Maklumat</small></div>
+            </div>
+            <div class="menu-card" onclick="enterSystem('page-admin-check')">
+                <div style="font-size:2rem">🔐</div>
+                <div><div style="font-weight:700; color:white">Admin IT</div><small style="color:#94a3b8">Login Pegawai</small></div>
+            </div>
+            <div class="menu-card" onclick="enterSystem('page-notepad')">
+                <div style="font-size:2rem">📌</div>
+                <div><div style="font-weight:700; color:white">Nota</div><small style="color:#94a3b8">Catatan Peribadi</small></div>
+            </div>
         </div>
     </div>
 
     <div id="app-container">
         
         <div class="mobile-header">
-            <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
-            <div class="page-title-header" id="header-title">Menu Utama</div>
-            <div style="width:40px"></div>
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <b id="header-title">Menu Utama</b>
+            <div style="width:20px"></div>
         </div>
 
-        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+        <div class="overlay" onclick="toggleSidebar()"></div>
 
         <div class="sidebar" id="sidebar">
-            <div class="brand"><span class="brand-icon">🚀</span> E-Aset Pro</div>
+            <div class="brand-logo">
+                <span style="background:var(--primary); width:35px; height:35px; display:flex; align-items:center; justify-content:center; border-radius:8px">🚀</span>
+                E-Aset Pro
+            </div>
             
-            <div class="nav-item" id="nav-cikgu" onclick="switchTab('page-cikgu')"><span>📝</span> Borang Serahan</div>
-            <div class="nav-item" id="nav-admin" onclick="checkAdmin()"><span>🛠️</span> Dashboard IT</div>
-            <div class="nav-item" id="nav-note" onclick="switchTab('page-notepad')"><span>📌</span> Notepad</div>
+            <div class="nav-link" id="nav-cikgu" onclick="switchTab('page-cikgu')"><span>📝</span> Borang Serahan</div>
+            <div class="nav-link" id="nav-admin" onclick="checkAdmin()"><span>🛠️</span> Dashboard IT</div>
+            <div class="nav-link" id="nav-note" onclick="switchTab('page-notepad')"><span>📌</span> Notepad</div>
+            
+            <div style="flex:1"></div> <div class="nav-link" onclick="exitSystem()" style="background:rgba(255,255,255,0.05); color:#f87171"><span>🚪</span> Keluar Sistem</div>
 
-            <div class="nav-item nav-home" onclick="exitSystem()">🏠 Menu Utama</div>
-
-            <div class="dev-badge">
-                <p>Designed by</p>
+            <div class="creator-badge">
+                <small>Created by</small>
                 <b>Nurul Syuhaida</b>
-                <p>Student Intern</p>
             </div>
         </div>
 
-        <div class="main-content-wrapper">
+        <div class="main-content">
             
             <div id="page-cikgu" class="page-section active">
                 <div class="card">
-                    <h2>Borang Serahan Aset</h2>
-                    <div class="form-row">
-                        <div><label>Nama Penghantar:</label><input type="text" id="c_name" placeholder="Cth: Cikgu Ahmad"></div>
-                        <div><label>Jenis Aset:</label>
-                            <select id="c_asset"><option>Printer</option><option>Laptop</option><option>PC Desktop</option><option>Projector</option><option>Lain-lain</option></select>
+                    <h2>📝 Borang Serahan Aset</h2>
+                    
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Nama Penghantar</label>
+                            <input type="text" id="c_name" placeholder="Nama Penuh">
+                        </div>
+                        <div class="input-group">
+                            <label>Jenis Peralatan</label>
+                            <select id="c_asset"><option>Printer</option><option>Laptop</option><option>PC</option><option>Projektor</option><option>Lain-lain</option></select>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div><label>No. Siri (Wajib):</label><input type="text" id="c_serial" style="text-transform:uppercase; letter-spacing:1px" placeholder="SN-XXXX"></div>
-                        <div><label>Tarikh:</label><input type="date" id="c_date"></div>
-                    </div>
-                    <div><label>Masalah / Catatan:</label><textarea id="c_note" rows="3" placeholder="Terangkan kerosakan..."></textarea></div>
                     
-                    <label>Tandatangan Penghantar:</label>
-                    <div class="sig-container">
-                        <canvas id="cvs-cikgu" class="sig-pad"></canvas>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>No. Siri Aset (Wajib)</label>
+                            <input type="text" id="c_serial" style="text-transform:uppercase" placeholder="Contoh: KPM-1234">
+                        </div>
+                        <div class="input-group">
+                            <label>Tarikh Serahan</label>
+                            <input type="date" id="c_date">
+                        </div>
                     </div>
-                    <div class="del-sign-btn" onclick="clearCvs('cvs-cikgu')">Padam Sign ❌</div>
-                    <div style="clear:both"></div>
-                    
+
+                    <div class="input-group">
+                        <label>Keterangan Masalah</label>
+                        <textarea id="c_note" rows="3" placeholder="Sila nyatakan kerosakan..."></textarea>
+                    </div>
+
+                    <label>Tandatangan Penghantar</label>
+                    <div class="canvas-box">
+                        <canvas id="cvs-cikgu"></canvas>
+                    </div>
+                    <div onclick="clearCvs('cvs-cikgu')" style="color:red; font-size:0.8rem; text-align:right; margin-top:5px; cursor:pointer; font-weight:600">Padam Sign ❌</div>
+
                     <button class="btn btn-primary" onclick="submitForm()">HANTAR BORANG</button>
                 </div>
             </div>
 
             <div id="page-admin" class="page-section">
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #f1f5f9; padding-bottom:15px">
-                        <h2 style="border:none; margin:0; padding:0">Dashboard IT</h2>
-                        <button onclick="downloadExcel()" style="background:#10b981; color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.9rem">📥 Excel</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:20px">
+                        <h2 style="margin:0; border:none">Dashboard IT</h2>
+                        <button onclick="downloadExcel()" style="background:#10b981; color:white; border:none; padding:8px 15px; border-radius:6px; font-weight:600; cursor:pointer">📥 Download Excel</button>
                     </div>
-                    
-                    <div id="pending-list" style="margin-bottom:30px"></div>
-                    
-                    <h3 style="color:#475569; margin-bottom:15px">Sejarah Rekod</h3>
-                    <div style="overflow-x:auto; border-radius:12px; border:1px solid #e2e8f0;">
-                        <table id="db-table" style="width:100%; border-collapse:collapse; font-size:0.9rem">
-                            <thead><tr style="background:#f8fafc; text-align:left; color:#475569">
-                                <th style="padding:15px">Tarikh</th><th style="padding:15px">Nama & Aset</th><th style="padding:15px">Status</th>
-                            </tr></thead>
-                            <tbody></tbody>
-                        </table>
+
+                    <div id="pending-list"></div>
+
+                    <div style="margin-top:30px">
+                        <h4 style="color:#64748b; margin-bottom:10px">Sejarah Rekod</h4>
+                        <div style="overflow-x:auto; border:1px solid #e2e8f0; border-radius:10px">
+                            <table id="db-table" style="width:100%; border-collapse:collapse; font-size:0.9rem; background:white;">
+                                <thead style="background:#f8fafc; color:#475569">
+                                    <tr><th style="padding:12px; text-align:left">Tarikh</th><th style="padding:12px; text-align:left">Perkara</th><th style="padding:12px; text-align:left">Status</th></tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="page-process" class="page-section">
-                <button onclick="switchTab('page-admin')" style="background:#e2e8f0; border:none; padding:10px 15px; border-radius:10px; margin-bottom:15px; font-weight:600; color:#475569; cursor:pointer">⬅ Kembali</button>
-                <div class="card" style="border-top:5px solid #f59e0b">
-                    <h2>Proses Penerimaan</h2>
-                    <div id="process-info" style="background:#eff6ff; padding:20px; margin-bottom:25px; border-radius:12px; font-size:0.95rem; color:#1e40af; line-height:1.6; border:1px solid #bfdbfe"></div>
+                <button onclick="switchTab('page-admin')" style="background:white; border:1px solid #ccc; padding:8px 15px; border-radius:6px; margin-bottom:15px; cursor:pointer">⬅ Kembali</button>
+                
+                <div class="card" style="border-top:4px solid #f59e0b">
+                    <h2>🛠️ Proses Tindakan</h2>
                     
-                    <div class="form-row">
-                        <div><label>Nama Pegawai IT:</label><input type="text" id="it_name" placeholder="Nama Anda"></div>
-                        <div><label>Status Tindakan:</label>
-                            <select id="it_status"><option>Diterima - Akan Dibaiki</option><option>Diterima - Simpan</option><option>Ditolak / Dipulangkan</option><option>Lupus</option></select>
+                    <div id="process-info" style="background:#eff6ff; padding:20px; border-radius:10px; border:1px solid #bfdbfe; color:#1e3a8a; margin-bottom:20px"></div>
+
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Pegawai IT Bertugas</label>
+                            <input type="text" id="it_name">
+                        </div>
+                        <div class="input-group">
+                            <label>Keputusan / Status</label>
+                            <select id="it_status">
+                                <option>Dalam Tindakan</option>
+                                <option>Selesai - Dibaiki</option>
+                                <option>Dipulangkan</option>
+                                <option>Lupus (BER)</option>
+                            </select>
                         </div>
                     </div>
-                    
-                    <label>Tandatangan IT:</label>
-                    <div class="sig-container">
-                        <canvas id="cvs-it" class="sig-pad"></canvas>
-                    </div>
-                    <div class="del-sign-btn" onclick="clearCvs('cvs-it')">Padam Sign IT ❌</div>
-                    <div style="clear:both"></div>
 
-                    <button class="btn btn-primary" onclick="saveIT()">SIMPAN & SELESAI</button>
+                    <label>Tandatangan Pegawai IT</label>
+                    <div class="canvas-box">
+                        <canvas id="cvs-it"></canvas>
+                    </div>
+                    <div onclick="clearCvs('cvs-it')" style="color:red; font-size:0.8rem; text-align:right; margin-top:5px; cursor:pointer; font-weight:600">Padam Sign IT ❌</div>
+
+                    <button class="btn btn-primary" onclick="saveIT()">SIMPAN STATUS</button>
                 </div>
             </div>
 
             <div id="page-notepad" class="page-section">
                 <div class="card">
-                    <h2>Nota Pantas</h2>
+                    <h2>📌 Nota Peribadi</h2>
                     <div style="display:flex; gap:10px">
-                        <input type="text" id="note-text" placeholder="Tulis sesuatu..." style="margin-top:0">
-                        <button class="btn btn-primary" onclick="addNote()" style="margin-top:0; width:auto; padding:0 25px">Tambah</button>
+                        <input type="text" id="note-text" placeholder="Tulis nota ringkas...">
+                        <button onclick="addNote()" style="width:auto; padding:0 20px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer">Tambah</button>
                     </div>
-                    <div id="note-grid" style="margin-top:25px; display:grid; gap:15px"></div>
+                    <div id="note-grid" style="margin-top:20px; display:grid; gap:10px"></div>
                 </div>
             </div>
 
@@ -292,12 +312,10 @@
     </div>
 
 <script>
-    // --- 1. UI & RESPONSIVE LOGIC ---
+    // --- UI CONTROL ---
     function toggleSidebar() {
-        if(window.innerWidth < 1024) {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.querySelector('.sidebar-overlay').classList.toggle('show');
-        }
+        document.getElementById('sidebar').classList.toggle('open');
+        document.querySelector('.overlay').classList.toggle('show');
     }
 
     function enterSystem(page) {
@@ -310,166 +328,134 @@
     }
 
     function exitSystem() {
-        document.getElementById('app-container').classList.remove('active');
-        if(window.innerWidth < 1024) toggleSidebar(); 
-        setTimeout(() => {
+        if(confirm("Kembali ke menu utama?")) {
+            document.getElementById('app-container').classList.remove('active');
             document.getElementById('landing-page').style.transform = 'translateY(0)';
-        }, 300);
+            if(window.innerWidth < 1024) toggleSidebar();
+        }
     }
 
     function switchTab(id) {
-        ['page-cikgu','page-admin','page-process','page-notepad'].forEach(p => document.getElementById(p).classList.remove('active'));
+        // Hide all pages
+        document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        // Active Sidebar Link
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
         if(id.includes('cikgu')) document.getElementById('nav-cikgu').classList.add('active');
         if(id.includes('admin') || id.includes('process')) document.getElementById('nav-admin').classList.add('active');
         if(id.includes('note')) document.getElementById('nav-note').classList.add('active');
 
-        const titles = {'page-cikgu':'Borang Aset', 'page-admin':'Dashboard IT', 'page-notepad':'Nota', 'page-process':'Proses IT'};
-        document.getElementById('header-title').innerText = titles[id] || 'Menu';
+        // Header Title (Mobile)
+        const t = {'page-cikgu':'Borang Aset','page-admin':'Admin Dashboard','page-process':'Proses','page-notepad':'Nota'};
+        document.getElementById('header-title').innerText = t[id] || 'Menu';
 
-        if(window.innerWidth < 1024) { 
+        if(window.innerWidth < 1024) { // Auto close mobile sidebar
             document.getElementById('sidebar').classList.remove('open');
-            document.querySelector('.sidebar-overlay').classList.remove('show');
+            document.querySelector('.overlay').classList.remove('show');
         }
-        setTimeout(() => { resizeCanvas('cvs-cikgu'); resizeCanvas('cvs-it'); }, 150); 
+
+        setTimeout(() => { resizeCvs('cvs-cikgu'); resizeCvs('cvs-it'); }, 200);
     }
 
-    // --- 2. CANVAS (SIGNATURE) ---
-    function resizeCanvas(id) {
+    // --- CANVAS (SIGNATURE) ---
+    function resizeCvs(id) {
         const c = document.getElementById(id);
         c.width = c.parentElement.offsetWidth;
-        c.height = 150; 
+        c.height = 150;
     }
-
-    function setupCanvas(id) {
+    function setupCvs(id) {
         const c = document.getElementById(id);
         const ctx = c.getContext('2d');
-        let isDrawing = false;
+        let draw = false;
         
-        const getPos = (e) => {
+        const pos = (e) => {
             const r = c.getBoundingClientRect();
-            return {
-                x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
-                y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
-            };
+            return { x: (e.touches?e.touches[0].clientX:e.clientX)-r.left, y: (e.touches?e.touches[0].clientY:e.clientY)-r.top };
         }
         
-        ['mousedown', 'touchstart'].forEach(evt => c.addEventListener(evt, (e)=>{
-            if(evt=='touchstart') e.preventDefault();
-            isDrawing=true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y);
-        }));
-        ['mousemove', 'touchmove'].forEach(evt => c.addEventListener(evt, (e)=>{
-            if(evt=='touchmove') e.preventDefault();
-            if(isDrawing){ const p = getPos(e); ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineTo(p.x, p.y); ctx.stroke(); }
-        }));
-        ['mouseup', 'touchend'].forEach(evt => c.addEventListener(evt, ()=>{ isDrawing=false }));
-        
-        window.addEventListener('resize', ()=>resizeCanvas(id)); 
+        ['mousedown','touchstart'].forEach(ev=>c.addEventListener(ev,(e)=>{ if(ev=='touchstart')e.preventDefault(); draw=true; ctx.beginPath(); ctx.moveTo(pos(e).x, pos(e).y); }));
+        ['mousemove','touchmove'].forEach(ev=>c.addEventListener(ev,(e)=>{ if(ev=='touchmove')e.preventDefault(); if(draw){ ctx.lineTo(pos(e).x, pos(e).y); ctx.stroke(); } }));
+        ['mouseup','touchend'].forEach(ev=>c.addEventListener(ev,()=>draw=false));
+        window.addEventListener('resize', ()=>resizeCvs(id));
     }
-    setupCanvas('cvs-cikgu'); setupCanvas('cvs-it');
-    function clearCvs(id) { 
-        const c = document.getElementById(id); 
-        c.getContext('2d').clearRect(0,0,c.width,c.height); 
-    }
+    setupCvs('cvs-cikgu'); setupCvs('cvs-it');
+    function clearCvs(id) { const c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
 
-    // --- 3. DATA LOGIC (NEW DB NAME FOR INTERN PROJECT) ---
-    let db = JSON.parse(localStorage.getItem('asetDB_final')) || [];
+    // --- DATA LOGIC ---
+    let db = JSON.parse(localStorage.getItem('asetDB_final')) || []; // Maintain same DB
     let notes = JSON.parse(localStorage.getItem('notesDB_final')) || [];
-    let currentId = null;
+    let curId = null;
     document.getElementById('c_date').valueAsDate = new Date();
 
     function submitForm() {
-        const name = document.getElementById('c_name').value;
-        const serial = document.getElementById('c_serial').value;
-        if(!name || !serial) return alert("Sila isi Nama & No Siri!");
+        const n = document.getElementById('c_name').value;
+        const s = document.getElementById('c_serial').value;
+        if(!n || !s) return alert("Sila isi Nama & No Siri!");
         
-        db.push({
-            id: Date.now(),
-            date: document.getElementById('c_date').value,
-            name, serial: serial.toUpperCase(),
-            asset: document.getElementById('c_asset').value,
-            note: document.getElementById('c_note').value,
-            status: 'PENDING', itName: '-'
-        });
+        db.push({ id:Date.now(), date:document.getElementById('c_date').value, name:n, serial:s.toUpperCase(), asset:document.getElementById('c_asset').value, note:document.getElementById('c_note').value, status:'PENDING', itName:'-' });
         localStorage.setItem('asetDB_final', JSON.stringify(db));
-        alert("✅ Borang berjaya dihantar!");
-        document.getElementById('c_name').value = "";
-        document.getElementById('c_serial').value = "";
-        document.getElementById('c_note').value = "";
+        alert("✅ Berjaya hantar!");
+        document.getElementById('c_name').value=""; document.getElementById('c_serial').value=""; document.getElementById('c_note').value="";
         clearCvs('cvs-cikgu');
     }
 
     function checkAdmin() {
-        if(prompt("Password IT:") === "admin123") {
-            document.getElementById('landing-page').style.transform = 'translateY(-100%)';
+        if(prompt("Password IT:")==="admin123") {
+            document.getElementById('landing-page').style.transform='translateY(-100%)';
             document.getElementById('app-container').classList.add('active');
             switchTab('page-admin'); renderAdmin();
-        } else alert("Salah Password!");
+        } else alert("Salah!");
     }
 
     function renderAdmin() {
         const list = document.getElementById('pending-list');
-        const tbody = document.querySelector('#db-table tbody');
-        list.innerHTML = ""; tbody.innerHTML = "";
+        const tb = document.querySelector('#db-table tbody');
+        list.innerHTML = ""; tb.innerHTML = "";
         
-        db.slice().reverse().forEach(item => {
-            let statusBadge = item.status === 'PENDING' ? '<span style="background:#fef3c7; color:#d97706; padding:4px 10px; border-radius:20px; font-weight:700; font-size:0.8rem">⏳ Menunggu</span>' : '<span style="background:#dcfce7; color:#166534; padding:4px 10px; border-radius:20px; font-weight:700; font-size:0.8rem">✅ Selesai</span>';
+        db.slice().reverse().forEach(x => {
+            const badge = x.status==='PENDING' ? '<span style="color:#d97706; background:#fef3c7; padding:3px 8px; border-radius:10px; font-size:0.75rem; font-weight:700">Menunggu</span>' : '<span style="color:#166534; background:#dcfce7; padding:3px 8px; border-radius:10px; font-size:0.75rem; font-weight:700">Selesai</span>';
+            tb.innerHTML += `<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:12px">${x.date}</td><td style="padding:12px"><b>${x.name}</b><br><small style="color:#64748b">${x.asset} (${x.serial})</small></td><td style="padding:12px">${badge}</td></tr>`;
             
-            tbody.innerHTML += `<tr><td style="padding:15px; border-bottom:1px solid #f1f5f9">${item.date}</td><td style="padding:15px; border-bottom:1px solid #f1f5f9"><b>${item.name}</b><br><small style="color:#64748b">${item.asset} (${item.serial})</small></td><td style="padding:15px; border-bottom:1px solid #f1f5f9">${statusBadge}</td></tr>`;
-            
-            if(item.status === 'PENDING') {
-                list.innerHTML += `<div style="background:#fffbeb; border:1px solid #fcd34d; padding:20px; margin-bottom:15px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 10px rgba(251, 191, 36, 0.1)">
-                    <div><b style="font-size:1.1rem; color:#92400e">${item.asset}</b> <span style="background:#fef3c7; padding:2px 6px; border-radius:4px; font-size:0.8rem; font-weight:700; color:#92400e">${item.serial}</span><br><small style="color:#b45309">Dari: ${item.name}</small></div>
-                    <button onclick="process(${item.id})" style="background:#f59e0b; color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:700; cursor:pointer; box-shadow:0 4px 10px rgba(245, 158, 11, 0.3)">Proses ➡</button>
-                </div>`;
+            if(x.status==='PENDING') {
+                list.innerHTML += `<div style="background:#fffbeb; border:1px solid #fcd34d; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center"><div><b>${x.asset}</b> (${x.serial})<br><small>Oleh: ${x.name}</small></div><button onclick="proc(${x.id})" style="background:#f59e0b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer">Proses</button></div>`;
             }
         });
-        if(!list.innerHTML) list.innerHTML = "<div style='text-align:center; padding:30px; color:#94a3b8; background:#f8fafc; border-radius:16px; border:2px dashed #e2e8f0'>Tiada tugasan baru.</div>";
+        if(!list.innerHTML) list.innerHTML = "<div style='text-align:center; padding:20px; color:#ccc; border:2px dashed #eee; border-radius:10px'>Tiada tugasan baru.</div>";
     }
 
-    function process(id) {
-        currentId = id;
-        const item = db.find(x => x.id === id);
-        document.getElementById('process-info').innerHTML = `<b>Aset:</b> ${item.asset} (${item.serial})<br><b>Penghantar:</b> ${item.name}<br><b>Masalah:</b> ${item.note}`;
-        clearCvs('cvs-it');
-        switchTab('page-process');
+    function proc(id) {
+        curId = id; const item = db.find(x=>x.id===id);
+        document.getElementById('process-info').innerHTML = `<b>Aset:</b> ${item.asset} <br><b>Masalah:</b> ${item.note}`;
+        clearCvs('cvs-it'); switchTab('page-process');
     }
 
     function saveIT() {
-        const idx = db.findIndex(x => x.id === currentId);
-        if(idx !== -1) {
+        const idx = db.findIndex(x=>x.id===curId);
+        if(idx!==-1) {
             db[idx].itName = document.getElementById('it_name').value;
             db[idx].status = document.getElementById('it_status').value;
             localStorage.setItem('asetDB_final', JSON.stringify(db));
-            alert("✅ Data disimpan!");
-            switchTab('page-admin'); renderAdmin();
+            alert("Disimpan!"); switchTab('page-admin'); renderAdmin();
         }
     }
 
     function addNote() {
-        const txt = document.getElementById('note-text').value;
-        if(txt) {
-            notes.push({id:Date.now(), text:txt});
-            localStorage.setItem('notesDB_final', JSON.stringify(notes));
-            document.getElementById('note-text').value=""; renderNotes();
-        }
+        const t = document.getElementById('note-text').value;
+        if(t) { notes.push({id:Date.now(), text:t}); localStorage.setItem('notesDB_final', JSON.stringify(notes)); document.getElementById('note-text').value=""; renNote(); }
     }
-    function renderNotes() {
-        document.getElementById('note-grid').innerHTML = notes.slice().reverse().map(n => `<div style="background:#fff; padding:20px; border-radius:16px; box-shadow:0 4px 10px rgba(0,0,0,0.03); display:flex; justify-content:space-between; align-items:center; border:1px solid #f1f5f9"><span style="font-weight:500; color:#334155">${n.text}</span><span onclick="delNote(${n.id})" style="color:#ef4444; font-weight:bold; cursor:pointer; background:#fee2e2; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%">✕</span></div>`).join('');
+    function renNote() {
+        document.getElementById('note-grid').innerHTML = notes.slice().reverse().map(n=>`<div style="background:white; padding:15px; border-radius:8px; border:1px solid #eee; display:flex; justify-content:space-between"><span>${n.text}</span><span onclick="delNote(${n.id})" style="color:red; cursor:pointer">✕</span></div>`).join('');
     }
-    function delNote(id) { notes=notes.filter(n=>n.id!==id); localStorage.setItem('notesDB_final', JSON.stringify(notes)); renderNotes(); }
+    function delNote(id) { notes=notes.filter(n=>n.id!==id); localStorage.setItem('notesDB_final', JSON.stringify(notes)); renNote(); }
 
     function downloadExcel() {
-        let csv = "ID,Tarikh,Nama,Aset,Serial,Masalah,Status IT,Nama IT\n" + db.map(r => `${r.id},"${r.date}","${r.name}","${r.asset}","${r.serial}","${r.note}","${r.status}","${r.itName}"`).join("\n");
-        const link = document.createElement('a');
-        link.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-        link.download = 'Laporan_Aset_Syuhaida.csv'; link.click();
+        let csv = "ID,Tarikh,Nama,Aset,Serial,Masalah,Status,IT Name\n" + db.map(r => `${r.id},"${r.date}","${r.name}","${r.asset}","${r.serial}","${r.note}","${r.status}","${r.itName}"`).join("\n");
+        const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURI(csv); a.download='Laporan_Aset.csv'; a.click();
     }
     
-    // Init
-    setTimeout(() => { resizeCanvas('cvs-cikgu'); resizeCanvas('cvs-it'); }, 500);
+    // Init Canvas Size
+    setTimeout(() => { resizeCvs('cvs-cikgu'); resizeCvs('cvs-it'); }, 500);
 </script>
 
 </body>
