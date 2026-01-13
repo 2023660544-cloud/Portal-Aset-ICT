@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Aset YPKT - V24 (Multi-Log)</title>
+    <title>Sistem Aset YPKT </title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- STYLE ASAL KEKAL (TIDAK BERUBAH) --- */
@@ -177,7 +177,7 @@
 
     <div id="landing-page">
         <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1>
-        <p></p></p>
+        <p style="color:#94a3b8; margin-top:0; margin-bottom:30px">Versi 25 - Search Jejak (Firebase)</p>
 
         <div class="landing-grid">
             <div class="landing-card" onclick="openMode('public')">
@@ -300,7 +300,9 @@
                         </div>
                     </div>
 
-                    <p style="text-align:center; font-size:0.85rem; color:#64748b; margin-top:30px; margin-bottom:10px">
+                    <input type="text" id="search-jejak" placeholder="🔎 Cari Aset (Nama / Siri / Jenis)..." oninput="renderJejakListOnly()" style="margin-top:20px; width:100%; padding:15px; border:2px solid #93c5fd; border-radius:10px;">
+
+                    <p style="text-align:center; font-size:0.85rem; color:#64748b; margin-top:10px; margin-bottom:10px">
                         👇 Klik pada kad aset di bawah untuk <b>INFO PENUH & TANDAKAN SIAP (COMPLETE)</b> 👇
                     </p>
                     <div id="list-jejak">Loading data...</div>
@@ -420,7 +422,7 @@
             if(pageId === 'adm-terima') renderTerima();
             if(pageId === 'adm-jejak') renderJejak();
             if(pageId === 'adm-pulang') renderListPulang('list-pulang-admin');
-            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v24') || '';
+            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v25') || '';
         }
 
         function toggleSidebar() {
@@ -428,7 +430,7 @@
             document.querySelector('.overlay').classList.toggle('active');
         }
 
-        // --- SEARCH FAST TRACK (KEKAL: NAMA PENERIMA KOSONG) ---
+        // --- SEARCH FAST TRACK ---
         function searchMyAsset() {
             let keyword = document.getElementById('search-keyword').value.trim().toLowerCase();
             let div = document.getElementById('search-results-area');
@@ -560,21 +562,46 @@
             });
         }
 
-        // --- JEJAK ASET (LOGIC BARU: PREVIEW LOG) ---
+        // --- JEJAK ASET (UPDATED: SEARCH) ---
         function renderJejak() {
             let sel = document.getElementById('track-sel');
-            // Simpan value lama kalau ada (supaya tak refresh hilang selection)
             let oldVal = sel.value;
             sel.innerHTML = '<option value="">-- Pilih Aset Untuk Tambah Nota --</option>';
             window.db.filter(x => x.status !== 'RETURNED' && x.status !== 'PENDING').forEach(x => {
                 sel.innerHTML += `<option value="${x.id}">${x.type} - ${x.name} (${x.serial})</option>`;
             });
-            sel.value = oldVal; // Restore selection
+            sel.value = oldVal; 
 
+            // Render List (Panggil function khas)
+            renderJejakListOnly();
+
+            if(sel.value) previewLogs();
+        }
+
+        // FUNGSI BARU: FILTER LIST SAHAJA (UNTUK SEARCH)
+        window.renderJejakListOnly = function() {
+            let keyword = document.getElementById('search-jejak').value.toLowerCase();
             let div = document.getElementById('list-jejak');
             div.innerHTML = '';
             
-            window.db.filter(x => x.status !== 'PENDING').reverse().forEach(i => {
+            // Filter asas (Bukan Pending)
+            let list = window.db.filter(x => x.status !== 'PENDING');
+
+            // Filter Search (Kalau ada keyword)
+            if(keyword) {
+                list = list.filter(x => 
+                    x.name.toLowerCase().includes(keyword) || 
+                    x.serial.toLowerCase().includes(keyword) ||
+                    x.type.toLowerCase().includes(keyword)
+                );
+            }
+
+            if(list.length === 0) {
+                div.innerHTML = '<p style="text-align:center; color:#94a3b8">Tiada rekod dijumpai.</p>';
+                return;
+            }
+
+            list.reverse().forEach(i => {
                 let sColor = '#3b82f6'; let sText = 'DALAM PROSES';
                 if(i.status === 'COMPLETED') { sColor = '#8b5cf6'; sText = 'SIAP (READY)'; }
                 if(i.status === 'RETURNED') { sColor = '#10b981'; sText = 'SUDAH PULANG'; }
@@ -593,12 +620,8 @@
                     </div>
                 </div>`;
             });
-
-            // Update preview kalau ada selection
-            if(sel.value) previewLogs();
         }
 
-        // FUNGSI BARU: TUNJUK LOG BILA PILIH DROPDOWN
         window.previewLogs = function() {
             let id = document.getElementById('track-sel').value;
             let previewDiv = document.getElementById('log-preview');
@@ -612,7 +635,6 @@
             if(item && item.logs) {
                 previewDiv.style.display = 'block';
                 previewDiv.innerHTML = '<strong style="display:block; margin-bottom:5px; font-size:0.8rem; color:#64748b">SEJARAH NOTA (TERKINI DI ATAS):</strong>';
-                // Clone array, reverse to show newest first
                 [...item.logs].reverse().forEach(l => {
                     previewDiv.innerHTML += `<div style="font-size:0.85rem; border-bottom:1px solid #eee; padding:4px 0;">👉 ${l.text} <span style="color:#aaa; font-size:0.75rem">(${l.time})</span></div>`;
                 });
@@ -628,12 +650,11 @@
             
             let item = window.db.find(x => x.id === id);
             let currentLogs = item.logs || [];
-            // Multiple Notes: Push to array, don't overwrite
             currentLogs.push({text: txt, time: new Date().toLocaleString()});
 
             window.update(window.ref(window.dbRef, 'assets/' + id), { logs: currentLogs }).then(() => {
-                document.getElementById('track-txt').value = ''; // Clear input only
-                previewLogs(); // Refresh preview immediately
+                document.getElementById('track-txt').value = ''; 
+                previewLogs(); 
             });
         }
 
@@ -643,7 +664,6 @@
 
             let logsHTML = '';
             if(item.logs && Array.isArray(item.logs)) {
-                // Show newest first in detail view too
                 [...item.logs].reverse().forEach(log => {
                     logsHTML += `<div class="log-item">👉 ${log.text} <small style="color:#aaa">(${log.time})</small></div>`;
                 });
@@ -761,7 +781,7 @@
             document.body.removeChild(a);
         }
 
-        function saveNote() { localStorage.setItem('nota_v24', document.getElementById('notepad').value); }
+        function saveNote() { localStorage.setItem('nota_v25', document.getElementById('notepad').value); }
 
         function initCanvas(id) {
             let c = document.getElementById(id);
