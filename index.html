@@ -3,107 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal Aset ICT (Mobile)</title>
+    <title>Portal Aset ICT (Hybrid V7)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
         :root {
             --primary: #2563eb;
-            --dark: #1e293b;
-            --light: #f1f5f9;
-            --sidebar-width: 260px;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --sidebar-width: 280px;
+            --header-height: 60px;
         }
 
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--light); height: 100vh; overflow: hidden; touch-action: pan-y; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--light); height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; }
 
         /* ===========================
-           1. LANDING PAGE
+           1. LANDING PAGE (MUKA DEPAN)
            =========================== */
         #landing-page {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            background: linear-gradient(135deg, var(--dark) 0%, #334155 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; z-index: 2000; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            color: white; z-index: 2000; transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            padding: 20px;
         }
-
-        .landing-content { text-align: center; width: 90%; max-width: 400px; }
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 30px; }
-        
+        .landing-content { text-align: center; max-width: 500px; width: 100%; }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 40px; }
         .menu-card {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            padding: 20px; border-radius: 15px; cursor: pointer; display: flex; align-items: center; gap: 15px;
-            backdrop-filter: blur(10px); transition: 0.2s;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            padding: 25px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 20px;
+            backdrop-filter: blur(10px); transition: 0.3s;
         }
-        .menu-card:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
-        .menu-icon { font-size: 2rem; }
-        .menu-text { font-weight: 600; font-size: 1.1rem; text-align: left; }
-        .menu-sub { font-size: 0.8rem; color: #cbd5e1; text-align: left; font-weight: normal;}
+        .menu-card:hover { background: rgba(255,255,255,0.2); transform: translateY(-5px); border-color: var(--primary); }
+        .menu-icon { font-size: 2.5rem; }
+        .menu-text-box { text-align: left; }
+        .menu-title { font-weight: 700; font-size: 1.2rem; }
+        .menu-sub { font-size: 0.9rem; color: #cbd5e1; opacity: 0.8; }
 
         /* ===========================
-           2. APP CONTAINER
+           2. APP STRUCTURE (SISTEM DALAM)
            =========================== */
         #app-container {
             display: flex; height: 100vh; width: 100%; position: absolute; top: 0; left: 0;
-            transform: translateY(100%); transition: transform 0.5s ease-in-out; opacity: 0; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); opacity: 0;
+            flex-direction: column; /* Default Mobile Direction */
+            background: var(--light);
         }
         #app-container.active { transform: translateY(0); opacity: 1; }
 
-        /* MOBILE HEADER (HAMBURGER) */
+        /* --- MOBILE HEADER (Only for Phone) --- */
         .mobile-header {
-            background: #fff; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 50; height: 60px; box-sizing: border-box;
+            background: #fff; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05); height: var(--header-height); z-index: 50; flex-shrink: 0;
         }
-        .hamburger-btn { font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--dark); padding: 5px; }
-        .page-title { font-weight: 700; color: var(--dark); font-size: 1.1rem; }
+        .hamburger-btn { font-size: 1.8rem; background: none; border: none; cursor: pointer; color: var(--dark); padding: 5px; }
+        .page-title-header { font-weight: 700; color: var(--dark); font-size: 1.1rem; }
 
-        /* SIDEBAR (MENU) */
+        /* --- SIDEBAR (Responsive) --- */
         .sidebar { 
             position: fixed; top: 0; left: 0; height: 100%; width: var(--sidebar-width);
             background: #fff; z-index: 1000; transform: translateX(-100%); transition: transform 0.3s ease;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 20px; box-sizing: border-box;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.05); display: flex; flex-direction: column; padding: 30px;
+            border-right: 1px solid #f1f5f9;
         }
-        .sidebar.open { transform: translateX(0); }
-        
-        /* OVERLAY (GELAP BELAKANG MENU) */
+        .sidebar.open { transform: translateX(0); } /* Class untuk buka di mobile */
         .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 900; display: none; opacity: 0; transition: opacity 0.3s;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); 
+            z-index: 900; display: none; opacity: 0; transition: opacity 0.3s;
         }
         .sidebar-overlay.show { display: block; opacity: 1; }
 
-        .brand { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
-        .nav-item { padding: 15px; margin-bottom: 10px; color: #64748b; border-radius: 10px; font-weight: 500; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
-        .nav-item.active { background: #eff6ff; color: var(--primary); font-weight: 700; }
+        .brand { font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 50px; display: flex; align-items: center; gap: 12px; }
+        .brand-icon { color: var(--primary); font-size: 1.8rem; }
+        .nav-item { padding: 16px; margin-bottom: 10px; color: #64748b; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 15px; transition: 0.2s; cursor: pointer; font-size: 0.95rem;}
+        .nav-item:hover { background: #f8fafc; color: var(--primary); }
+        .nav-item.active { background: #eff6ff; color: var(--primary); }
         .nav-home { margin-top: auto; background: var(--dark); color: white !important; }
+        .nav-home:hover { background: #334155 !important; }
 
-        /* MAIN CONTENT */
-        .main-content { flex: 1; background: #f8fafc; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        /* --- MAIN CONTENT AREA --- */
+        .main-content-wrapper { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 25px; position: relative; }
+        .page-section { display: none; animation: fadeIn 0.4s ease; max-width: 1000px; margin: 0 auto; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CARDS & FORMS --- */
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); margin-bottom: 25px; border: 1px solid #f1f5f9; }
+        h2 { margin-top: 0; color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 25px; font-size: 1.5rem; }
         
-        /* CARDS & FORMS */
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 20px; }
-        .form-row { display: grid; grid-template-columns: 1fr; gap: 15px; } /* Mobile: 1 Column */
+        .form-row { display: grid; grid-template-columns: 1fr; gap: 20px; } /* Default Mobile: 1 Column */
         
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px; margin-top: 5px; box-sizing: border-box; font-size: 16px; /* Prevent zoom on iPhone */ background: #f8fafc; }
-        label { font-weight: 600; font-size: 0.9rem; color: #475569; margin-top: 15px; display: block; }
+        label { font-weight: 600; font-size: 0.9rem; color: #475569; margin-bottom: 8px; display: block; margin-top: 20px; }
+        input, select, textarea { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; background: #fcfdfe; transition: 0.3s; font-family: inherit; font-size: 1rem; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
         
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: 700; margin-top: 20px; font-size: 1rem; color: white; cursor: pointer; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 700; margin-top: 30px; font-size: 1rem; color: white; cursor: pointer; transition: 0.2s; }
         .btn-primary { background: var(--primary); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
-        .sig-pad { border: 2px dashed #cbd5e1; border-radius: 10px; width: 100%; background: #fff; touch-action: none; }
+        .btn-primary:hover { transform: translateY(-2px); }
 
-        /* DESKTOP VIEW (MEDIA QUERY) */
-        @media (min-width: 769px) {
-            #landing-page { display: flex; flex-direction: row; }
-            .landing-content { text-align: center; }
-            .menu-grid { grid-template-columns: repeat(3, 1fr); max-width: 800px; }
-            .menu-card { flex-direction: column; text-align: center; width: 180px; padding: 30px 20px; }
-            .menu-text { text-align: center; } .menu-sub { text-align: center; }
+        .sig-container { background: #f8fafc; padding: 5px; border-radius: 12px; border: 2px dashed #cbd5e1; }
+        .sig-pad { width: 100%; height: 150px; background: #fff; border-radius: 8px; cursor: crosshair; touch-action: none; display: block; }
+        .del-sign-btn { color: #ef4444; text-align: right; margin-top: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: inline-block; float: right; padding: 5px; }
+
+        /* =========================================
+           RESPONSIVE DESIGN (PENTING UNTUK LAPTOP)
+           ========================================= */
+        @media (min-width: 1024px) {
+            /* Ubah Landing Page jadi sebelah-sebelah */
+            #landing-page { flex-direction: row; padding: 50px; gap: 50px; }
+            .landing-content { text-align: left; }
+            .menu-grid { grid-template-columns: repeat(3, 1fr); margin-top: 0; }
+            .menu-card { flex-direction: column; text-align: center; padding: 40px 30px; }
+            .menu-text-box { text-align: center; }
             
-            #app-container { flex-direction: row; }
-            .mobile-header { display: none; }
-            .sidebar { position: relative; transform: none; width: 280px; box-shadow: none; border-right: 1px solid #e2e8f0; }
-            .form-row { grid-template-columns: 1fr 1fr; }
-            .hamburger-btn { display: none; }
-            .main-content { padding: 40px; }
+            /* Ubah Sistem Dalam jadi Sidebar Kekal */
+            #app-container { flex-direction: row; } /* Susun memanjang ke tepi */
+            .mobile-header { display: none; } /* Sorok header mobile */
+            .hamburger-btn { display: none; } /* Sorok button hamburger */
+            .sidebar-overlay { display: none !important; } /* Tak perlu overlay gelap */
+
+            .sidebar { 
+                position: relative; /* Bukan lagi fixed */
+                transform: translateX(0); /* Sentiasa nampak */
+                box-shadow: none; /* Hilangkan bayang timbul */
+                height: 100vh;
+            }
+
+            .main-content-wrapper { padding: 40px; } /* Tambah padding untuk skrin besar */
+            
+            /* Ubah form jadi 2 column di laptop */
+            .form-row { grid-template-columns: 1fr 1fr; gap: 30px; }
         }
     </style>
 </head>
@@ -111,22 +141,22 @@
 
     <div id="landing-page">
         <div class="landing-content">
-            <h1 style="margin:0; font-size:2.5rem;">📱 Portal Aset</h1>
-            <p style="color:#94a3b8; margin-bottom:30px">Sistem versi mudah alih</p>
-
-            <div class="menu-grid">
-                <div class="menu-card" onclick="enterSystem('page-cikgu')">
-                    <span class="menu-icon">📥</span>
-                    <div><div class="menu-text">Borang Aset</div><div class="menu-sub">Hantar Peralatan</div></div>
-                </div>
-                <div class="menu-card" onclick="enterSystem('page-admin-check')">
-                    <span class="menu-icon">🔐</span>
-                    <div><div class="menu-text">Admin IT</div><div class="menu-sub">Login Pegawai</div></div>
-                </div>
-                <div class="menu-card" onclick="enterSystem('page-notepad')">
-                    <span class="menu-icon">📌</span>
-                    <div><div class="menu-text">Nota</div><div class="menu-sub">Catatan Peribadi</div></div>
-                </div>
+            <div style="font-size:3rem; margin-bottom:10px">🏫</div>
+            <h1 style="margin:0; font-size:2.8rem; line-height:1.2">Portal Aset ICT</h1>
+            <p style="color:#cbd5e1; margin-top:10px; font-size:1.1rem;">Sistem Pengurusan Berpusat</p>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="enterSystem('page-cikgu')">
+                <span class="menu-icon">📝</span>
+                <div class="menu-text-box"><div class="menu-title">Borang Aset</div><div class="menu-sub">Serahan Peralatan</div></div>
+            </div>
+            <div class="menu-card" onclick="enterSystem('page-admin-check')">
+                <span class="menu-icon">🔐</span>
+                <div class="menu-text-box"><div class="menu-title">Admin IT</div><div class="menu-sub">Login Pegawai</div></div>
+            </div>
+            <div class="menu-card" onclick="enterSystem('page-notepad')">
+                <span class="menu-icon">📌</span>
+                <div class="menu-text-box"><div class="menu-title">Memo</div><div class="menu-sub">Catatan Pantas</div></div>
             </div>
         </div>
     </div>
@@ -135,13 +165,14 @@
         
         <div class="mobile-header">
             <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
-            <div class="page-title" id="header-title">Menu Utama</div>
-            <div style="width:30px"></div> </div>
+            <div class="page-title-header" id="header-title">Menu Utama</div>
+            <div style="width:40px"></div>
+        </div>
 
         <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
         <div class="sidebar" id="sidebar">
-            <div class="brand">🚀 E-Aset Pro <small style="font-size:0.7rem; color:#94a3b8">v6 Mobile</small></div>
+            <div class="brand"><span class="brand-icon">🚀</span> E-Aset Pro V7</div>
             
             <div class="nav-item" id="nav-cikgu" onclick="switchTab('page-cikgu')"><span>📝</span> Borang Serahan</div>
             <div class="nav-item" id="nav-admin" onclick="checkAdmin()"><span>🛠️</span> Dashboard IT</div>
@@ -150,62 +181,87 @@
             <div class="nav-item nav-home" onclick="exitSystem()">🏠 Menu Utama</div>
         </div>
 
-        <div class="main-content">
+        <div class="main-content-wrapper">
             
             <div id="page-cikgu" class="page-section active">
                 <div class="card">
-                    <h2>Borang Serahan</h2>
+                    <h2>Borang Serahan Aset</h2>
                     <div class="form-row">
-                        <div><label>Nama:</label><input type="text" id="c_name"></div>
-                        <div><label>Aset:</label>
-                            <select id="c_asset">
-                                <option>Printer</option><option>Laptop</option><option>PC</option><option>Projector</option>
-                            </select>
+                        <div><label>Nama Penghantar:</label><input type="text" id="c_name" placeholder="Cth: Cikgu Ahmad"></div>
+                        <div><label>Jenis Aset:</label>
+                            <select id="c_asset"><option>Printer</option><option>Laptop</option><option>PC Desktop</option><option>Projector</option><option>Lain-lain</option></select>
                         </div>
                     </div>
-                    <div><label>No. Siri (Wajib):</label><input type="text" id="c_serial" style="text-transform:uppercase"></div>
-                    <div><label>Tarikh:</label><input type="date" id="c_date"></div>
-                    <div><label>Masalah:</label><textarea id="c_note" rows="3"></textarea></div>
+                    <div class="form-row">
+                        <div><label>No. Siri (Wajib):</label><input type="text" id="c_serial" style="text-transform:uppercase; letter-spacing:1px" placeholder="SN-XXXX"></div>
+                        <div><label>Tarikh:</label><input type="date" id="c_date"></div>
+                    </div>
+                    <div><label>Masalah / Catatan:</label><textarea id="c_note" rows="3" placeholder="Terangkan kerosakan..."></textarea></div>
                     
-                    <label>Tandatangan:</label>
-                    <canvas id="cvs-cikgu" class="sig-pad" height="150"></canvas>
-                    <div onclick="clearCvs('cvs-cikgu')" style="color:red; text-align:right; margin-top:5px; font-size:0.8rem">Padam Sign</div>
+                    <label>Tandatangan Penghantar:</label>
+                    <div class="sig-container">
+                        <canvas id="cvs-cikgu" class="sig-pad"></canvas>
+                    </div>
+                    <div class="del-sign-btn" onclick="clearCvs('cvs-cikgu')">Padam Sign ❌</div>
+                    <div style="clear:both"></div>
                     
-                    <button class="btn btn-primary" onclick="submitForm()">HANTAR</button>
+                    <button class="btn btn-primary" onclick="submitForm()">HANTAR BORANG</button>
                 </div>
             </div>
 
-            <div id="page-admin" class="page-section" style="display:none">
+            <div id="page-admin" class="page-section">
                 <div class="card">
-                    <h2 style="display:flex; justify-content:space-between">Dashboard <button onclick="downloadExcel()" style="background:#10b981; color:white; border:none; padding:5px 10px; border-radius:5px; font-size:0.8rem">Excel</button></h2>
-                    <div id="pending-list"></div>
-                    <div style="overflow-x:auto; margin-top:20px">
-                        <table id="db-table" style="width:100%; border-collapse:collapse; font-size:0.8rem">
-                            <thead><tr style="background:#f1f5f9; text-align:left"><th>Tarikh</th><th>Nama</th><th>Status</th></tr></thead>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #f1f5f9; padding-bottom:15px">
+                        <h2 style="border:none; margin:0; padding:0">Dashboard IT</h2>
+                        <button onclick="downloadExcel()" style="background:#10b981; color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.9rem">📥 Excel</button>
+                    </div>
+                    
+                    <div id="pending-list" style="margin-bottom:30px"></div>
+                    
+                    <h3 style="color:#475569; margin-bottom:15px">Sejarah Rekod</h3>
+                    <div style="overflow-x:auto; border-radius:12px; border:1px solid #e2e8f0;">
+                        <table id="db-table" style="width:100%; border-collapse:collapse; font-size:0.9rem">
+                            <thead><tr style="background:#f8fafc; text-align:left; color:#475569">
+                                <th style="padding:15px">Tarikh</th><th style="padding:15px">Nama & Aset</th><th style="padding:15px">Status</th>
+                            </tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <div id="page-process" class="page-section" style="display:none">
-                <button onclick="switchTab('page-admin')" style="background:#e2e8f0; border:none; padding:10px; border-radius:8px; margin-bottom:10px">⬅ Kembali</button>
-                <div class="card" style="border-top:4px solid #f59e0b">
-                    <h3>Proses Aset</h3>
-                    <div id="process-info" style="background:#eff6ff; padding:10px; margin-bottom:15px; border-radius:8px; font-size:0.9rem"></div>
-                    <label>Nama IT:</label><input type="text" id="it_name">
-                    <label>Status:</label><select id="it_status"><option>Baiki</option><option>Simpan</option><option>Pulang</option></select>
-                    <label>Sign IT:</label><canvas id="cvs-it" class="sig-pad" height="150"></canvas>
-                    <button class="btn btn-primary" onclick="saveIT()">SIMPAN</button>
+            <div id="page-process" class="page-section">
+                <button onclick="switchTab('page-admin')" style="background:#e2e8f0; border:none; padding:10px 15px; border-radius:10px; margin-bottom:15px; font-weight:600; color:#475569; cursor:pointer">⬅ Kembali</button>
+                <div class="card" style="border-top:5px solid #f59e0b">
+                    <h2>Proses Penerimaan</h2>
+                    <div id="process-info" style="background:#eff6ff; padding:20px; margin-bottom:25px; border-radius:12px; font-size:0.95rem; color:#1e40af; line-height:1.6; border:1px solid #bfdbfe"></div>
+                    
+                    <div class="form-row">
+                        <div><label>Nama Pegawai IT:</label><input type="text" id="it_name" placeholder="Nama Anda"></div>
+                        <div><label>Status Tindakan:</label>
+                            <select id="it_status"><option>Diterima - Akan Dibaiki</option><option>Diterima - Simpan</option><option>Ditolak / Dipulangkan</option><option>Lupus</option></select>
+                        </div>
+                    </div>
+                    
+                    <label>Tandatangan IT:</label>
+                    <div class="sig-container">
+                        <canvas id="cvs-it" class="sig-pad"></canvas>
+                    </div>
+                    <div class="del-sign-btn" onclick="clearCvs('cvs-it')">Padam Sign IT ❌</div>
+                    <div style="clear:both"></div>
+
+                    <button class="btn btn-primary" onclick="saveIT()">SIMPAN & SELESAI</button>
                 </div>
             </div>
 
-            <div id="page-notepad" class="page-section" style="display:none">
+            <div id="page-notepad" class="page-section">
                 <div class="card">
                     <h2>Nota Pantas</h2>
-                    <input type="text" id="note-text" placeholder="Tulis...">
-                    <button class="btn btn-primary" onclick="addNote()" style="margin-top:10px; padding:10px">Tambah</button>
-                    <div id="note-grid" style="margin-top:20px; display:grid; gap:10px"></div>
+                    <div style="display:flex; gap:10px">
+                        <input type="text" id="note-text" placeholder="Tulis sesuatu..." style="margin-top:0">
+                        <button class="btn btn-primary" onclick="addNote()" style="margin-top:0; width:auto; padding:0 25px">Tambah</button>
+                    </div>
+                    <div id="note-grid" style="margin-top:25px; display:grid; gap:15px"></div>
                 </div>
             </div>
 
@@ -213,10 +269,13 @@
     </div>
 
 <script>
-    // --- 1. UI LOGIC (MOBILE) ---
+    // --- 1. UI & RESPONSIVE LOGIC ---
     function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.querySelector('.sidebar-overlay').classList.toggle('show');
+        // Hanya berfungsi di mobile
+        if(window.innerWidth < 1024) {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.querySelector('.sidebar-overlay').classList.toggle('show');
+        }
     }
 
     function enterSystem(page) {
@@ -230,51 +289,36 @@
 
     function exitSystem() {
         document.getElementById('app-container').classList.remove('active');
-        toggleSidebar(); // Close sidebar if open
+        if(window.innerWidth < 1024) toggleSidebar(); // Tutup sidebar jika di mobile
         setTimeout(() => {
             document.getElementById('landing-page').style.transform = 'translateY(0)';
         }, 300);
     }
 
     function switchTab(id) {
-        // Hide all pages
-        ['page-cikgu','page-admin','page-process','page-notepad'].forEach(p => {
-            document.getElementById(p).style.display = 'none';
-        });
-        // Show selected
-        document.getElementById(id).style.display = 'block';
+        ['page-cikgu','page-admin','page-process','page-notepad'].forEach(p => document.getElementById(p).classList.remove('active'));
+        document.getElementById(id).classList.add('active');
         
-        // Update Sidebar Styles
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         if(id.includes('cikgu')) document.getElementById('nav-cikgu').classList.add('active');
         if(id.includes('admin') || id.includes('process')) document.getElementById('nav-admin').classList.add('active');
         if(id.includes('note')) document.getElementById('nav-note').classList.add('active');
 
-        // Update Header Title
-        const titles = {'page-cikgu':'Borang Aset', 'page-admin':'Dashboard IT', 'page-notepad':'Nota', 'page-process':'Proses'};
-        document.getElementById('header-title').innerText = titles[id] || 'E-Aset';
+        const titles = {'page-cikgu':'Borang Aset', 'page-admin':'Dashboard IT', 'page-notepad':'Nota', 'page-process':'Proses IT'};
+        document.getElementById('header-title').innerText = titles[id] || 'Menu';
 
-        // Close sidebar automatically on mobile
-        if(window.innerWidth < 769) {
+        if(window.innerWidth < 1024) { // Auto close sidebar di mobile
             document.getElementById('sidebar').classList.remove('open');
             document.querySelector('.sidebar-overlay').classList.remove('show');
         }
-
-        // Resize Canvas fix
-        setTimeout(() => { 
-            resizeCanvas('cvs-cikgu'); resizeCanvas('cvs-it');
-        }, 100);
+        setTimeout(() => { resizeCanvas('cvs-cikgu'); resizeCanvas('cvs-it'); }, 150); // Fix canvas size
     }
 
-    // --- 2. DATA LOGIC ---
-    let db = JSON.parse(localStorage.getItem('asetDB_v6')) || [];
-    let notes = JSON.parse(localStorage.getItem('notesDB')) || [];
-    let currentId = null;
-    document.getElementById('c_date').valueAsDate = new Date();
-
+    // --- 2. CANVAS (SIGNATURE) ---
     function resizeCanvas(id) {
         const c = document.getElementById(id);
-        c.width = c.parentElement.offsetWidth; // Force width to container
+        c.width = c.parentElement.offsetWidth;
+        c.height = 150; // Tetapkan tinggi
     }
 
     function setupCanvas(id) {
@@ -282,26 +326,25 @@
         const ctx = c.getContext('2d');
         let isDrawing = false;
         
-        // Mouse & Touch Events Combined
         const getPos = (e) => {
-            const rect = c.getBoundingClientRect();
-            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-            return {x,y};
+            const r = c.getBoundingClientRect();
+            return {
+                x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
+                y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
+            };
         }
         
         ['mousedown', 'touchstart'].forEach(evt => c.addEventListener(evt, (e)=>{
-            if(evt=='touchstart') e.preventDefault(); // Stop scroll
-            isDrawing=true; ctx.beginPath(); 
-            const p = getPos(e); ctx.moveTo(p.x, p.y);
+            if(evt=='touchstart') e.preventDefault();
+            isDrawing=true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y);
         }));
-        
         ['mousemove', 'touchmove'].forEach(evt => c.addEventListener(evt, (e)=>{
             if(evt=='touchmove') e.preventDefault();
-            if(isDrawing){ const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+            if(isDrawing){ const p = getPos(e); ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineTo(p.x, p.y); ctx.stroke(); }
         }));
-        
         ['mouseup', 'touchend'].forEach(evt => c.addEventListener(evt, ()=>{ isDrawing=false }));
+        
+        window.addEventListener('resize', ()=>resizeCanvas(id)); // Resize jika screen berubah
     }
     setupCanvas('cvs-cikgu'); setupCanvas('cvs-it');
     function clearCvs(id) { 
@@ -309,10 +352,16 @@
         c.getContext('2d').clearRect(0,0,c.width,c.height); 
     }
 
+    // --- 3. DATA LOGIC ---
+    let db = JSON.parse(localStorage.getItem('asetDB_v7')) || [];
+    let notes = JSON.parse(localStorage.getItem('notesDB_v7')) || [];
+    let currentId = null;
+    document.getElementById('c_date').valueAsDate = new Date();
+
     function submitForm() {
         const name = document.getElementById('c_name').value;
         const serial = document.getElementById('c_serial').value;
-        if(!name || !serial) return alert("Isi Nama & No Siri!");
+        if(!name || !serial) return alert("Sila isi Nama & No Siri!");
         
         db.push({
             id: Date.now(),
@@ -322,8 +371,8 @@
             note: document.getElementById('c_note').value,
             status: 'PENDING', itName: '-'
         });
-        localStorage.setItem('asetDB_v6', JSON.stringify(db));
-        alert("✅ Berjaya!");
+        localStorage.setItem('asetDB_v7', JSON.stringify(db));
+        alert("✅ Borang berjaya dihantar!");
         document.getElementById('c_name').value = "";
         document.getElementById('c_serial').value = "";
         document.getElementById('c_note').value = "";
@@ -332,11 +381,10 @@
 
     function checkAdmin() {
         if(prompt("Password IT:") === "admin123") {
-            // Force enter if from landing
             document.getElementById('landing-page').style.transform = 'translateY(-100%)';
             document.getElementById('app-container').classList.add('active');
             switchTab('page-admin'); renderAdmin();
-        } else alert("Salah!");
+        } else alert("Salah Password!");
     }
 
     function renderAdmin() {
@@ -345,22 +393,24 @@
         list.innerHTML = ""; tbody.innerHTML = "";
         
         db.slice().reverse().forEach(item => {
-            tbody.innerHTML += `<tr><td style="border-bottom:1px solid #eee; padding:10px">${item.date}</td><td style="border-bottom:1px solid #eee; padding:10px">${item.name}<br><small>${item.asset}</small></td><td style="border-bottom:1px solid #eee; padding:10px">${item.status}</td></tr>`;
+            let statusBadge = item.status === 'PENDING' ? '<span style="background:#fef3c7; color:#d97706; padding:4px 10px; border-radius:20px; font-weight:700; font-size:0.8rem">⏳ Menunggu</span>' : '<span style="background:#dcfce7; color:#166534; padding:4px 10px; border-radius:20px; font-weight:700; font-size:0.8rem">✅ Selesai</span>';
+            
+            tbody.innerHTML += `<tr><td style="padding:15px; border-bottom:1px solid #f1f5f9">${item.date}</td><td style="padding:15px; border-bottom:1px solid #f1f5f9"><b>${item.name}</b><br><small style="color:#64748b">${item.asset} (${item.serial})</small></td><td style="padding:15px; border-bottom:1px solid #f1f5f9">${statusBadge}</td></tr>`;
             
             if(item.status === 'PENDING') {
-                list.innerHTML += `<div style="background:#fffbeb; border:1px solid #fbbf24; padding:15px; margin-bottom:10px; border-radius:10px; display:flex; justify-content:space-between; align-items:center">
-                    <div><b>${item.asset}</b> (${item.serial})<br><small>${item.name}</small></div>
-                    <button onclick="process(${item.id})" style="background:#f59e0b; color:white; border:none; padding:8px 12px; border-radius:5px">Proses</button>
+                list.innerHTML += `<div style="background:#fffbeb; border:1px solid #fcd34d; padding:20px; margin-bottom:15px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 10px rgba(251, 191, 36, 0.1)">
+                    <div><b style="font-size:1.1rem; color:#92400e">${item.asset}</b> <span style="background:#fef3c7; padding:2px 6px; border-radius:4px; font-size:0.8rem; font-weight:700; color:#92400e">${item.serial}</span><br><small style="color:#b45309">Dari: ${item.name}</small></div>
+                    <button onclick="process(${item.id})" style="background:#f59e0b; color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:700; cursor:pointer; box-shadow:0 4px 10px rgba(245, 158, 11, 0.3)">Proses ➡</button>
                 </div>`;
             }
         });
-        if(!list.innerHTML) list.innerHTML = "<p style='text-align:center; color:#ccc'>Tiada pending.</p>";
+        if(!list.innerHTML) list.innerHTML = "<div style='text-align:center; padding:30px; color:#94a3b8; background:#f8fafc; border-radius:16px; border:2px dashed #e2e8f0'>Tiada tugasan baru.</div>";
     }
 
     function process(id) {
         currentId = id;
         const item = db.find(x => x.id === id);
-        document.getElementById('process-info').innerHTML = `<b>${item.asset}</b><br>Masalah: ${item.note}`;
+        document.getElementById('process-info').innerHTML = `<b>Aset:</b> ${item.asset} (${item.serial})<br><b>Penghantar:</b> ${item.name}<br><b>Masalah:</b> ${item.note}`;
         clearCvs('cvs-it');
         switchTab('page-process');
     }
@@ -370,8 +420,8 @@
         if(idx !== -1) {
             db[idx].itName = document.getElementById('it_name').value;
             db[idx].status = document.getElementById('it_status').value;
-            localStorage.setItem('asetDB_v6', JSON.stringify(db));
-            alert("Disimpan!");
+            localStorage.setItem('asetDB_v7', JSON.stringify(db));
+            alert("✅ Data disimpan!");
             switchTab('page-admin'); renderAdmin();
         }
     }
@@ -380,24 +430,24 @@
         const txt = document.getElementById('note-text').value;
         if(txt) {
             notes.push({id:Date.now(), text:txt});
-            localStorage.setItem('notesDB', JSON.stringify(notes));
-            document.getElementById('note-text').value="";
-            renderNotes();
+            localStorage.setItem('notesDB_v7', JSON.stringify(notes));
+            document.getElementById('note-text').value=""; renderNotes();
         }
     }
     function renderNotes() {
-        const g = document.getElementById('note-grid');
-        g.innerHTML = notes.slice().reverse().map(n => `<div style="background:#fff; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05); display:flex; justify-content:space-between"><span>${n.text}</span><span onclick="delNote(${n.id})" style="color:red; font-weight:bold">✕</span></div>`).join('');
+        document.getElementById('note-grid').innerHTML = notes.slice().reverse().map(n => `<div style="background:#fff; padding:20px; border-radius:16px; box-shadow:0 4px 10px rgba(0,0,0,0.03); display:flex; justify-content:space-between; align-items:center; border:1px solid #f1f5f9"><span style="font-weight:500; color:#334155">${n.text}</span><span onclick="delNote(${n.id})" style="color:#ef4444; font-weight:bold; cursor:pointer; background:#fee2e2; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%">✕</span></div>`).join('');
     }
-    function delNote(id) { notes=notes.filter(n=>n.id!==id); localStorage.setItem('notesDB', JSON.stringify(notes)); renderNotes(); }
+    function delNote(id) { notes=notes.filter(n=>n.id!==id); localStorage.setItem('notesDB_v7', JSON.stringify(notes)); renderNotes(); }
 
     function downloadExcel() {
-        let csv = "ID,Tarikh,Nama,Aset,Serial,Status\n" + db.map(r => `${r.id},"${r.date}","${r.name}","${r.asset}","${r.serial}","${r.status}"`).join("\n");
+        let csv = "ID,Tarikh,Nama,Aset,Serial,Masalah,Status IT,Nama IT\n" + db.map(r => `${r.id},"${r.date}","${r.name}","${r.asset}","${r.serial}","${r.note}","${r.status}","${r.itName}"`).join("\n");
         const link = document.createElement('a');
         link.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-        link.download = 'Data.csv';
-        link.click();
+        link.download = 'Laporan_Aset_V7.csv'; link.click();
     }
+    
+    // Init
+    setTimeout(() => { resizeCanvas('cvs-cikgu'); resizeCanvas('cvs-it'); }, 500);
 </script>
 
 </body>
