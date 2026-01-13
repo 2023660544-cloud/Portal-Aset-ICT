@@ -3,161 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Aset YPKT </title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Sistem Aset YPKT - V26 (Taska & UI Update)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- STYLE ASAL KEKAL (TIDAK BERUBAH) --- */
+        /* --- CORE VARIABLES --- */
         :root {
-            --primary: #2563eb; 
-            --dark: #1e293b; 
-            --sidebar-bg: #0f172a;
-            --light: #f3f4f6;
-            --red: #ef4444;
-            --green: #10b981;
-            --orange: #f97316;
-            --purple: #8b5cf6;
+            --primary: #3b82f6;       /* Biru Terang Sikit */
+            --primary-dark: #2563eb;  /* Biru Gelap sikit */
+            --secondary: #64748b;     /* Kelabu Teks */
+            --bg-body: #f1f5f9;       /* Background Page */
+            --sidebar-bg: #1e293b;    /* Sidebar Gelap Moden */
+            --sidebar-active: #334155;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
         }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--light); height: 100vh; overflow: hidden; }
+
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg-body); height: 100vh; overflow: hidden; color: #334155; }
         * { box-sizing: border-box; }
 
         .hide-scroll { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
 
+        /* --- LANDING PAGE --- */
         #landing-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999; transition: transform 0.4s ease;
         }
         .landing-grid { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 340px; }
         .landing-card {
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: white;
-            backdrop-filter: blur(10px); transition: 0.2s;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            padding: 20px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: white;
+            backdrop-filter: blur(12px); transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .landing-card:active { transform: scale(0.96); background: rgba(255,255,255,0.15); }
+        .landing-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.2); }
         .icon-box { font-size: 1.8rem; width: 50px; text-align: center; }
         .card-title { font-weight: 700; font-size: 1rem; }
-        .card-sub { font-size: 0.8rem; color: #94a3b8; }
-        .card-fast { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); }
+        .card-sub { font-size: 0.8rem; color: #cbd5e1; }
+        .card-fast { border-color: rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.15); }
 
         #app-container { display: none; height: 100vh; width: 100%; }
         #app-container.active { display: flex; }
 
+        /* --- NEW SIDEBAR DESIGN --- */
         .sidebar {
-            width: 260px; background: var(--sidebar-bg); color: #cbd5e1;
+            width: 270px; background: var(--sidebar-bg); color: #94a3b8;
             display: flex; flex-direction: column; flex-shrink: 0;
-            transition: transform 0.3s ease; z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 1000; box-shadow: 4px 0 24px rgba(0,0,0,0.1);
         }
-        .brand { padding: 25px; font-size: 1.2rem; font-weight: 700; color: white; border-bottom: 1px solid #334155; }
-        .nav-links { padding: 20px 10px; flex: 1; }
+        .brand { 
+            padding: 30px 25px; font-size: 1.4rem; font-weight: 800; color: white; 
+            letter-spacing: -0.5px; border-bottom: 1px solid #334155;
+            background: linear-gradient(to right, #1e293b, #0f172a);
+        }
+        .nav-links { padding: 25px 15px; flex: 1; }
         .nav-item {
-            padding: 14px; margin-bottom: 5px; border-radius: 8px; cursor: pointer;
-            display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s;
+            padding: 16px 20px; margin-bottom: 8px; border-radius: 10px; cursor: pointer;
+            display: flex; align-items: center; gap: 15px; font-weight: 500; font-size: 0.95rem;
+            transition: all 0.2s ease; border: 1px solid transparent;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-item.active { background: var(--primary); color: white; }
-        
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; transform: translateX(5px); }
+        .nav-item.active { 
+            background: var(--primary); color: white; 
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+            font-weight: 600;
+        }
         .sidebar-footer {
-            padding: 20px; text-align: center; font-size: 0.75rem; color: #64748b;
-            border-top: 1px solid #334155; background: rgba(0,0,0,0.2);
+            padding: 20px; text-align: center; font-size: 0.75rem; color: #475569;
+            border-top: 1px solid #334155; background: #0f172a;
         }
 
-        .main-content { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--light); }
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--bg-body); }
+        
         .top-header {
-            height: 60px; background: white; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0;
+            height: 70px; background: rgba(255,255,255,0.9); padding: 0 25px; 
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-shrink: 0; backdrop-filter: blur(8px);
+            position: sticky; top: 0; z-index: 100;
         }
-        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--dark); margin-right: 15px; }
-        .page-area { flex: 1; padding: 20px; overflow-y: auto; }
-        .page-section { display: none; max-width: 800px; margin: 0 auto; animation: fadeUp 0.3s; }
+        .menu-toggle { display: none; font-size: 1.6rem; cursor: pointer; color: var(--sidebar-bg); margin-right: 15px; }
+        
+        .page-area { flex: 1; padding: 25px; overflow-y: auto; scroll-behavior: smooth; }
+        .page-section { display: none; max-width: 800px; margin: 0 auto; animation: fadeUp 0.4s ease-out; }
         .page-section.active { display: block; }
 
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
-        .card-track-clickable {
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; 
-            border-left: 5px solid var(--primary);
+        /* --- CARD & FORM DESIGN --- */
+        .card { 
+            background: white; padding: 30px; border-radius: 16px; 
+            box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid #e2e8f0;
         }
-        .card-track-clickable:active { transform: scale(0.98); background: #f8fafc; }
-        .card-track-clickable:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-        label { display: block; font-weight: 600; font-size: 0.9rem; color: #475569; margin-bottom: 6px; margin-top: 15px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #f8fafc; font-family: inherit; }
         
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 1rem; }
-        .btn-blue { background: var(--primary); }
-        .btn-green { background: var(--green); }
-        .btn-purple { background: var(--purple); }
+        .form-header {
+            text-align: center; margin-bottom: 30px;
+        }
+        .form-header h2 { margin: 0; color: var(--primary-dark); font-size: 1.5rem; letter-spacing: -0.5px; }
+        .form-header p { color: #64748b; margin-top: 5px; font-size: 0.9rem; }
+
+        label { display: block; font-weight: 600; font-size: 0.9rem; color: #334155; margin-bottom: 8px; margin-top: 20px; }
+        input, select, textarea { 
+            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; 
+            font-size: 1rem; background: #f8fafc; font-family: inherit; transition: all 0.3s;
+            color: #1e293b;
+        }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--primary); background: white; outline: none; 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn { 
+            width: 100%; padding: 16px; border: none; border-radius: 10px; color: white; 
+            font-weight: 600; cursor: pointer; margin-top: 25px; font-size: 1rem; letter-spacing: 0.5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-blue { background: var(--primary-dark); box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
+        .btn-green { background: #10b981; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); }
+        .btn-purple { background: #8b5cf6; box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3); }
         
         .canvas-wrapper {
-            border: 2px dashed #94a3b8; border-radius: 8px; height: 180px; background: white;
-            position: relative; touch-action: none; 
+            border: 2px dashed #94a3b8; border-radius: 10px; height: 180px; background: #f8fafc;
+            position: relative; touch-action: none; overflow: hidden;
         }
         canvas { width: 100%; height: 100%; display: block; }
         .btn-clear-sign {
-            position: absolute; bottom: 8px; right: 8px; background: #ef4444; color: white;
-            font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; cursor: pointer; z-index: 10;
+            position: absolute; bottom: 10px; right: 10px; background: #ef4444; color: white;
+            font-size: 0.75rem; padding: 6px 12px; border-radius: 6px; cursor: pointer; z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
+        /* --- MODAL --- */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center;
+            background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center;
             padding: 20px; backdrop-filter: blur(5px);
         }
         .modal.active { display: flex; }
         .modal-content {
-            background: white; width: 100%; max-width: 600px; border-radius: 12px;
-            max-height: 85vh; overflow-y: auto; padding: 25px; position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeUp 0.3s;
+            background: white; width: 100%; max-width: 600px; border-radius: 16px;
+            max-height: 85vh; overflow-y: auto; padding: 30px; position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: fadeUp 0.3s;
         }
-        .modal-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .info-block { margin-bottom: 20px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .info-label { font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display:block; }
+        .info-val { font-size: 1rem; color: #1e293b; font-weight: 500; margin-bottom: 15px; display:block; }
         
-        .info-block { margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .info-label { font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; display:block; }
-        .info-val { font-size: 0.95rem; color: #1e293b; font-weight: 500; margin-bottom: 10px; display:block; }
-        .log-item { padding: 8px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.9rem; }
-        .log-item:last-child { border-bottom: none; }
-
-        .landing-credit {
-            position: absolute; bottom: 20px; width: 100%; text-align: center;
-            color: rgba(255,255,255,0.3); font-size: 0.8rem; letter-spacing: 0.5px;
-        }
-
-        /* --- STYLE SEARCH --- */
+        /* --- SEARCH STYLE --- */
         .search-hero {
-            background: white; border-radius: 16px; padding: 30px; 
-            text-align: center; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
-            border: 1px solid rgba(37, 99, 235, 0.1);
+            background: white; border-radius: 20px; padding: 40px 20px; 
+            text-align: center; box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.1);
         }
-        .search-input-group {
-            position: relative; max-width: 400px; margin: 20px auto 0;
-        }
-        .search-input {
-            width: 100%; padding: 18px 20px; padding-right: 60px;
-            font-size: 1.1rem; border-radius: 50px; 
-            border: 2px solid #e2e8f0; outline: none; transition: 0.3s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .search-input-group { position: relative; max-width: 450px; margin: 25px auto 0; }
+        .search-input { border-radius: 50px; padding-right: 60px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .search-btn-icon {
             position: absolute; right: 8px; top: 8px; height: 44px; width: 44px;
             background: var(--primary); color: white; border-radius: 50%;
             border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; transition: 0.2s;
+            font-size: 1.2rem; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .search-btn-icon:hover { transform: scale(1.1); background: #1d4ed8; }
-        .result-card { animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+        .search-btn-icon:hover { transform: scale(1.1); background: var(--primary-dark); }
+        .card-track-clickable { cursor: pointer; transition: all 0.2s; border-left: 6px solid var(--primary); }
+        .card-track-clickable:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
         @media (max-width: 768px) {
-            .sidebar { position: fixed; height: 100%; left: -260px; width: 260px; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
-            .sidebar.open { transform: translateX(260px); }
+            .sidebar { position: fixed; height: 100%; left: -270px; width: 270px; }
+            .sidebar.open { transform: translateX(270px); }
             .menu-toggle { display: block; }
             .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 900; }
             .overlay.active { display: block; }
         }
-        @keyframes fadeUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+        @keyframes fadeUp { from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);} }
     </style>
 </head>
 <body>
@@ -166,18 +185,18 @@
 
     <div id="detail-modal" class="modal" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <span id="m-title">Detail Aset</span>
-                <button onclick="closeModal()" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer">Tutup</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:15px; margin-bottom:20px;">
+                <span id="m-title" style="font-size:1.25rem; font-weight:700; color:#1e293b">Detail Aset</span>
+                <button onclick="closeModal()" style="background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:600">Tutup</button>
             </div>
             <div id="m-body"></div>
-            <div id="m-actions" style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:15px"></div>
+            <div id="m-actions" style="margin-top:25px; border-top:1px solid #e2e8f0; padding-top:20px"></div>
         </div>
     </div>
 
     <div id="landing-page">
-        <h1 style="color:white; margin-bottom:5px">Sistem Aset YPKT</h1>
-        </p></p>
+        <h1 style="color:white; margin-bottom:5px; font-weight:800; font-size:2rem;">Sistem Aset YPKT</h1>
+        <p></p>
 
         <div class="landing-grid">
             <div class="landing-card" onclick="openMode('public')">
@@ -206,70 +225,99 @@
                 <div class="nav-item" onclick="navTo('adm-jejak', this)">📍 2. Jejak Aset</div>
                 <div class="nav-item" onclick="navTo('adm-pulang', this)">📦 3. Serahan Pulang</div>
                 <div class="nav-item" onclick="navTo('adm-nota', this)">📌 4. Nota (Sulit)</div>
-                <hr style="border-color:#334155">
-                <div class="nav-item" onclick="downloadExcelAll()" style="color:#4ade80">📊 Download Excel</div>
-                <div class="nav-item" onclick="location.reload()" style="color:#f87171">🚪 Log Keluar</div>
+                <div style="height:30px"></div>
+                <div class="nav-item" onclick="downloadExcelAll()" style="color:#4ade80; border:1px solid rgba(74, 222, 128, 0.2)">📊 Download Excel</div>
+                <div class="nav-item" onclick="location.reload()" style="color:#f87171; border:1px solid rgba(248, 113, 113, 0.2)">🚪 Log Keluar</div>
             </div>
-            <div class="sidebar-footer">Dev: Nurul Syuhaida (Intern)</div>
+            <div class="sidebar-footer">By Nurul syuhaida (intern) </div>
         </div>
 
         <div class="main-content">
             <div class="top-header">
                 <div style="display:flex; align-items:center;">
                     <div class="menu-toggle" id="menu-btn" onclick="toggleSidebar()">☰</div>
-                    <h3 style="margin:0" id="header-title">Menu</h3>
+                    <h3 style="margin:0; color:#1e293b; font-weight:700" id="header-title">Menu</h3>
                 </div>
-                <button onclick="location.reload()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer">🏠 Menu Utama</button>
+                <button onclick="location.reload()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; font-size:0.95rem">🏠 Utama</button>
             </div>
 
             <div class="page-area hide-scroll">
                 
                 <div id="page-cikgu" class="page-section">
-                    <div class="card">
-                        <h2 style="color:var(--primary); margin-top:0">📝 Borang Serahan</h2>
-                        <label>Nama Cikgu / Staff</label><input type="text" id="c_name">
-                        <label>Lokasi YPKT</label>
-                        <select id="c_loc">
-                            <option value="">-- Pilih --</option>
-                            <option>YPKT Ibu Pejabat</option>
-                            <option>YPKT Kuala Nerus</option>
-                            <option>YPKT Marang</option>
-                            <option>YPKT Hulu Terengganu</option>
-                            <option>YPKT Dungun</option>
-                            <option>YPKT Kemaman</option>
-                            <option>YPKT Besut</option>
-                            <option>YPKT Setiu</option>
-                        </select>
-                        <label>Jenis Aset</label><select id="c_type"><option>Laptop</option><option>PC</option><option>Printer</option><option>Lain-lain</option></select>
-                        <label>No Siri</label><input type="text" id="c_serial">
-                        <label>Masalah</label><textarea id="c_issue" rows="3"></textarea>
-                        <label>Tarikh</label><input type="text" id="c_date" readonly>
+                    <div class="card" style="max-width:600px; margin:0 auto; padding:40px;">
+                        <div class="form-header">
+                            <h2>📝 Borang Serahan Aset</h2>
+                            <p>Sila isi maklumat aset dan lokasi dengan lengkap.</p>
+                        </div>
+                        
+                        <div style="background:#f1f5f9; padding:20px; border-radius:12px; margin-bottom:20px;">
+                            <h4 style="margin:0 0 15px 0; color:#475569; border-bottom:1px solid #cbd5e1; padding-bottom:10px;">👤 Maklumat Pemilik</h4>
+                            
+                            <label>Nama Cikgu / Staff</label>
+                            <input type="text" id="c_name" placeholder="Nama Penuh Anda">
+                            
+                            <label>Lokasi YPKT</label>
+                            <select id="c_loc">
+                                <option value="">-- Sila Pilih Lokasi --</option>
+                                <option>YPKT Ibu Pejabat</option>
+                                <option>YPKT Kuala Nerus</option>
+                                <option>YPKT Marang</option>
+                                <option>YPKT Hulu Terengganu</option>
+                                <option>YPKT Dungun</option>
+                                <option>YPKT Kemaman</option>
+                                <option>YPKT Besut</option>
+                                <option>YPKT Setiu</option>
+                            </select>
+
+                            <label>Nama Taska / Unit (Jika ada)</label>
+                            <input type="text" id="c_taska" placeholder="Cth: Taska Permata 1 / Unit Kewangan">
+                        </div>
+
+                        <div style="background:#f1f5f9; padding:20px; border-radius:12px; margin-bottom:20px;">
+                            <h4 style="margin:0 0 15px 0; color:#475569; border-bottom:1px solid #cbd5e1; padding-bottom:10px;">💻 Maklumat Aset</h4>
+                            
+                            <label>Jenis Aset</label>
+                            <select id="c_type">
+                                <option>Laptop</option>
+                                <option>PC</option>
+                                <option>Printer</option>
+                                <option>Lain-lain</option>
+                            </select>
+                            
+                            <label>No Siri (Serial No.)</label>
+                            <input type="text" id="c_serial" placeholder="Lihat sticker belakang/bawah aset">
+                            
+                            <label>Masalah / Kerosakan</label>
+                            <textarea id="c_issue" rows="3" placeholder="Terangkan masalah yang dihadapi..."></textarea>
+                        </div>
+
+                        <label>Tarikh Hari Ini</label>
+                        <input type="text" id="c_date" readonly style="background:#e2e8f0; color:#64748b">
                         
                         <label>Tandatangan</label>
                         <div class="canvas-wrapper">
                             <canvas id="cvs_cikgu"></canvas>
                             <div class="btn-clear-sign" onclick="clearCanvas('cvs_cikgu')">Padam</div>
                         </div>
-                        <button class="btn btn-blue" onclick="submitCikgu()">HANTAR (ONLINE)</button>
+                        <button class="btn btn-blue" onclick="submitCikgu()">HANTAR BORANG</button>
                     </div>
                 </div>
 
                 <div id="page-fast-track" class="page-section">
                     <div class="search-hero">
-                        <div style="font-size:3rem; margin-bottom:10px">📦</div>
-                        <h2 style="margin:0; color:var(--dark)">Sistem Serahan Pintar</h2>
+                        <div style="font-size:3.5rem; margin-bottom:10px">📦</div>
+                        <h2 style="margin:0; color:var(--sidebar-bg)">Sistem Serahan Pintar</h2>
                         <p style="color:#64748b; margin-top:5px">Cari aset anda untuk pengesahan pengambilan.</p>
                         
                         <div class="search-input-group">
                             <input type="text" id="search-keyword" class="search-input" placeholder="Taip Nama Pemilik Aset...">
                             <button class="search-btn-icon" onclick="searchMyAsset()">🔍</button>
                         </div>
-                        <div style="margin-top:10px; font-size:0.8rem; color:#94a3b8">
+                        <div style="margin-top:15px; font-size:0.85rem; color:#94a3b8">
                             *Hanya aset berstatus <b>SIAP (Completed)</b> akan dipaparkan.
                         </div>
                     </div>
-                    
-                    <div id="search-results-area" style="margin-top:30px"></div>
+                    <div id="search-results-area" style="margin-top:40px"></div>
                 </div>
 
                 <div id="adm-terima" class="page-section">
@@ -280,16 +328,16 @@
                 <div id="adm-jejak" class="page-section">
                     <h2 style="margin-top:0">📍 Jejak & Kemaskini Aset</h2>
                     
-                    <div class="card" style="background:#eff6ff; border:1px solid #bfdbfe">
-                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Kemaskini Log & Nota (Multiple)</h3>
+                    <div class="card" style="background:#eff6ff; border:1px solid #bfdbfe; box-shadow:none;">
+                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Update Log & Nota</h3>
                         <p style="font-size:0.85rem; color:#64748b; margin-bottom:15px">
-                            Pilih aset untuk melihat sejarah nota dan menambah nota baru.
+                            Pilih aset untuk melihat nota lama dan menambah nota baru.
                         </p>
                         
                         <label>Pilih Aset:</label>
                         <select id="track-sel" style="background:white" onchange="previewLogs()"></select>
                         
-                        <div id="log-preview" style="margin-top:10px; padding:10px; background:white; border-radius:6px; border:1px dashed #94a3b8; max-height:120px; overflow-y:auto; display:none;">
+                        <div id="log-preview" style="margin-top:10px; padding:15px; background:white; border-radius:8px; border:1px dashed #94a3b8; max-height:150px; overflow-y:auto; display:none;">
                             <small style="color:#94a3b8"><i>Pilih aset untuk lihat sejarah nota...</i></small>
                         </div>
 
@@ -302,16 +350,13 @@
 
                     <input type="text" id="search-jejak" placeholder="🔎 Cari Aset (Nama / Siri / Jenis)..." oninput="renderJejakListOnly()" style="margin-top:20px; width:100%; padding:15px; border:2px solid #93c5fd; border-radius:10px;">
 
-                    <p style="text-align:center; font-size:0.85rem; color:#64748b; margin-top:10px; margin-bottom:10px">
-                        👇 Klik pada kad aset di bawah untuk <b>INFO PENUH & TANDAKAN SIAP (COMPLETE)</b> 👇
-                    </p>
-                    <div id="list-jejak">Loading data...</div>
+                    <div id="list-jejak" style="margin-top:20px;">Loading data...</div>
                 </div>
 
                 <div id="adm-pulang" class="page-section">
                     <h2>📦 Senarai Sedia Untuk Diambil (Completed)</h2>
                     <p style="color:#64748b; margin-top:-10px; margin-bottom:20px; font-size:0.9rem">
-                        Hanya aset yang telah ditanda <b>COMPLETED (SIAP)</b> akan muncul di sini.
+                        Hanya aset yang telah ditanda <b>SIAP</b> akan muncul di sini.
                     </p>
                     <div id="list-pulang-admin">Loading data...</div>
                 </div>
@@ -331,7 +376,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
             authDomain: "aset-ypkt.firebaseapp.com",
@@ -422,7 +466,7 @@
             if(pageId === 'adm-terima') renderTerima();
             if(pageId === 'adm-jejak') renderJejak();
             if(pageId === 'adm-pulang') renderListPulang('list-pulang-admin');
-            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v25') || '';
+            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v26') || '';
         }
 
         function toggleSidebar() {
@@ -448,23 +492,23 @@
             
             if(matches.length === 0) {
                 div.innerHTML = `
-                <div style="text-align:center; padding:40px; background:white; border-radius:12px; border:1px dashed #cbd5e1">
-                    <div style="font-size:2rem">🤷‍♂️</div>
+                <div style="text-align:center; padding:40px; background:white; border-radius:12px; border:2px dashed #cbd5e1">
+                    <div style="font-size:3rem; margin-bottom:10px;">🤷‍♂️</div>
+                    <p style="font-size:1.1rem; font-weight:600;">Tiada Rekod Dijumpai</p>
                     <p>Maaf, tiada aset SIAP atas nama <b>"${keyword}"</b>.</p>
-                    <small style="color:#94a3b8">Mungkin aset masih dalam proses baiki (Received) atau ejaan salah.</small>
                 </div>`;
             } else {
                 let now = new Date().toLocaleString();
                 matches.forEach(i => {
                     div.innerHTML += `
-                    <div class="card result-card" style="border-left:5px solid #8b5cf6; border-top:1px solid #e2e8f0">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
-                            <div style="background:#f3e8ff; color:#6b21a8; padding:5px 10px; border-radius:20px; font-size:0.8rem; font-weight:bold">✅ Sedia Diambil</div>
+                    <div class="card result-card" style="border-left:6px solid #8b5cf6; border-top:1px solid #e2e8f0">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px">
+                            <div style="background:#f3e8ff; color:#6b21a8; padding:5px 12px; border-radius:20px; font-size:0.8rem; font-weight:bold">✅ Sedia Diambil</div>
                         </div>
                         <h3 style="margin:0">${i.type} (${i.serial})</h3>
                         <p style="margin-top:5px; color:#475569">Milik: <b>${i.name}</b> (${i.loc})</p>
-                        <hr>
-                        <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0">
+                        <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                        <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0">
                             <h4 style="margin-top:0; color:#1e293b">Pengesahan Serahan</h4>
                             <label>Tarikh Serahan</label>
                             <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
@@ -505,16 +549,23 @@
             });
         }
 
+        // --- SUBMIT CIKGU (ADA TASKA FIELD BARU) ---
         function submitCikgu() {
             let n = document.getElementById('c_name').value;
             let l = document.getElementById('c_loc').value;
+            let t = document.getElementById('c_taska').value; // Ambil nilai Taska
             let s = document.getElementById('c_serial').value;
+            
             if(!n || !l || !s) return alert("Sila isi maklumat wajib!");
 
             window.push(window.ref(window.dbRef, 'assets'), {
                 date: document.getElementById('c_date').value,
-                name: n, loc: l, type: document.getElementById('c_type').value,
-                serial: s, issue: document.getElementById('c_issue').value,
+                name: n, 
+                loc: l, 
+                taska: t || '-', // Simpan ke database
+                type: document.getElementById('c_type').value,
+                serial: s, 
+                issue: document.getElementById('c_issue').value,
                 status: 'PENDING',
                 logs: [{text: "Borang dihantar", time: new Date().toLocaleString()}],
                 admName: '', admTime: '', retName: '', retTime: ''
@@ -528,14 +579,16 @@
             let div = document.getElementById('list-terima');
             div.innerHTML = '';
             let list = window.db.filter(x => x.status === 'PENDING').reverse();
-            if(list.length === 0) div.innerHTML = '<p class="text-center">Tiada data baru.</p>';
+            if(list.length === 0) div.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8">Tiada serahan baru.</div>';
             let now = new Date().toLocaleString(); 
             list.forEach(i => {
                 div.innerHTML += `
-                <div class="card" style="border-left:5px solid #f59e0b">
+                <div class="card" style="border-left:6px solid #f59e0b">
                     <h3>${i.type} (${i.serial})</h3>
-                    <p>${i.name} - ${i.loc}<br><span style="color:red">Masalah: ${i.issue}</span></p>
-                    <hr>
+                    <p style="margin-bottom:5px"><b>${i.name}</b></p>
+                    <p style="font-size:0.9rem; color:#64748b; margin-top:0">${i.loc} ${i.taska ? ' - ' + i.taska : ''}</p>
+                    <p style="background:#fef2f2; color:#ef4444; padding:10px; border-radius:8px; font-size:0.9rem;">Masalah: ${i.issue}</p>
+                    <hr style="margin:15px 0; border:0; border-top:1px solid #e2e8f0;">
                     <label>Tarikh Terima (Auto)</label>
                     <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
                     <label>Nama Admin</label>
@@ -562,7 +615,7 @@
             });
         }
 
-        // --- JEJAK ASET (UPDATED: SEARCH) ---
+        // --- JEJAK ASET (UPDATED) ---
         function renderJejak() {
             let sel = document.getElementById('track-sel');
             let oldVal = sel.value;
@@ -571,23 +624,17 @@
                 sel.innerHTML += `<option value="${x.id}">${x.type} - ${x.name} (${x.serial})</option>`;
             });
             sel.value = oldVal; 
-
-            // Render List (Panggil function khas)
             renderJejakListOnly();
-
             if(sel.value) previewLogs();
         }
 
-        // FUNGSI BARU: FILTER LIST SAHAJA (UNTUK SEARCH)
         window.renderJejakListOnly = function() {
             let keyword = document.getElementById('search-jejak').value.toLowerCase();
             let div = document.getElementById('list-jejak');
             div.innerHTML = '';
             
-            // Filter asas (Bukan Pending)
             let list = window.db.filter(x => x.status !== 'PENDING');
 
-            // Filter Search (Kalau ada keyword)
             if(keyword) {
                 list = list.filter(x => 
                     x.name.toLowerCase().includes(keyword) || 
@@ -607,16 +654,16 @@
                 if(i.status === 'RETURNED') { sColor = '#10b981'; sText = 'SUDAH PULANG'; }
 
                 div.innerHTML += `
-                <div class="card card-track-clickable" onclick="showDetails('${i.id}')" style="border-left:5px solid ${sColor}">
+                <div class="card card-track-clickable" onclick="showDetails('${i.id}')" style="border-left:6px solid ${sColor}">
                     <div style="display:flex; justify-content:space-between; align-items:center">
                         <b>${i.type} (${i.serial})</b>
-                        <span style="font-size:0.7rem; background:${sColor}20; color:${sColor}; padding:3px 8px; border-radius:4px; font-weight:bold">${sText}</span>
+                        <span style="font-size:0.7rem; background:${sColor}20; color:${sColor}; padding:4px 10px; border-radius:20px; font-weight:700">${sText}</span>
                     </div>
-                    <div style="font-size:0.9rem; margin-top:5px; color:#475569">
-                        Milik: ${i.name} (${i.loc})
+                    <div style="font-size:0.95rem; margin-top:8px; color:#475569">
+                        Milik: <b>${i.name}</b> (${i.loc})
                     </div>
-                    <div style="font-size:0.8rem; color:#64748b; margin-top:10px; font-style:italic">
-                        Klik untuk info & update.
+                     <div style="font-size:0.85rem; color:#64748b; margin-top:5px">
+                        ${i.taska ? 'Unit/Taska: ' + i.taska : ''}
                     </div>
                 </div>`;
             });
@@ -634,9 +681,12 @@
             let item = window.db.find(x => x.id === id);
             if(item && item.logs) {
                 previewDiv.style.display = 'block';
-                previewDiv.innerHTML = '<strong style="display:block; margin-bottom:5px; font-size:0.8rem; color:#64748b">SEJARAH NOTA (TERKINI DI ATAS):</strong>';
+                previewDiv.innerHTML = '<strong style="display:block; margin-bottom:10px; font-size:0.8rem; color:#64748b; letter-spacing:0.5px;">SEJARAH NOTA (TERKINI DI ATAS):</strong>';
                 [...item.logs].reverse().forEach(l => {
-                    previewDiv.innerHTML += `<div style="font-size:0.85rem; border-bottom:1px solid #eee; padding:4px 0;">👉 ${l.text} <span style="color:#aaa; font-size:0.75rem">(${l.time})</span></div>`;
+                    previewDiv.innerHTML += `<div style="font-size:0.9rem; border-bottom:1px solid #f1f5f9; padding:8px 0; display:flex; gap:10px;">
+                        <span>👉</span>
+                        <div>${l.text} <br><span style="color:#94a3b8; font-size:0.75rem">${l.time}</span></div>
+                    </div>`;
                 });
             } else {
                 previewDiv.style.display = 'none';
@@ -665,20 +715,25 @@
             let logsHTML = '';
             if(item.logs && Array.isArray(item.logs)) {
                 [...item.logs].reverse().forEach(log => {
-                    logsHTML += `<div class="log-item">👉 ${log.text} <small style="color:#aaa">(${log.time})</small></div>`;
+                    logsHTML += `<div class="log-item" style="padding:10px 0; border-bottom:1px dashed #e2e8f0">👉 ${log.text} <div style="color:#94a3b8; font-size:0.8rem; margin-top:2px;">${log.time}</div></div>`;
                 });
             }
 
             let html = `
-                <div class="info-block" style="border-left:4px solid #2563eb">
-                    <span class="info-label">INFO ASAL</span>
-                    <span class="info-val"><b>${item.name}</b> (${item.loc})</span>
-                    <span class="info-val">Aset: ${item.type} (${item.serial})</span>
-                    <span class="info-val" style="color:red">Masalah: ${item.issue}</span>
+                <div class="info-block" style="border-left:4px solid #2563eb; background:#eff6ff;">
+                    <span class="info-label" style="color:#2563eb">INFO PEMILIK</span>
+                    <span class="info-val"><b>${item.name}</b></span>
+                    <span class="info-val" style="margin-bottom:5px">${item.loc}</span>
+                    <span class="info-val" style="font-size:0.9rem; color:#64748b">${item.taska ? 'Unit/Taska: ' + item.taska : '(Tiada info taska)'}</span>
+                </div>
+                <div class="info-block">
+                    <span class="info-label">INFO ASET</span>
+                    <span class="info-val">${item.type} (${item.serial})</span>
+                    <span class="info-val" style="color:#ef4444; background:#fef2f2; padding:10px; border-radius:6px; display:inline-block; border:1px solid #fecaca">Masalah: ${item.issue}</span>
                 </div>
                 <div class="info-block">
                     <span class="info-label">SEJARAH LOG (MULTIPLE)</span>
-                    <div style="max-height:150px; overflow-y:auto">${logsHTML}</div>
+                    <div style="max-height:200px; overflow-y:auto">${logsHTML}</div>
                 </div>
             `;
 
@@ -688,11 +743,11 @@
             let btnArea = document.getElementById('m-actions');
             if(item.status === 'RECEIVED') {
                 btnArea.innerHTML = `
-                    <p style="font-size:0.85rem; color:#64748b; margin-bottom:10px">Adakah aset ini sudah siap dibaiki sepenuhnya?</p>
+                    <p style="font-size:0.9rem; color:#64748b; margin-bottom:15px; text-align:center;">Adakah aset ini sudah siap dibaiki sepenuhnya?</p>
                     <button class="btn btn-purple" onclick="markAsComplete('${item.id}')">✅ TANDA ASET SEBAGAI SIAP (COMPLETE)</button>
                 `;
             } else if (item.status === 'COMPLETED') {
-                btnArea.innerHTML = `<div style="text-align:center; color:#8b5cf6; font-weight:bold">Status: SIAP (Menunggu Pengambilan)</div>`;
+                btnArea.innerHTML = `<div style="text-align:center; padding:15px; background:#f3e8ff; border-radius:8px; color:#7c3aed; font-weight:bold; border:1px solid #ddd6fe">Status: SIAP (Menunggu Pengambilan)</div>`;
             } else {
                 btnArea.innerHTML = '';
             }
@@ -727,10 +782,10 @@
 
             list.forEach(i => {
                 div.innerHTML += `
-                <div class="card" style="border-left:5px solid #8b5cf6">
+                <div class="card" style="border-left:6px solid #8b5cf6">
                     <h3>${i.type} (${i.serial})</h3>
                     <p>Milik: ${i.name} (${i.loc})</p>
-                    <div style="background:#f3e8ff; padding:10px; border-radius:8px">
+                    <div style="background:#f3e8ff; padding:20px; border-radius:12px; margin-top:15px;">
                         <label>Tarikh Serahan (Auto)</label>
                         <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
                         <label>Nama Penerima</label>
@@ -760,28 +815,30 @@
             });
         }
 
+        // --- EXCEL DOWNLOAD (ADA TASKA) ---
         function downloadExcelAll() {
             if(window.db.length === 0) return alert("Tiada data.");
-            let headers = ["ID", "Tarikh", "Nama", "Lokasi", "Jenis", "Siri", "Masalah", "Status", "Admin", "Penerima", "Tarikh Pulang"];
+            // Added "Taska/Unit" column
+            let headers = ["ID", "Tarikh", "Nama", "Lokasi", "Taska/Unit", "Jenis", "Siri", "Masalah", "Status", "Admin", "Penerima", "Tarikh Pulang"];
             let csvRows = [headers.join(",")];
             window.db.forEach(row => {
                 const clean = (t) => `"${String(t||'').replace(/"/g, '""').replace(/\n/g, ' ')}"`;
                 let values = [
-                    row.id, clean(row.date), clean(row.name), clean(row.loc), clean(row.type),
-                    clean(row.serial), clean(row.issue), clean(row.status), clean(row.admName),
+                    row.id, clean(row.date), clean(row.name), clean(row.loc), clean(row.taska), // Included row.taska
+                    clean(row.type), clean(row.serial), clean(row.issue), clean(row.status), clean(row.admName),
                     clean(row.retName), clean(row.retTime)
                 ];
                 csvRows.push(values.join(","));
             });
             let a = document.createElement('a');
             a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvRows.join("\n"));
-            a.download = 'Data_Aset_Lengkap.csv';
+            a.download = 'Data_Aset_Lengkap_V26.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
-        function saveNote() { localStorage.setItem('nota_v25', document.getElementById('notepad').value); }
+        function saveNote() { localStorage.setItem('nota_v26', document.getElementById('notepad').value); }
 
         function initCanvas(id) {
             let c = document.getElementById(id);
