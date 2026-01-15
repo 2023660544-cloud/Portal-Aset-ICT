@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Rasmi - Sistem Aset ICT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Gambar Background Pejabat Moden (Unsplash) */
+            background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover;
+            position: relative;
+        }
+
+        /* Lapisan Gelap di atas gambar supaya tulisan nampak */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); /* Warna gelap transparent */
+            backdrop-filter: blur(4px); /* Blur sikit background */
+        }
+
+        /* KAD UTAMA */
+        .login-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            opacity: 0; /* Mula-mula halimunan */
+            transform: translateY(30px); /* Mula-mula kat bawah sikit */
+            animation: slideUpFade 0.8s ease-out forwards; /* Animasi masuk */
+        }
+
+        @keyframes slideUpFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* LOGO & TEKS */
+        .logo-area {
+            width: 70px;
+            height: 70px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        h1 { margin: 0; color: #1e293b; font-weight: 700; font-size: 1.6rem; }
+        .greeting { color: #2563eb; font-weight: 500; margin-bottom: 5px; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;}
+        p.desc { color: #64748b; font-size: 0.9rem; margin-top: 10px; line-height: 1.5; }
+
+        /* GARISAN PEMISAH */
+        .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 25px 0;
+            width: 100%;
+        }
+
+        /* INFO BOX KECIL */
+        .info-grid {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+        }
+        .info-item {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+        .info-item b { display: block; font-size: 1.2rem; color: #1e293b; margin-bottom: 2px; }
+
+        /* BUTTON PROFESSIONAL */
+        .btn-enter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background: #1e293b;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-sizing: border-box; /* Penting supaya padding tak kacau width */
+        }
+        
+        .btn-enter:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-enter span { margin-left: 10px; transition: 0.3s; }
+        .btn-enter:hover span { margin-left: 15px; }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-area">🏢</div>
+        
+        <div class="greeting" id="greet-txt">Selamat Datang</div>
+        
+        <h1>Sistem Aset ICT</h1>
+        <p class="desc">Portal Pengurusan & Penyelenggaraan Aset<br>Unit Pengurusan Maklumat</p>
+
+        <div class="divider"></div>
+
+        <div class="info-grid">
+            <div class="info-item"><b>v2.6</b>Versi</div>
+            <div class="info-item"><b>24/7</b>Akses</div>
+            <div class="info-item"><b>Secure</b>Sistem</div>
+        </div>
+
+        <a href="index.html" class="btn-enter">
+            Log Masuk Portal <span>➔</span>
+        </a>
+
+        <div class="footer">
+            &copy; 2024 Hak Cipta Terpelihara.
+        </div>
+    </div>
+
+    <script>
+        // Script ringkas untuk detect Pagi/Petang
+        const h = new Date().getHours();
+        const txt = document.getElementById('greet-txt');
+        
+        if (h >= 5 && h < 12) txt.innerText = "Selamat Pagi";
+        else if (h >= 12 && h < 15) txt.innerText = "Selamat Tengahari";
+        else if (h >= 15 && h < 19) txt.innerText = "Selamat Petang";
+        else txt.innerText = "Selamat Malam";
+    </script>
+</body>
+</html>
