@@ -103,36 +103,31 @@
     </div>
 
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
+        // 1. IMPORT FIREBASE (Versi 9.22.0)
+        // Saya tambah 'set' di sini sebab kita perlu gunakannya untuk simpan data
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // ==========================================================
-        // ⚠️ SILA COPY DAN PASTE CONFIG FIREBASE DARI LINK ASAL DI SINI ⚠️
-        // ==========================================================
+        // 2. CONFIGURATION (Ini config sebenar tuan)
         const firebaseConfig = {
-            apiKey: "MASUKKAN_API_KEY_DI_SINI",
-            authDomain: "MASUKKAN_AUTH_DOMAIN_DI_SINI",
-            databaseURL: "MASUKKAN_DATABASE_URL_DI_SINI",
-            projectId: "MASUKKAN_PROJECT_ID_DI_SINI",
-            storageBucket: "MASUKKAN_BUCKET_DI_SINI",
-            messagingSenderId: "MASUKKAN_MESSAGING_ID",
-            appId: "MASUKKAN_APP_ID"
+            apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
+            authDomain: "aset-ypkt.firebaseapp.com",
+            databaseURL: "https://aset-ypkt-default-rtdb.firebaseio.com",
+            projectId: "aset-ypkt",
+            storageBucket: "aset-ypkt.firebasestorage.app",
+            messagingSenderId: "501863979091",
+            appId: "1:501863979091:web:adf72aa4de7db740498ea6"
         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ==========================================================
-        // SETUP TARIKH & CANVAS (TIDAK PERLU UBAH)
-        // ==========================================================
-        
-        // Auto Tarikh
+        // 3. UI LOGIC (Tarikh & Signature)
         const today = new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' });
         document.getElementById('c_date').value = today;
 
-        // Setup Canvas
+        // Canvas Setup
         const canvas = document.getElementById('cvs_cikgu');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
@@ -146,7 +141,7 @@
             ctx.strokeStyle = "#000";
         }
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        setTimeout(resizeCanvas, 100); // Delay sikit untuk pastikan load
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
@@ -160,7 +155,7 @@
             const pos = getPos(e);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
-            e.preventDefault();
+            if(e.type === 'touchstart') e.preventDefault(); 
         }
 
         function draw(e) {
@@ -168,29 +163,31 @@
             const pos = getPos(e);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
-            e.preventDefault();
+            if(e.type === 'touchmove') e.preventDefault();
         }
 
         function stopDraw() { isDrawing = false; }
 
+        // Mouse Events
         canvas.addEventListener('mousedown', startDraw);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDraw);
         canvas.addEventListener('mouseout', stopDraw);
+        
+        // Touch Events (Mobile)
         canvas.addEventListener('touchstart', startDraw, {passive: false});
         canvas.addEventListener('touchmove', draw, {passive: false});
         canvas.addEventListener('touchend', stopDraw);
 
+        // Tombol Padam Signature
         document.getElementById('clearBtn').addEventListener('click', () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         });
 
-        // ==========================================================
-        // FUNGSI SUBMIT KE DATABASE 'serahan_aset'
-        // ==========================================================
+        // 4. HANTAR DATA KE FIREBASE
         document.getElementById('submitBtn').addEventListener('click', () => {
             
-            // Ambil value dari form
+            // Ambil Data dari Form
             const nama = document.getElementById('c_name').value.trim();
             const lokasi = document.getElementById('c_loc').value;
             const taska = document.getElementById('c_taska').value.trim();
@@ -199,32 +196,31 @@
             const issue = document.getElementById('c_issue').value.trim();
             const tarikh = document.getElementById('c_date').value;
 
-            // Check Tandatangan
+            // Check Signature Kosong
             const blank = document.createElement('canvas');
             blank.width = canvas.width; blank.height = canvas.height;
             const isSignBlank = canvas.toDataURL() === blank.toDataURL();
 
-            // Validasi mudah
+            // Validasi
             if(!nama || !lokasi || !serial || !issue) {
-                Swal.fire('Ralat', 'Sila lengkapkan Nama, Lokasi, No Siri dan Masalah.', 'warning');
+                Swal.fire('Tidak Lengkap', 'Sila isi Nama, Lokasi, No Siri dan Masalah.', 'warning');
                 return;
             }
-
             if(isSignBlank) {
-                Swal.fire('Ralat', 'Sila turunkan tandatangan.', 'warning');
+                Swal.fire('Tiada Tandatangan', 'Sila turunkan tandatangan digital.', 'warning');
                 return;
             }
 
-            // Tunjuk loading
+            // Tunjuk Loading
             Swal.fire({
-                title: 'Sedang Hantar...',
-                text: 'Sila tunggu sebentar.',
+                title: 'Menghantar...',
+                text: 'Sila tunggu sebentar',
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); }
             });
 
-            // Hantar ke Firebase Database
-            // Saya namakan table ini 'serahan_aset' supaya sesuai dengan nama borang
+            // Proses Simpan ke Database
+            // Data akan masuk ke folder "serahan_aset" dalam database
             const newRef = push(ref(db, 'serahan_aset')); 
             
             set(newRef, {
@@ -235,8 +231,8 @@
                 no_siri: serial,
                 masalah: issue,
                 tarikh: tarikh,
-                sign_cikgu: canvas.toDataURL(),
-                status: 'Baru Terima', // Status default
+                sign_cikgu: canvas.toDataURL(), // Simpan signature
+                status: 'Baru Terima', 
                 timestamp: Date.now()
             })
             .then(() => {
@@ -246,13 +242,12 @@
                     icon: 'success',
                     confirmButtonColor: '#2563eb'
                 }).then(() => {
-                    // Kembali ke menu atau reload
-                    window.location.href = 'menu.html';
+                    window.location.href = 'menu.html'; // Balik ke menu
                 });
             })
             .catch((err) => {
                 console.error(err);
-                Swal.fire('Ralat Sistem', 'Gagal menghantar data: ' + err.message, 'error');
+                Swal.fire('Ralat', 'Gagal menghantar: ' + err.message, 'error');
             });
         });
 
