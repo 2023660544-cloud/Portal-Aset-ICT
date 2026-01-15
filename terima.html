@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Terima Aset</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
+        header { background: #f59e0b; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border-left: 5px solid #f59e0b; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        input { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: white; background: #2563eb; }
+        .canvas-wrapper { height: 120px; border: 2px dashed #cbd5e1; position: relative; margin-bottom: 10px; }
+        canvas { width: 100%; height: 100%; display: block; }
+        .btn-clear { position: absolute; top: 5px; right: 5px; background: red; color: white; font-size: 0.7rem; padding: 4px; border-radius: 4px; cursor: pointer; }
+        /* Nav Bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; }
+        .nav-item { text-align: center; font-size: 0.75rem; color: #64748b; text-decoration: none; width: 100%; }
+        .nav-item span { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+        .nav-item.active { color: #f59e0b; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <header><h1>Admin Terima</h1><p>Pengesahan Penerimaan Aset</p></header>
+    <div class="container" id="list-terima">Loading...</div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><span>🏠</span>Daftar</a>
+        <a href="terima.html" class="nav-item active"><span>📥</span>Terima</a>
+        <a href="jejak.html" class="nav-item"><span>🔍</span>Jejak</a>
+        <a href="pulang.html" class="nav-item"><span>✅</span>Pulang</a>
+        <a href="nota.html" class="nav-item"><span>⚙️</span>Nota</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // PASSWORD LOCK
+        if(sessionStorage.getItem('adminAuth') !== 'true') {
+            let p = prompt("Masukkan Password Admin:");
+            if(p !== "1234") { window.location.href = 'index.html'; } // Kick balik ke index kalau salah
+            else { sessionStorage.setItem('adminAuth', 'true'); }
+        }
+
+        // GANTI CONFIG SAMA MACAM INDEX.HTML
+        const firebaseConfig = { apiKey: "API_KEY", authDomain: "PROJECT.firebaseapp.com", databaseURL: "https://PROJECT-default-rtdb.firebaseio.com", projectId: "PROJECT", storageBucket: "PROJECT.appspot.com", messagingSenderId: "SENDER", appId: "APP_ID" };
+        
+        const app = initializeApp(firebaseConfig);
+        const dbRef = getDatabase(app);
+
+        onValue(ref(dbRef, 'assets'), (snap) => {
+            let div = document.getElementById('list-terima'); div.innerHTML = '';
+            let data = snap.val();
+            if(!data) return div.innerHTML = '<p style="text-align:center">Tiada data.</p>';
+
+            // Convert object to array & filter PENDING
+            let list = Object.keys(data).map(k => ({id:k, ...data[k]})).filter(x => x.status === 'PENDING').reverse();
+            
+            if(list.length === 0) return div.innerHTML = '<p style="text-align:center; color:#888">Tiada aset pending.</p>';
+
+            list.forEach(i => {
+                let el = document.createElement('div'); el.className = 'card';
+                el.innerHTML = `
+                    <h3>${i.type} (${i.serial})</h3>
+                    <p><b>${i.name}</b>: ${i.issue}</p>
+                    <input id="n_${i.id}" placeholder="Nama Admin Penerima">
+                    <div class="canvas-wrapper"><canvas id="c_${i.id}"></canvas><div class="btn-clear" onclick="clearC('c_${i.id}')">X</div></div>
+                    <button class="btn" onclick="save('${i.id}')">SAHKAN TERIMA</button>
+                `;
+                div.appendChild(el);
+                setTimeout(()=>initC(`c_${i.id}`), 100);
+            });
+        });
+
+        // Global functions (perlu diletakkan di window scope sebab module script)
+        window.initC = function(id) {
+            let c = document.getElementById(id); let ctx = c.getContext('2d');
+            c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
+            let drawing = false;
+            const getPos = (e) => { let r=c.getBoundingClientRect(); return {x:(e.touches?e.touches[0].clientX:e.clientX)-r.left, y:(e.touches?e.touches[0].clientY:e.clientY)-r.top}; };
+            ['mousedown','touchstart'].forEach(ev=>c.addEventListener(ev,(e)=>{ if(ev=='touchstart')e.preventDefault(); drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }));
+            ['mousemove','touchmove'].forEach(ev=>c.addEventListener(ev,(e)=>{ if(ev=='touchmove')e.preventDefault(); if(drawing){ ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); }}));
+            ['mouseup','touchend'].forEach(()=>drawing=false);
+        }
+        window.clearC = function(id) { let c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+
+        window.save = function(id) {
+            let n = document.getElementById(`n_${id}`).value;
+            if(!n) return alert("Sila isi nama admin!");
+            update(ref(dbRef, 'assets/'+id), {
+                status: 'RECEIVED', admName: n, admTime: new Date().toLocaleString(),
+                logs: [{text:"Diterima Admin: "+n, time: new Date().toLocaleString()}] // Simplified log logic rewrite
+            }).then(()=>alert("Aset Diterima!"));
+        }
+    </script>
+</body>
+</html>
