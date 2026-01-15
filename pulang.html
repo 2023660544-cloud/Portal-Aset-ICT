@@ -19,7 +19,7 @@
             color: #334155;
         }
 
-        /* --- 1. SIDEBAR (SAMA DENGAN JEJAK.HTML) --- */
+        /* --- 1. SIDEBAR --- */
         .sidebar {
             width: 280px;
             background-color: #161e2e;
@@ -40,6 +40,7 @@
         .btn-action { padding: 12px; border-radius: 8px; text-align: left; font-size: 0.9rem; font-weight: 600; cursor: pointer; background: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .btn-excel { border: 1px solid #10b981; color: #10b981; } 
         .btn-logout { border: 1px solid #ef4444; color: #ef4444; }
+        .btn-logout:hover { background: rgba(239, 68, 68, 0.1); }
         .footer-credit { margin-top: 20px; font-size: 0.7rem; color: #475569; text-align: center; }
 
         /* --- 2. MAIN CONTENT --- */
@@ -56,7 +57,9 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             overflow: hidden;
             border-left: 6px solid #a855f7; /* Purple Border Left */
+            animation: fadeIn 0.5s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card-header { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; }
         .card-header h3 { margin: 0; font-size: 1.1rem; color: #1e293b; }
@@ -87,7 +90,7 @@
             border-radius: 8px;
             height: 150px;
             position: relative;
-            touch-action: none;
+            touch-action: none; /* PENTING: Halang scroll masa sign */
         }
         canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
         
@@ -135,8 +138,8 @@
     </aside>
 
     <main class="main-content">
-        <h2 class="page-title">📦 Senarai Sedia Untuk Diambil (Completed)</h2>
-        <p class="page-subtitle">Hanya aset yang telah ditanda <b>SIAP</b> akan muncul di sini untuk proses serahan pulang.</p>
+        <h2 class="page-title">📦 Senarai Sedia Untuk Diambil (Siap)</h2>
+        <p class="page-subtitle">Hanya aset yang statusnya <b>SIAP</b> akan muncul di sini untuk proses tandatangan & serahan.</p>
 
         <div id="returnList" class="return-list">
             <p style="text-align:center; color:#94a3b8; margin-top:50px;">Sedang memuatkan data...</p>
@@ -147,7 +150,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // CONFIG (Sama macam fail lain)
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
             authDomain: "aset-ypkt.firebaseapp.com",
@@ -174,27 +177,22 @@
             
             const data = snapshot.val();
             if(!data) {
-                container.innerHTML = '<div style="text-align:center; padding:40px; background:white; border-radius:10px;">Tiada aset siap untuk diambil.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:#64748b;">Tiada aset siap untuk diambil.</div>';
                 return;
             }
 
-            // Filter: Status == 'Siap' (atau 'COMPLETED' ikut database tuan)
-            // Di sini kita guna 'Siap' sebab dalam jejak.html kita set 'COMPLETED' tapi label paparan mungkin berbeza. 
-            // Kita filter item yang BELUM pulang tapi dah SIAP.
-            
-            // Note: Pastikan status di jejak.html konsisten. Jika jejak set 'Siap', guna 'Siap'. 
-            // Jika jejak set 'COMPLETED', tukar bawah ni jadi 'COMPLETED'.
+            // Filter item: Status mesti 'Siap'
             const list = Object.entries(data)
                 .map(([key, val]) => ({ id: key, ...val }))
-                .filter(item => item.status === 'Siap' || item.status === 'COMPLETED') 
+                .filter(item => item.status === 'Siap') 
                 .reverse();
 
             if(list.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px; background:white; border-radius:10px; color:#64748b;">Semua aset telah dipulangkan atau belum siap dibaiki.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:#64748b;">Tiada aset berstatus "Siap" buat masa ini.</div>';
                 return;
             }
 
-            // Render Card
+            // Render Cards
             list.forEach(item => {
                 const nowStr = new Date().toLocaleString('en-US', { hour12: true });
                 
@@ -212,7 +210,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nama Penerima</label>
-                            <input type="text" id="name_${item.id}" class="form-input" placeholder="Masukkan nama penerima...">
+                            <input type="text" id="name_${item.id}" class="form-input" placeholder="Masukkan nama penerima..." value="${item.nama}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Sign Penerima:</label>
@@ -226,7 +224,7 @@
                 `;
                 container.appendChild(card);
                 
-                // Initialize Canvas selepas element dimasukkan ke DOM
+                // Initialize Canvas
                 setTimeout(() => initCanvas(`can_${item.id}`), 200);
             });
         });
@@ -236,7 +234,7 @@
             const canvas = document.getElementById(canvasId);
             if(!canvas) return;
             
-            // Set canvas size to match container
+            // Set canvas resolution match display
             canvas.width = canvas.parentElement.offsetWidth;
             canvas.height = canvas.parentElement.offsetHeight;
             
@@ -253,19 +251,21 @@
             canvas.addEventListener('mouseup', () => { isDrawing = false; });
             canvas.addEventListener('mouseout', () => { isDrawing = false; });
 
-            // Touch Events (Mobile)
+            // Touch Events (Mobile Fix)
             const getTouchPos = (e) => {
                 const rect = canvas.getBoundingClientRect();
                 return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
             };
             
             canvas.addEventListener('touchstart', (e) => { 
-                e.preventDefault(); isDrawing = true; 
+                e.preventDefault(); // Stop scrolling when touching canvas
+                isDrawing = true; 
                 const pos = getTouchPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); 
             }, { passive: false });
             
             canvas.addEventListener('touchmove', (e) => { 
-                e.preventDefault(); if(isDrawing) { 
+                e.preventDefault(); 
+                if(isDrawing) { 
                     const pos = getTouchPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); 
                 } 
             }, { passive: false });
@@ -284,7 +284,7 @@
             const nameInput = document.getElementById(`name_${id}`).value;
             const canvas = document.getElementById(`can_${id}`);
             
-            // Simple validation check (is canvas blank?)
+            // Check blank canvas
             const blank = document.createElement('canvas');
             blank.width = canvas.width; blank.height = canvas.height;
             const isCanvasBlank = canvas.toDataURL() === blank.toDataURL();
@@ -292,35 +292,35 @@
             if(!nameInput) return Swal.fire('Ralat', 'Sila masukkan nama penerima.', 'error');
             if(isCanvasBlank) return Swal.fire('Ralat', 'Sila turunkan tandatangan.', 'error');
 
+            // Ambil Data Gambar Sign
+            const signatureImage = canvas.toDataURL('image/png');
+
             Swal.fire({
                 title: 'Sahkan Serahan?',
-                text: "Pastikan aset dipulangkan kepada orang yang betul.",
-                icon: 'warning',
+                text: "Aset akan ditanda sebagai 'Sudah Pulang'.",
+                icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Sahkan',
                 confirmButtonColor: '#10b981'
             }).then((result) => {
                 if (result.isConfirmed) {
                     
-                    // Update Firebase
                     const now = new Date().toLocaleString('ms-MY');
                     
-                    // Fetch existing logs first (optional but safer) or just push new log
-                    // Here we just overwrite logs array with new appended log (requires reading first usually),
-                    // but for simplicity, we use the `logs` update method from previous logic.
-                    // To do it properly without reading first, we just push to logs list if data structure permits,
-                    // but here we will fetch specific item to append log.
-                    
-                    // Shortcut: Just update fields and rewrite logs if needed or just add 'Sudah Pulang'
-                    
+                    // Update Firebase
                     update(ref(db, 'serahan_aset/' + id), {
                         status: 'Sudah Pulang',
                         penerima_pulang: nameInput,
-                        tarikh_pulang: now
+                        tarikh_pulang: now,
+                        signature_pulang: signatureImage // Simpan gambar sign
                     }).then(() => {
-                        // Tambah Log secara berasingan (Optional enhancement)
-                        // Untuk simple, kita refresh page atau biarkan onValue handle remove card
-                        Swal.fire('Berjaya!', 'Aset telah dipulangkan.', 'success');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berjaya!',
+                            text: 'Aset telah dipulangkan.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
                     });
                 }
             });
