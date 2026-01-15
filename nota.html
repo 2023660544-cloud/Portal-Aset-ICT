@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota & Tetapan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
+        header { background: #334155; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #ddd; }
+        textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; color: white; background: #334155; margin-bottom:10px; }
+        .btn-red { background: #ef4444; }
+        /* Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; }
+        .nav-item { text-align: center; font-size: 0.75rem; color: #64748b; text-decoration: none; width: 100%; }
+        .nav-item span { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+        .nav-item.active { color: #334155; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <header><h1>Nota Admin</h1><p>Tetapan & Laporan</p></header>
+    <div class="container">
+        
+        <div class="card">
+            <h3>Download Data (CSV)</h3>
+            <button class="btn" onclick="dlExcel()">📥 Muat Turun Laporan Lengkap</button>
+        </div>
+
+        <div class="card">
+            <h3>Papan Putih (Auto-Save)</h3>
+            <textarea id="notepad" rows="10" placeholder="Tulis nota di sini..."></textarea>
+        </div>
+
+        <button class="btn btn-red" onclick="logout()">LOGOUT ADMIN</button>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><span>🏠</span>Daftar</a>
+        <a href="terima.html" class="nav-item"><span>📥</span>Terima</a>
+        <a href="jejak.html" class="nav-item"><span>🔍</span>Jejak</a>
+        <a href="pulang.html" class="nav-item"><span>✅</span>Pulang</a>
+        <a href="nota.html" class="nav-item active"><span>⚙️</span>Nota</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // PASSWORD LOCK
+        if(sessionStorage.getItem('adminAuth') !== 'true') {
+            let p = prompt("Masukkan Password Admin:");
+            if(p !== "1234") { window.location.href = 'index.html'; }
+            else { sessionStorage.setItem('adminAuth', 'true'); }
+        }
+
+        // GANTI CONFIG
+        const firebaseConfig = { apiKey: "API_KEY", authDomain: "PROJECT.firebaseapp.com", databaseURL: "https://PROJECT-default-rtdb.firebaseio.com", projectId: "PROJECT", storageBucket: "PROJECT.appspot.com", messagingSenderId: "SENDER", appId: "APP_ID" };
+        const app = initializeApp(firebaseConfig);
+        const dbRef = getDatabase(app);
+
+        let dbData = [];
+        onValue(ref(dbRef, 'assets'), (s) => {
+            let d = s.val(); if(d) dbData = Object.values(d);
+        });
+
+        // Notepad Logic (Local Storage)
+        let note = localStorage.getItem('nota_admin');
+        if(note) document.getElementById('notepad').value = note;
+        document.getElementById('notepad').addEventListener('keyup', (e)=>localStorage.setItem('nota_admin', e.target.value));
+
+        // Excel Export
+        window.dlExcel = function() {
+            if(dbData.length === 0) return alert("Tiada data.");
+            let csv = "Nama,Lokasi,Taska,Jenis,Siri,Masalah,Status,Tarikh\n";
+            dbData.forEach(r => {
+                csv += `"${r.name}","${r.loc}","${r.taska||''}","${r.type}","${r.serial}","${r.issue}","${r.status}","${r.date}"\n`;
+            });
+            let a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+            a.download='Laporan_Aset.csv'; a.click();
+        }
+
+        window.logout = function() {
+            sessionStorage.removeItem('adminAuth');
+            alert("Anda telah logout.");
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
