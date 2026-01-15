@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jejak Aset</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
+        header { background: #2563eb; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid #2563eb; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        /* Modal */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; }
+        .modal.active { display:flex; }
+        .modal-content { background:white; width:90%; max-width:400px; padding:20px; border-radius:15px; max-height:80vh; overflow-y:auto; }
+        /* Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; }
+        .nav-item { text-align: center; font-size: 0.75rem; color: #64748b; text-decoration: none; width: 100%; }
+        .nav-item span { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+        .nav-item.active { color: #2563eb; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <header><h1>Jejak Aset</h1><p>Cari Status Pembaikan</p></header>
+    <div class="container">
+        <input type="text" id="search" placeholder="🔍 Cari Nama / No Siri...">
+        <div id="list-jejak">Loading...</div>
+    </div>
+
+    <div id="modal" class="modal"><div class="modal-content" id="m-content"></div></div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><span>🏠</span>Daftar</a>
+        <a href="terima.html" class="nav-item"><span>📥</span>Terima</a>
+        <a href="jejak.html" class="nav-item active"><span>🔍</span>Jejak</a>
+        <a href="pulang.html" class="nav-item"><span>✅</span>Pulang</a>
+        <a href="nota.html" class="nav-item"><span>⚙️</span>Nota</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // GANTI CONFIG
+        const firebaseConfig = { apiKey: "API_KEY", authDomain: "PROJECT.firebaseapp.com", databaseURL: "https://PROJECT-default-rtdb.firebaseio.com", projectId: "PROJECT", storageBucket: "PROJECT.appspot.com", messagingSenderId: "SENDER", appId: "APP_ID" };
+        const app = initializeApp(firebaseConfig);
+        const dbRef = getDatabase(app);
+        
+        let allData = [];
+
+        onValue(ref(dbRef, 'assets'), (snap) => {
+            let d = snap.val(); if(!d) return;
+            allData = Object.keys(d).map(k => ({id:k, ...d[k]})).filter(x => x.status !== 'PENDING').reverse();
+            render(allData);
+        });
+
+        function render(list) {
+            let div = document.getElementById('list-jejak'); div.innerHTML = '';
+            list.forEach(i => {
+                let col = i.status === 'COMPLETED' ? '#8b5cf6' : '#2563eb';
+                let el = document.createElement('div'); el.className = 'card'; el.style.borderLeftColor = col;
+                el.innerHTML = `<b>${i.type}</b> (${i.serial})<br><small>${i.name} - ${i.status}</small>`;
+                el.onclick = () => showDetail(i);
+                div.appendChild(el);
+            });
+        }
+
+        document.getElementById('search').addEventListener('keyup', (e) => {
+            let val = e.target.value.toLowerCase();
+            let filtered = allData.filter(x => x.name.toLowerCase().includes(val) || x.serial.toLowerCase().includes(val));
+            render(filtered);
+        });
+
+        function showDetail(item) {
+            let logs = (item.logs || []).reverse().map(l => `<div style="border-bottom:1px solid #eee; padding:5px; font-size:0.9rem">${l.text}<br><small style="color:#888">${l.time}</small></div>`).join('');
+            let btnHtml = '';
+            
+            // ADMIN BOLEH UPDATE STATUS DALAM MODAL INI
+            if(sessionStorage.getItem('adminAuth') === 'true' && item.status === 'RECEIVED') {
+                btnHtml = `<br><button onclick="window.markSiap('${item.id}')" style="width:100%; padding:10px; background:#8b5cf6; color:white; border:none; border-radius:5px;">✅ Tanda SIAP (Completed)</button>`;
+            }
+
+            document.getElementById('m-content').innerHTML = `
+                <div style="text-align:right; font-size:1.5rem; cursor:pointer" onclick="document.getElementById('modal').classList.remove('active')">&times;</div>
+                <h3>${item.type}</h3>
+                <p>Masalah: ${item.issue}</p>
+                <div style="background:#f8fafc; padding:10px; max-height:200px; overflow-y:auto; border-radius:8px;">${logs}</div>
+                ${btnHtml}
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        window.markSiap = function(id) {
+            if(!confirm("Dah siap baiki?")) return;
+            let item = allData.find(x => x.id === id);
+            let logs = item.logs || []; logs.push({text: "SIAP (COMPLETED)", time: new Date().toLocaleString()});
+            update(ref(dbRef, 'assets/'+id), { status:'COMPLETED', logs: logs }).then(()=>{
+                alert("Status Updated!"); document.getElementById('modal').classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>
