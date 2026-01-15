@@ -3,390 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Jejak Aset</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8fafc;
-            margin: 0; padding: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            color: #334155;
-        }
-
-        /* --- 1. SIDEBAR --- */
-        .sidebar {
-            width: 280px;
-            background-color: #161e2e;
-            color: white;
-            display: flex; flex-direction: column;
-            padding: 25px; flex-shrink: 0;
-            overflow-y: auto;
-        }
-
-        .sidebar-header {
-            font-size: 1.2rem; font-weight: 700; margin-bottom: 30px;
-            color: #fff; display: flex; align-items: center; gap: 10px;
-        }
-
-        .nav-links { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-
-        .nav-item {
-            text-decoration: none; color: #94a3b8;
-            padding: 12px 15px; border-radius: 10px;
-            font-size: 0.95rem; font-weight: 500;
-            display: flex; align-items: center; gap: 12px;
-            transition: 0.3s;
-        }
-
-        .nav-item:hover { background-color: #2d3748; color: white; }
-
-        /* ACTIVE STATE */
-        .nav-item.active {
-            background-color: #3b82f6;
-            color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-            font-weight: 600;
-        }
-
-        .action-buttons { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
-        .btn-action {
-            padding: 12px; border-radius: 8px; text-align: left;
-            font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            background: transparent; display: flex; align-items: center; gap: 10px;
-            text-decoration: none;
-        }
-        .btn-excel { border: 1px solid #10b981; color: #10b981; }
-        .btn-logout { border: 1px solid #ef4444; color: #ef4444; }
-        .footer-credit { margin-top: 20px; font-size: 0.7rem; color: #475569; text-align: center; }
-
-        /* --- 2. MAIN CONTENT --- */
-        .main-content {
-            flex: 1; padding: 30px; overflow-y: auto; position: relative;
-        }
-
-        h2.page-title {
-            font-size: 1.4rem; margin-top: 0; margin-bottom: 20px;
-            display: flex; align-items: center; gap: 10px; color: #334155;
-        }
-
-        /* --- UPDATE BOX --- */
-        .update-box {
-            background-color: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        .update-header { font-weight: 600; color: #1e40af; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        
-        select, input.search-input, input.note-input {
-            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; outline: none; background: white;
-        }
-        .input-group { margin-bottom: 15px; }
-        .btn-simpan { background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
-        .btn-simpan:hover { background: #1d4ed8; }
-
-        /* --- LIST CARD --- */
-        .search-wrapper { margin-bottom: 20px; }
-        .card-list { display: flex; flex-direction: column; gap: 15px; }
-        .card {
-            background: white; padding: 20px; border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 5px solid #ccc;
-            cursor: pointer; transition: transform 0.2s;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .card-info h3 { margin: 0 0 5px 0; font-size: 1rem; color: #1e293b; }
-        .card-info p { margin: 0; font-size: 0.85rem; color: #64748b; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        
-        .badge-green { background: #d1fae5; color: #047857; }
-        .badge-blue { background: #dbeafe; color: #1e40af; }
-        .badge-orange { background: #ffedd5; color: #c2410c; }
-
-        /* --- MODAL --- */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000;
-            align-items: center; justify-content: center;
-        }
-        .modal-card {
-            background: white; width: 90%; max-width: 500px;
-            border-radius: 16px; padding: 25px;
-            max-height: 90vh; overflow-y: auto;
-        }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; }
-        .modal-title { font-weight: 700; color: #334155; font-size: 1.1rem; }
-        .btn-close { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-
-        .info-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .label { font-size: 0.7rem; color: #64748b; font-weight: 700; display: block; margin-bottom: 5px; }
-        .value { font-weight: 600; color: #1e293b; display: block; }
-        
-        .log-container { max-height: 200px; overflow-y: auto; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
-        .log-item { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; }
-        .log-time { font-size: 0.7rem; color: #94a3b8; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow: visible; }
-            .sidebar { width: 100%; padding: 15px; }
-            .nav-links { flex-direction: row; flex-wrap: wrap; gap: 5px; }
-            .nav-item { padding: 8px 12px; font-size: 0.8rem; }
-            .main-content { padding: 15px; }
-        }
-    </style>
+    <title>Admin Panel - Jejak Aset</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-header">Admin Panel 🔒</div>
-        <nav class="nav-links">
-            <a href="terima.html" class="nav-item">📥 1. Penerimaan</a>
-            <a href="jejak.html" class="nav-item active">📍 2. Jejak Aset</a>
-            <a href="pulang.html" class="nav-item">📦 3. Serahan Pulang</a>
-            <a href="#" class="nav-item" onclick="Swal.fire('Info', 'Halaman Nota sulit.', 'info')">📌 4. Nota (Sulit)</a>
-        </nav>
-        <div class="action-buttons">
-            <button class="btn-action btn-excel" onclick="Swal.fire('Info','Belum siap','info')">📊 Download Excel</button>
-            <button class="btn-action btn-logout" id="btnLogout">🚪 Log Keluar</button>
-        </div>
-        <div class="footer-credit">By Nurul syuhaida (intern)</div>
-    </aside>
-
-    <main class="main-content">
-        <h2 class="page-title">📍 Jejak & Kemaskini Aset</h2>
-
-        <div class="update-box">
-            <div class="update-header">✍️ Kemaskini Status & Nota</div>
-            
-            <div class="input-group">
-                <label class="label">1. Pilih Aset:</label>
-                <select id="assetDropdown">
-                    <option value="">-- Cari aset di sini --</option>
-                </select>
+<div class="container-fluid">
+    <div class="row">
+        
+        <nav class="col-md-2 d-none d-md-block bg-dark sidebar">
+            <div class="sidebar-sticky">
+                <h3 class="text-white p-3">Admin Panel 🔒</h3>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="terima.html">
+                            📥 1. Penerimaan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active btn-primary" href="jejak.html">
+                            📍 2. Jejak Aset
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="pulang.html">
+                            📦 3. Serahan Pulang
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="nota.html">
+                            📌 4. Nota (Sulit)
+                        </a>
+                    </li>
+                </ul>
+                <div class="mt-5 p-3">
+                    <button class="btn btn-outline-success w-100 mb-2">📊 Download Excel</button>
+                    <button class="btn btn-outline-danger w-100">🚪 Log Keluar</button>
+                </div>
             </div>
-            
-            <div class="input-group" style="display:flex; gap:10px;">
-                <div style="flex:1;">
-                    <label class="label">2. Tukar Status:</label>
-                    <select id="newStatus">
-                        <option value="">-- Kekal Status Sama --</option>
-                        <option value="Dalam Proses">🔧 Dalam Proses</option>
-                        <option value="Siap">✅ Siap (Boleh Ambil)</option>
-                        <option value="Rosak Kekal">❌ Rosak (Tidak boleh dibaiki)</option>
-                    </select>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 bg-light">
+            <div class="pt-3 pb-2 mb-3 text-center">
+                <h4>📍 Jejak & Kemaskini Aset</h4>
+            </div>
+
+            <div class="card mb-4 bg-primary-light border-primary">
+                <div class="card-body">
+                    <h6>✍ Update Log & Nota</h6>
+                    <div class="form-group">
+                        <label>Pilih Aset:</label>
+                        <select class="form-control">
+                            <option>-- Pilih Aset Untuk Tambah Nota --</option>
+                        </select>
+                    </div>
+                    <div class="input-group mt-2">
+                        <input type="text" class="form-control" placeholder="Cth: Hantar repair, Menunggu barang...">
+                        <button class="btn btn-primary">Simpan</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="input-group">
-                <label class="label">3. Tambah Catatan (Log):</label>
-                <input type="text" id="newNote" class="note-input" placeholder="Cth: Sudah format, menunggu sparepart...">
+            <div class="input-group mb-3">
+                <span class="input-group-text">🔍</span>
+                <input type="text" class="form-control" placeholder="Cari Aset (Nama / Siri / Jenis)...">
             </div>
 
-            <button class="btn-simpan" onclick="updateAsset()">💾 Simpan Kemaskini</button>
-        </div>
-
-        <div class="search-wrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="🔎 Cari Aset (Nama / Siri / Jenis)...">
-        </div>
-
-        <div id="assetList" class="card-list">
-            <p style="text-align:center; color:#94a3b8;">Sedang memuatkan data...</p>
-        </div>
-    </main>
-
-    <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title" id="mTitle">Info Aset</div>
-                <button class="btn-close" onclick="document.getElementById('modalOverlay').style.display='none'">Tutup</button>
-            </div>
-            <div class="info-section">
-                <span class="label">PEMILIK</span>
-                <span class="value" id="mOwner">-</span>
-                <span style="font-size:0.85rem;" id="mLoc">-</span>
-            </div>
-            <div class="info-section">
-                <span class="label">MASALAH ASAL</span>
-                <p style="margin:0; font-weight:500; color:#ef4444;" id="mIssue">-</p>
-            </div>
-            <div class="info-section">
-                <span class="label">SEJARAH LOG</span>
-                <div class="log-container" id="mLogs"></div>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
-            authDomain: "aset-ypkt.firebaseapp.com",
-            databaseURL: "https://aset-ypkt-default-rtdb.firebaseio.com",
-            projectId: "aset-ypkt",
-            storageBucket: "aset-ypkt.firebasestorage.app",
-            messagingSenderId: "501863979091",
-            appId: "1:501863979091:web:adf72aa4de7db740498ea6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        if(sessionStorage.getItem('adminAuth') !== 'true') { window.location.href = 'terima.html'; }
-        document.getElementById('btnLogout').onclick = () => { sessionStorage.removeItem('adminAuth'); window.location.href = 'menu.html'; };
-
-        let allAssets = [];
-
-        // 1. FETCH DATA
-        const dbRef = ref(db, 'serahan_aset');
-        onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            const container = document.getElementById('assetList');
-            container.innerHTML = '';
-
-            if(!data) {
-                container.innerHTML = '<p style="text-align:center;">Tiada data.</p>';
-                return;
-            }
-
-            allAssets = Object.entries(data).map(([key, val]) => ({ id: key, ...val })).reverse();
-            
-            renderList(allAssets);
-            renderDropdown(allAssets);
-        });
-
-        // 2. RENDER LIST
-        function renderList(items) {
-            const container = document.getElementById('assetList');
-            container.innerHTML = '';
-
-            items.forEach(item => {
-                let borderCol = '#2563eb'; 
-                let badgeClass = 'badge-blue';
-                
-                if(item.status === 'Baru Terima') { borderCol = '#f59e0b'; badgeClass = 'badge-orange'; }
-                else if(item.status === 'Siap') { borderCol = '#10b981'; badgeClass = 'badge-green'; }
-                else if(item.status === 'Sudah Pulang') { borderCol = '#64748b'; badgeClass = 'badge-green'; }
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style.borderLeftColor = borderCol;
-                card.onclick = () => openModal(item.id);
-                
-                card.innerHTML = `
-                    <div class="card-info">
-                        <h3>${item.jenis} (${item.no_siri || '-'})</h3>
-                        <p>Milik: <b>${item.nama}</b></p>
-                        <p style="font-size:0.75rem;">${item.lokasi || ''}</p>
+            <div class="card mb-2 border-start-success shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Printer (Ypkt/20/40558)</strong><br>
+                        <small>Milik: Kamirah abdullah (YPKT Dungun)</small>
                     </div>
-                    <span class="badge ${badgeClass}">${item.status || 'Unknown'}</span>
-                `;
-                container.appendChild(card);
-            });
-        }
+                    <span class="badge bg-success-subtle text-success">SUDAH PULANG</span>
+                </div>
+            </div>
 
-        // 3. RENDER DROPDOWN
-        function renderDropdown(items) {
-            const dd = document.getElementById('assetDropdown');
-            const currentVal = dd.value;
-            
-            // Simpan status semasa dropdown kalau user tengah pilih
-            dd.innerHTML = '<option value="">-- Pilih Aset Untuk Update --</option>';
-            items.forEach(item => {
-                if(item.status !== 'Sudah Pulang') { // Jangan tunjuk aset yang dah pulang
-                    const opt = document.createElement('option');
-                    opt.value = item.id;
-                    opt.text = `${item.nama} - ${item.jenis} (${item.status})`;
-                    dd.appendChild(opt);
-                }
-            });
-            if(currentVal) dd.value = currentVal;
-        }
+            <div class="card mb-2 border-start-success shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Printer (ypkt/203/2329)</strong><br>
+                        <small>Milik: kairina binti muhammad (YPKT Kuala Nerus)</small>
+                    </div>
+                    <span class="badge bg-success-subtle text-success">SUDAH PULANG</span>
+                </div>
+            </div>
 
-        // 4. UPDATE FUNCTION (STATUS & NOTE)
-        window.updateAsset = function() {
-            const id = document.getElementById('assetDropdown').value;
-            const status = document.getElementById('newStatus').value;
-            const note = document.getElementById('newNote').value;
-
-            if(!id) return Swal.fire('Ralat', 'Sila pilih aset dahulu.', 'error');
-            if(!status && !note) return Swal.fire('Ralat', 'Sila pilih status baru ATAU tulis nota.', 'warning');
-
-            const item = allAssets.find(x => x.id === id);
-            const currentLogs = item.logs || [];
-            
-            // Add Log if note exists
-            if(note) {
-                currentLogs.unshift({
-                    text: note,
-                    time: new Date().toLocaleString('ms-MY')
-                });
-            }
-
-            // Prepare Update Data
-            let updateData = {};
-            if(note) updateData.logs = currentLogs;
-            if(status) updateData.status = status;
-
-            update(ref(db, 'serahan_aset/' + id), updateData).then(() => {
-                document.getElementById('newNote').value = '';
-                document.getElementById('newStatus').value = '';
-                Swal.fire({ icon: 'success', title: 'Berjaya', text: 'Data dikemaskini!', timer: 1500, showConfirmButton: false });
-            });
-        }
-
-        // 5. SEARCH
-        document.getElementById('searchInput').addEventListener('keyup', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allAssets.filter(item => 
-                (item.nama && item.nama.toLowerCase().includes(term)) || 
-                (item.no_siri && item.no_siri.toLowerCase().includes(term))
-            );
-            renderList(filtered);
-        });
-
-        // 6. MODAL
-        window.openModal = function(id) {
-            const item = allAssets.find(x => x.id === id);
-            if(!item) return;
-
-            document.getElementById('mTitle').innerText = item.jenis + ' (' + (item.no_siri || '') + ')';
-            document.getElementById('mOwner').innerText = item.nama;
-            document.getElementById('mLoc').innerText = `${item.lokasi || ''} - ${item.taska || ''}`;
-            document.getElementById('mIssue').innerText = item.masalah || 'Tiada info';
-
-            const logContainer = document.getElementById('mLogs');
-            logContainer.innerHTML = '';
-            
-            if(item.logs && item.logs.length > 0) {
-                item.logs.forEach(log => {
-                    logContainer.innerHTML += `
-                        <div class="log-item">
-                            <div>👉</div>
-                            <div>
-                                <div style="color:#334155;">${log.text}</div>
-                                <div class="log-time">${log.time}</div>
-                            </div>
-                        </div>`;
-                });
-            } else {
-                logContainer.innerHTML = '<span style="color:#cbd5e1; font-style:italic;">Tiada rekod.</span>';
-            }
-            document.getElementById('modalOverlay').style.display = 'flex';
-        }
-
-        window.closeModal = function(e) {
-            if(e.target.id === 'modalOverlay') document.getElementById('modalOverlay').style.display = 'none';
-        }
-    </script>
+        </main>
+    </div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
