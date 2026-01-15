@@ -7,137 +7,35 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-            color: #1e293b;
-        }
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
 
-        /* TOMBOL KEMBALI */
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            color: #64748b;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: 0.3s;
-        }
-        .btn-back:hover { color: #2563eb; transform: translateX(-5px); }
+        /* BUTTON BACK */
+        .btn-back { display: inline-flex; align-items: center; text-decoration: none; color: #64748b; font-weight: 600; margin-bottom: 20px; }
+        .btn-back:hover { color: #2563eb; }
 
-        /* CARD STYLE */
-        .card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 40px;
-            border: 1px solid white;
-        }
-
+        /* CARD */
+        .card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; padding: 40px; }
         .form-header { text-align: center; margin-bottom: 30px; }
-        .form-header h2 { margin: 0; color: #1e293b; font-size: 1.8rem; }
+        .form-header h2 { margin: 0; font-size: 1.8rem; color: #1e293b; }
         .form-header p { color: #94a3b8; margin-top: 5px; }
 
-        /* INPUT STYLES */
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #334155;
-            font-size: 0.9rem;
-        }
+        /* INPUTS */
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #334155; font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; margin-bottom: 20px; box-sizing: border-box; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            font-family: inherit;
-            margin-bottom: 20px;
-            box-sizing: border-box; /* Penting supaya tak lari layout */
-            transition: 0.3s;
-            font-size: 0.95rem;
-        }
+        /* SECTION */
+        .section-box { background: #f8fafc; padding: 25px; border-radius: 16px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        h4.section-title { margin: 0 0 20px 0; color: #2563eb; font-size: 1rem; }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
+        /* CANVAS SIGNATURE */
+        .canvas-wrapper { border: 2px dashed #cbd5e1; border-radius: 12px; background: #fff; position: relative; overflow: hidden; margin-bottom: 20px; touch-action: none; }
+        canvas { width: 100%; height: 200px; display: block; cursor: crosshair; }
+        .btn-clear-sign { position: absolute; bottom: 10px; right: 10px; background: #ef4444; color: white; padding: 5px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; }
 
-        /* SECTION BOX */
-        .section-box {
-            background: #f8fafc;
-            padding: 25px;
-            border-radius: 16px;
-            margin-bottom: 25px;
-            border: 1px solid #e2e8f0;
-        }
-
-        h4.section-title {
-            margin: 0 0 20px 0;
-            color: #2563eb;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* CANVAS TANDATANGAN */
-        .canvas-wrapper {
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            background: #fff;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 20px;
-            touch-action: none; /* Penting untuk mobile */
-        }
-        
-        canvas {
-            width: 100%;
-            height: 200px;
-            display: block;
-            cursor: crosshair;
-        }
-
-        .btn-clear-sign {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: #ef4444;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            opacity: 0.8;
-        }
-        .btn-clear-sign:hover { opacity: 1; }
-
-        /* BUTTON SUBMIT */
-        .btn-blue {
-            width: 100%;
-            padding: 16px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-        }
-        .btn-blue:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-        }
-
+        /* SUBMIT BTN */
+        .btn-blue { width: 100%; padding: 16px; background: #2563eb; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .btn-blue:hover { background: #1d4ed8; transform: translateY(-2px); }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -155,7 +53,6 @@
         
         <div class="section-box">
             <h4 class="section-title">👤 Maklumat Pemilik</h4>
-            
             <label>Nama Cikgu / Staff</label>
             <input type="text" id="c_name" placeholder="Nama Penuh Anda">
             
@@ -178,7 +75,6 @@
 
         <div class="section-box">
             <h4 class="section-title">💻 Maklumat Aset</h4>
-            
             <label>Jenis Aset</label>
             <select id="c_type">
                 <option>Laptop</option>
@@ -200,115 +96,137 @@
         <label>Tandatangan Pelapor</label>
         <div class="canvas-wrapper">
             <canvas id="cvs_cikgu"></canvas>
-            <div class="btn-clear-sign" onclick="clearCanvas()">Padam</div>
+            <div class="btn-clear-sign" id="clearBtn">Padam</div>
         </div>
 
-        <button class="btn-blue" onclick="submitCikgu()">HANTAR BORANG</button>
+        <button class="btn-blue" id="submitBtn">HANTAR BORANG</button>
     </div>
 
     <script type="module">
-        // 1. SETUP FIREBASE
-        // -----------------
-        // Sila copy paste CONFIG FIREBASE tuan di sini
-        // Kalau tak ingat, tengok fail lama tuan
+        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
 
+        // ==========================================================
+        // ⚠️ SILA COPY DAN PASTE CONFIG FIREBASE DARI LINK ASAL DI SINI ⚠️
+        // ==========================================================
         const firebaseConfig = {
-            apiKey: "API_KEY_ANDA",
-            authDomain: "DOMAIN_ANDA",
-            databaseURL: "URL_DATABASE_ANDA",
-            projectId: "ID_PROJEK",
-            storageBucket: "BUCKET",
-            messagingSenderId: "ID",
-            appId: "APP_ID"
+            apiKey: "MASUKKAN_API_KEY_DI_SINI",
+            authDomain: "MASUKKAN_AUTH_DOMAIN_DI_SINI",
+            databaseURL: "MASUKKAN_DATABASE_URL_DI_SINI",
+            projectId: "MASUKKAN_PROJECT_ID_DI_SINI",
+            storageBucket: "MASUKKAN_BUCKET_DI_SINI",
+            messagingSenderId: "MASUKKAN_MESSAGING_ID",
+            appId: "MASUKKAN_APP_ID"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 2. SETUP TARIKH AUTO
-        // --------------------
-        window.onload = function() {
-            const today = new Date().toLocaleDateString('ms-MY', {
-                day: '2-digit', month: 'long', year: 'numeric'
-            });
-            document.getElementById('c_date').value = today;
-            resizeCanvas(); // Setup saiz canvas
-        };
+        // ==========================================================
+        // SETUP TARIKH & CANVAS (TIDAK PERLU UBAH)
+        // ==========================================================
+        
+        // Auto Tarikh
+        const today = new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' });
+        document.getElementById('c_date').value = today;
 
-        // 3. SETUP CANVAS TANDATANGAN
-        // ---------------------------
+        // Setup Canvas
         const canvas = document.getElementById('cvs_cikgu');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
 
         function resizeCanvas() {
-            // Bagi canvas saiz betul ikut kotak dia
-            canvas.width = canvas.parentElement.offsetWidth;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
             canvas.height = 200;
             ctx.lineWidth = 2;
             ctx.lineCap = "round";
             ctx.strokeStyle = "#000";
         }
-        
         window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        // Mouse Events
-        canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
-        canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } });
-        canvas.addEventListener('mouseup', () => { isDrawing = false; });
-
-        // Touch Events (Untuk Phone)
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            isDrawing = true;
-            ctx.beginPath();
-            const touch = e.touches[0];
+        function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-        });
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!isDrawing) return;
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-            ctx.stroke();
-        });
-        canvas.addEventListener('touchend', () => { isDrawing = false; });
-
-        // Fungsi Global untuk Clear Canvas
-        window.clearCanvas = function() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        // 4. FUNCTION SUBMIT
-        // ------------------
-        window.submitCikgu = function() {
-            // Ambil Data
-            const nama = document.getElementById('c_name').value;
-            const lokasi = document.getElementById('c_loc').value;
-            const taska = document.getElementById('c_taska').value;
-            const type = document.getElementById('c_type').value;
-            const serial = document.getElementById('c_serial').value;
-            const issue = document.getElementById('c_issue').value;
-            const tarikh = document.getElementById('c_date').value;
-            const sign = canvas.toDataURL(); // Tukar lukisan jadi gambar
+        function startDraw(e) {
+            isDrawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        }
 
-            // Validasi (Check kosong tak)
-            if(!nama || !lokasi || !issue) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Borang Tak Lengkap',
-                    text: 'Sila isi Nama, Lokasi, dan Masalah.',
-                    confirmButtonColor: '#2563eb'
-                });
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            e.preventDefault();
+        }
+
+        function stopDraw() { isDrawing = false; }
+
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('mouseout', stopDraw);
+        canvas.addEventListener('touchstart', startDraw, {passive: false});
+        canvas.addEventListener('touchmove', draw, {passive: false});
+        canvas.addEventListener('touchend', stopDraw);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        // ==========================================================
+        // FUNGSI SUBMIT KE DATABASE 'serahan_aset'
+        // ==========================================================
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            
+            // Ambil value dari form
+            const nama = document.getElementById('c_name').value.trim();
+            const lokasi = document.getElementById('c_loc').value;
+            const taska = document.getElementById('c_taska').value.trim();
+            const type = document.getElementById('c_type').value;
+            const serial = document.getElementById('c_serial').value.trim();
+            const issue = document.getElementById('c_issue').value.trim();
+            const tarikh = document.getElementById('c_date').value;
+
+            // Check Tandatangan
+            const blank = document.createElement('canvas');
+            blank.width = canvas.width; blank.height = canvas.height;
+            const isSignBlank = canvas.toDataURL() === blank.toDataURL();
+
+            // Validasi mudah
+            if(!nama || !lokasi || !serial || !issue) {
+                Swal.fire('Ralat', 'Sila lengkapkan Nama, Lokasi, No Siri dan Masalah.', 'warning');
                 return;
             }
 
-            // Hantar ke Firebase
-            const newRef = push(ref(db, 'aduan_rosak'));
+            if(isSignBlank) {
+                Swal.fire('Ralat', 'Sila turunkan tandatangan.', 'warning');
+                return;
+            }
+
+            // Tunjuk loading
+            Swal.fire({
+                title: 'Sedang Hantar...',
+                text: 'Sila tunggu sebentar.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            // Hantar ke Firebase Database
+            // Saya namakan table ini 'serahan_aset' supaya sesuai dengan nama borang
+            const newRef = push(ref(db, 'serahan_aset')); 
+            
             set(newRef, {
                 nama: nama,
                 lokasi: lokasi,
@@ -317,25 +235,27 @@
                 no_siri: serial,
                 masalah: issue,
                 tarikh: tarikh,
-                sign_cikgu: sign,
-                status: 'Baru Terima', // Status asal
+                sign_cikgu: canvas.toDataURL(),
+                status: 'Baru Terima', // Status default
                 timestamp: Date.now()
             })
             .then(() => {
-                // Success
                 Swal.fire({
-                    icon: 'success',
                     title: 'Berjaya!',
-                    text: 'Aduan anda telah direkodkan.',
-                    confirmButtonColor: '#10b981'
+                    text: 'Borang serahan aset telah direkodkan.',
+                    icon: 'success',
+                    confirmButtonColor: '#2563eb'
                 }).then(() => {
-                    window.location.href = 'menu.html'; // Balik ke menu
+                    // Kembali ke menu atau reload
+                    window.location.href = 'menu.html';
                 });
             })
-            .catch((error) => {
-                Swal.fire({ icon: 'error', title: 'Ralat', text: error.message });
+            .catch((err) => {
+                console.error(err);
+                Swal.fire('Ralat Sistem', 'Gagal menghantar data: ' + err.message, 'error');
             });
-        }
+        });
+
     </script>
 </body>
 </html>
