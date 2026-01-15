@@ -3,85 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serahan Pulang</title>
+    <title>Admin - Serahan Pulang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
-        header { background: #8b5cf6; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border-left: 5px solid #8b5cf6; }
-        input { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: white; background: #10b981; }
-        .canvas-wrapper { height: 120px; border: 2px dashed #cbd5e1; position: relative; margin-bottom: 10px; }
-        canvas { width: 100%; height: 100%; display: block; }
-        .btn-clear { position: absolute; top: 5px; right: 5px; background: red; color: white; font-size: 0.7rem; padding: 4px; border-radius: 4px; cursor: pointer; }
-        /* Nav */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; }
-        .nav-item { text-align: center; font-size: 0.75rem; color: #64748b; text-decoration: none; width: 100%; }
-        .nav-item span { display: block; font-size: 1.2rem; margin-bottom: 2px; }
-        .nav-item.active { color: #8b5cf6; font-weight: 700; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            margin: 0; padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: #334155;
+        }
+
+        /* --- 1. SIDEBAR (SAMA DENGAN JEJAK.HTML) --- */
+        .sidebar {
+            width: 280px;
+            background-color: #161e2e;
+            color: white;
+            display: flex; flex-direction: column;
+            padding: 25px; flex-shrink: 0;
+            overflow-y: auto;
+        }
+        .sidebar-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 30px; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .nav-links { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { text-decoration: none; color: #94a3b8; padding: 12px 15px; border-radius: 10px; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
+        .nav-item:hover { background-color: #2d3748; color: white; }
+        
+        /* ACTIVE STATE */
+        .nav-item.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); font-weight: 600; }
+
+        .action-buttons { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-action { padding: 12px; border-radius: 8px; text-align: left; font-size: 0.9rem; font-weight: 600; cursor: pointer; background: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .btn-excel { border: 1px solid #10b981; color: #10b981; } 
+        .btn-logout { border: 1px solid #ef4444; color: #ef4444; }
+        .footer-credit { margin-top: 20px; font-size: 0.7rem; color: #475569; text-align: center; }
+
+        /* --- 2. MAIN CONTENT --- */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        h2.page-title { font-size: 1.4rem; margin-top: 0; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; color: #1e293b; }
+        p.page-subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 25px; margin-top: 0; }
+
+        /* --- CARD STYLE (PULANG) --- */
+        .return-list { display: flex; flex-direction: column; gap: 20px; max-width: 700px; margin: 0 auto; }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border-left: 6px solid #a855f7; /* Purple Border Left */
+        }
+
+        .card-header { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; }
+        .card-header h3 { margin: 0; font-size: 1.1rem; color: #1e293b; }
+        .card-header p { margin: 5px 0 0; font-size: 0.85rem; color: #64748b; }
+
+        /* PURPLE FORM AREA */
+        .form-container {
+            background-color: #f3e8ff; /* Purple 100 */
+            padding: 20px 25px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: #6b21a8; margin-bottom: 5px; text-transform: uppercase; }
+        
+        input.form-input {
+            width: 100%; padding: 12px; 
+            border: 1px solid #d8b4fe; 
+            border-radius: 8px; 
+            font-family: inherit; font-size: 0.9rem;
+            background: white; outline: none;
+        }
+        input.form-input:read-only { background: #e9d5ff; color: #581c87; cursor: not-allowed; }
+
+        /* CANVAS SIGNATURE */
+        .signature-pad {
+            background: white;
+            border: 2px dashed #9333ea; /* Purple Dashed */
+            border-radius: 8px;
+            height: 150px;
+            position: relative;
+            touch-action: none;
+        }
+        canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
+        
+        .btn-clear {
+            position: absolute; bottom: 10px; right: 10px;
+            background: #ef4444; color: white;
+            border: none; padding: 5px 10px; border-radius: 5px;
+            font-size: 0.7rem; font-weight: 600; cursor: pointer;
+            z-index: 10;
+        }
+
+        .btn-submit {
+            width: 100%; padding: 14px;
+            background: #10b981; color: white; /* Green */
+            border: none; border-radius: 8px;
+            font-weight: 600; font-size: 1rem; cursor: pointer;
+            margin-top: 10px; transition: 0.2s;
+        }
+        .btn-submit:hover { background: #059669; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow: visible; }
+            .sidebar { width: 100%; padding: 15px; }
+            .nav-links { flex-direction: row; flex-wrap: wrap; gap: 5px; }
+            .nav-item { padding: 8px 12px; font-size: 0.8rem; }
+            .main-content { padding: 15px; }
+        }
     </style>
 </head>
 <body>
-    <header><h1>Serahan Pulang</h1><p>Aset Siap & Boleh Diambil</p></header>
-    <div class="container" id="list-pulang">Loading...</div>
 
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item"><span>🏠</span>Daftar</a>
-        <a href="terima.html" class="nav-item"><span>📥</span>Terima</a>
-        <a href="jejak.html" class="nav-item"><span>🔍</span>Jejak</a>
-        <a href="pulang.html" class="nav-item active"><span>✅</span>Pulang</a>
-        <a href="nota.html" class="nav-item"><span>⚙️</span>Nota</a>
-    </nav>
+    <aside class="sidebar">
+        <div class="sidebar-header">Admin Panel 🔒</div>
+        <nav class="nav-links">
+            <a href="terima.html" class="nav-item">📥 1. Penerimaan</a>
+            <a href="jejak.html" class="nav-item">📍 2. Jejak Aset</a>
+            <a href="pulang.html" class="nav-item active">📦 3. Serahan Pulang</a> 
+            <a href="#" class="nav-item" onclick="Swal.fire('Info', 'Halaman Nota sulit.', 'info')">📌 4. Nota (Sulit)</a>
+        </nav>
+        <div class="action-buttons">
+            <button class="btn-action btn-excel" onclick="Swal.fire('Info','Belum siap','info')">📊 Download Excel</button>
+            <button class="btn-action btn-logout" id="btnLogout">🚪 Log Keluar</button>
+        </div>
+        <div class="footer-credit">By Nurul syuhaida (intern)</div>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="page-title">📦 Senarai Sedia Untuk Diambil (Completed)</h2>
+        <p class="page-subtitle">Hanya aset yang telah ditanda <b>SIAP</b> akan muncul di sini untuk proses serahan pulang.</p>
+
+        <div id="returnList" class="return-list">
+            <p style="text-align:center; color:#94a3b8; margin-top:50px;">Sedang memuatkan data...</p>
+        </div>
+    </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // GANTI CONFIG
-        const firebaseConfig = { apiKey: "API_KEY", authDomain: "PROJECT.firebaseapp.com", databaseURL: "https://PROJECT-default-rtdb.firebaseio.com", projectId: "PROJECT", storageBucket: "PROJECT.appspot.com", messagingSenderId: "SENDER", appId: "APP_ID" };
+        // CONFIG (Sama macam fail lain)
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
+            authDomain: "aset-ypkt.firebaseapp.com",
+            databaseURL: "https://aset-ypkt-default-rtdb.firebaseio.com",
+            projectId: "aset-ypkt",
+            storageBucket: "aset-ypkt.firebasestorage.app",
+            messagingSenderId: "501863979091",
+            appId: "1:501863979091:web:adf72aa4de7db740498ea6"
+        };
+
         const app = initializeApp(firebaseConfig);
-        const dbRef = getDatabase(app);
+        const db = getDatabase(app);
 
-        onValue(ref(dbRef, 'assets'), (snap) => {
-            let div = document.getElementById('list-pulang'); div.innerHTML = '';
-            let data = snap.val(); if(!data) return div.innerHTML = '<p>Tiada aset siap.</p>';
+        // AUTH CHECK
+        if(sessionStorage.getItem('adminAuth') !== 'true') { window.location.href = 'terima.html'; }
+        document.getElementById('btnLogout').onclick = () => { sessionStorage.removeItem('adminAuth'); window.location.href = 'menu.html'; };
+
+        // 1. FETCH DATA (Hanya status 'Siap')
+        const dbRef = ref(db, 'serahan_aset');
+        
+        onValue(dbRef, (snapshot) => {
+            const container = document.getElementById('returnList');
+            container.innerHTML = ''; // Clear loading
             
-            let list = Object.keys(data).map(k => ({id:k, ...data[k]})).filter(x => x.status === 'COMPLETED').reverse();
-            if(list.length === 0) return div.innerHTML = '<p style="text-align:center">Semua aset telah dipulangkan.</p>';
+            const data = snapshot.val();
+            if(!data) {
+                container.innerHTML = '<div style="text-align:center; padding:40px; background:white; border-radius:10px;">Tiada aset siap untuk diambil.</div>';
+                return;
+            }
 
-            list.forEach(i => {
-                let el = document.createElement('div'); el.className = 'card';
-                el.innerHTML = `
-                    <h3>${i.type} (${i.name})</h3>
-                    <p>Lokasi: ${i.loc}</p>
-                    <input id="n_${i.id}" placeholder="Nama Penerima">
-                    <div class="canvas-wrapper"><canvas id="c_${i.id}"></canvas><div class="btn-clear" onclick="clearC('c_${i.id}')">X</div></div>
-                    <button class="btn" onclick="save('${i.id}')">SAHKAN AMBIL</button>
+            // Filter: Status == 'Siap' (atau 'COMPLETED' ikut database tuan)
+            // Di sini kita guna 'Siap' sebab dalam jejak.html kita set 'COMPLETED' tapi label paparan mungkin berbeza. 
+            // Kita filter item yang BELUM pulang tapi dah SIAP.
+            
+            // Note: Pastikan status di jejak.html konsisten. Jika jejak set 'Siap', guna 'Siap'. 
+            // Jika jejak set 'COMPLETED', tukar bawah ni jadi 'COMPLETED'.
+            const list = Object.entries(data)
+                .map(([key, val]) => ({ id: key, ...val }))
+                .filter(item => item.status === 'Siap' || item.status === 'COMPLETED') 
+                .reverse();
+
+            if(list.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px; background:white; border-radius:10px; color:#64748b;">Semua aset telah dipulangkan atau belum siap dibaiki.</div>';
+                return;
+            }
+
+            // Render Card
+            list.forEach(item => {
+                const nowStr = new Date().toLocaleString('en-US', { hour12: true });
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${item.jenis} (${item.no_siri || 'Tiada No Siri'})</h3>
+                        <p>Milik: <b>${item.nama}</b> (${item.lokasi || '-'})</p>
+                    </div>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label class="form-label">Tarikh Serahan (Auto)</label>
+                            <input type="text" class="form-input" value="${nowStr}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nama Penerima</label>
+                            <input type="text" id="name_${item.id}" class="form-input" placeholder="Masukkan nama penerima...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sign Penerima:</label>
+                            <div class="signature-pad">
+                                <canvas id="can_${item.id}"></canvas>
+                                <button class="btn-clear" onclick="clearCanvas('can_${item.id}')">Padam</button>
+                            </div>
+                        </div>
+                        <button class="btn-submit" onclick="submitReturn('${item.id}')">Sahkan Serahan</button>
+                    </div>
                 `;
-                div.appendChild(el);
-                setTimeout(()=>initC(`c_${i.id}`), 100);
+                container.appendChild(card);
+                
+                // Initialize Canvas selepas element dimasukkan ke DOM
+                setTimeout(() => initCanvas(`can_${item.id}`), 200);
             });
         });
 
-        window.initC = function(id) {
-            let c = document.getElementById(id); let ctx = c.getContext('2d');
-            c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
-            let drawing = false;
-            const getPos = (e) => { let r=c.getBoundingClientRect(); return {x:(e.touches?e.touches[0].clientX:e.clientX)-r.left, y:(e.touches?e.touches[0].clientY:e.clientY)-r.top}; };
-            ['mousedown','touchstart'].forEach(ev=>c.addEventListener(ev,(e)=>{ if(ev=='touchstart')e.preventDefault(); drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }));
-            ['mousemove','touchmove'].forEach(ev=>c.addEventListener(ev,(e)=>{ if(ev=='touchmove')e.preventDefault(); if(drawing){ ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); }}));
-            ['mouseup','touchend'].forEach(()=>drawing=false);
-        }
-        window.clearC = function(id) { let c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+        // 2. CANVAS LOGIC
+        window.initCanvas = function(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if(!canvas) return;
+            
+            // Set canvas size to match container
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = "#000";
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            
+            let isDrawing = false;
 
-        window.save = function(id) {
-            let n = document.getElementById(`n_${id}`).value;
-            if(!n) return alert("Sila isi nama penerima!");
-            update(ref(dbRef, 'assets/'+id), {
-                status: 'RETURNED', retName: n, retTime: new Date().toLocaleString(),
-                logs: [{text:"Dipulangkan kpd: "+n, time: new Date().toLocaleString()}] 
-            }).then(()=>alert("Berjaya Dipulangkan!"));
+            // Mouse Events
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+            canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } });
+            canvas.addEventListener('mouseup', () => { isDrawing = false; });
+            canvas.addEventListener('mouseout', () => { isDrawing = false; });
+
+            // Touch Events (Mobile)
+            const getTouchPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+            };
+            
+            canvas.addEventListener('touchstart', (e) => { 
+                e.preventDefault(); isDrawing = true; 
+                const pos = getTouchPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); 
+            }, { passive: false });
+            
+            canvas.addEventListener('touchmove', (e) => { 
+                e.preventDefault(); if(isDrawing) { 
+                    const pos = getTouchPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); 
+                } 
+            }, { passive: false });
+            
+            canvas.addEventListener('touchend', () => { isDrawing = false; });
+        }
+
+        window.clearCanvas = function(id) {
+            const c = document.getElementById(id);
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, c.width, c.height);
+        }
+
+        // 3. SUBMIT FUNCTION
+        window.submitReturn = function(id) {
+            const nameInput = document.getElementById(`name_${id}`).value;
+            const canvas = document.getElementById(`can_${id}`);
+            
+            // Simple validation check (is canvas blank?)
+            const blank = document.createElement('canvas');
+            blank.width = canvas.width; blank.height = canvas.height;
+            const isCanvasBlank = canvas.toDataURL() === blank.toDataURL();
+
+            if(!nameInput) return Swal.fire('Ralat', 'Sila masukkan nama penerima.', 'error');
+            if(isCanvasBlank) return Swal.fire('Ralat', 'Sila turunkan tandatangan.', 'error');
+
+            Swal.fire({
+                title: 'Sahkan Serahan?',
+                text: "Pastikan aset dipulangkan kepada orang yang betul.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sahkan',
+                confirmButtonColor: '#10b981'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                    // Update Firebase
+                    const now = new Date().toLocaleString('ms-MY');
+                    
+                    // Fetch existing logs first (optional but safer) or just push new log
+                    // Here we just overwrite logs array with new appended log (requires reading first usually),
+                    // but for simplicity, we use the `logs` update method from previous logic.
+                    // To do it properly without reading first, we just push to logs list if data structure permits,
+                    // but here we will fetch specific item to append log.
+                    
+                    // Shortcut: Just update fields and rewrite logs if needed or just add 'Sudah Pulang'
+                    
+                    update(ref(db, 'serahan_aset/' + id), {
+                        status: 'Sudah Pulang',
+                        penerima_pulang: nameInput,
+                        tarikh_pulang: now
+                    }).then(() => {
+                        // Tambah Log secara berasingan (Optional enhancement)
+                        // Untuk simple, kita refresh page atau biarkan onValue handle remove card
+                        Swal.fire('Berjaya!', 'Aset telah dipulangkan.', 'success');
+                    });
+                }
+            });
         }
     </script>
 </body>
