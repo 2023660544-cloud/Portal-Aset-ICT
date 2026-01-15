@@ -3,375 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Penerimaan</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f1f5f9;
-            margin: 0; padding: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* --- 1. SIDEBAR (KIRI) --- */
-        .sidebar {
-            width: 280px;
-            background-color: #161e2e; /* Warna gelap admin panel */
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            flex-shrink: 0;
-            overflow-y: auto;
-        }
-
-        .sidebar-header {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Menu Links */
-        .nav-links {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: #94a3b8;
-            padding: 12px 15px;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: 0.3s;
-        }
-
-        .nav-item:hover {
-            background-color: #2d3748;
-            color: white;
-        }
-
-        /* Active State (Biru macam dalam gambar) */
-        .nav-item.active {
-            background-color: #3b82f6; /* Biru Terang */
-            color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-            font-weight: 600;
-        }
-
-        /* Button Actions Bawah */
-        .action-buttons {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn-action {
-            padding: 12px;
-            border-radius: 8px;
-            text-align: left;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .btn-excel {
-            border: 1px solid #10b981;
-            color: #10b981;
-        }
-        .btn-excel:hover { background: rgba(16, 185, 129, 0.1); }
-
-        .btn-logout {
-            border: 1px solid #ef4444;
-            color: #ef4444;
-        }
-        .btn-logout:hover { background: rgba(239, 68, 68, 0.1); }
-
-        .footer-credit {
-            margin-top: 20px;
-            font-size: 0.7rem;
-            color: #475569;
-            text-align: center;
-        }
-
-        /* --- 2. MAIN CONTENT (KANAN) --- */
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        h2.page-title {
-            color: #334155;
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* --- CARD STYLE (Sama macam request sebelum ini) --- */
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-left: 6px solid #f59e0b;
-            max-width: 700px; /* Limit lebar supaya tak terlalu panjang */
-        }
-
-        .asset-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
-        .asset-meta { font-size: 0.9rem; color: #64748b; margin-bottom: 15px; line-height: 1.4; }
-        .issue-box { background-color: #fef2f2; color: #ef4444; padding: 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; margin-bottom: 20px; border: 1px solid #fee2e2; }
-
-        label { display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 8px; margin-top: 15px; }
-        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; box-sizing: border-box; outline: none; font-size: 0.95rem; }
-        input.input-readonly { background-color: #e2e8f0; color: #64748b; font-weight: 500; }
-        
-        /* Canvas */
-        .canvas-wrapper { border: 2px dashed #94a3b8; border-radius: 8px; height: 160px; position: relative; background: #fff; margin-bottom: 20px; overflow: hidden; }
-        canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
-        .btn-clear { position: absolute; bottom: 10px; right: 10px; background-color: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; z-index: 10; }
-
-        .btn-submit { width: 100%; background-color: #2563eb; color: white; padding: 14px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; }
-        .btn-submit:hover { background-color: #1d4ed8; }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow: visible; }
-            .sidebar { width: 100%; padding: 15px; }
-            .nav-links { flex-direction: row; flex-wrap: wrap; gap: 5px; }
-            .nav-item { padding: 8px 12px; font-size: 0.8rem; }
-            .action-buttons { flex-direction: row; }
-            .main-content { padding: 15px; }
-        }
-    </style>
+    <title>Admin Panel - Penerimaan</title>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            Admin Panel 🔒
-        </div>
-
-        <nav class="nav-links">
-            <a href="terima.html" class="nav-item active">
-                📥 1. Penerimaan
-            </a>
-            <a href="#" class="nav-item" onclick="Swal.fire('Info', 'Halaman Jejak Aset belum siap.', 'info')">
-                📍 2. Jejak Aset
-            </a>
-            <a href="#" class="nav-item" onclick="Swal.fire('Info', 'Halaman Serahan Pulang belum siap.', 'info')">
-                📦 3. Serahan Pulang
-            </a>
-            <a href="#" class="nav-item" onclick="Swal.fire('Info', 'Halaman Nota sulit.', 'info')">
-                📌 4. Nota (Sulit)
-            </a>
+<div class="container-fluid">
+    <div class="row">
+        
+        <nav class="col-md-2 d-none d-md-block bg-dark sidebar">
+            <div class="sidebar-sticky">
+                <h3 class="text-white p-3">Admin Panel 🔒</h3>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active btn-primary" href="terima.html">
+                            📥 1. Penerimaan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="jejak.html">
+                            📍 2. Jejak Aset
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="pulang.html">
+                            📦 3. Serahan Pulang
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="nota.html">
+                            📌 4. Nota (Sulit)
+                        </a>
+                    </li>
+                </ul>
+                <div class="mt-5 p-3">
+                    <button class="btn btn-outline-success w-100 mb-2">📊 Download Excel</button>
+                    <button class="btn btn-outline-danger w-100">🚪 Log Keluar</button>
+                </div>
+            </div>
         </nav>
 
-        <div class="action-buttons">
-            <button class="btn-action btn-excel" onclick="downloadExcel()">
-                📊 Download Excel
-            </button>
-            <button class="btn-action btn-logout" id="btnLogout">
-                🚪 Log Keluar
-            </button>
-        </div>
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 bg-light">
+            <div class="pt-3 pb-2 mb-3">
+                <h4>📥 Menunggu Penerimaan</h4>
+            </div>
 
-        <div class="footer-credit">
-            By Nurul syuhaida (intern)
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <h2 class="page-title">📥 Menunggu Penerimaan</h2>
-
-        <div id="list-container">
-            <p style="text-align:center; color:#94a3b8; margin-top:50px;">Sedang memuatkan data...</p>
-        </div>
-    </main>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-
-        // CONFIG FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
-            authDomain: "aset-ypkt.firebaseapp.com",
-            databaseURL: "https://aset-ypkt-default-rtdb.firebaseio.com",
-            projectId: "aset-ypkt",
-            storageBucket: "aset-ypkt.firebasestorage.app",
-            messagingSenderId: "501863979091",
-            appId: "1:501863979091:web:adf72aa4de7db740498ea6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // --- AUTH CHECK ---
-        if(sessionStorage.getItem('adminAuth') !== 'true') {
-            Swal.fire({
-                title: 'Admin Panel 🔒',
-                text: 'Sila masukkan kata laluan untuk akses.',
-                input: 'password',
-                inputAttributes: { autocapitalize: 'off' },
-                allowOutsideClick: false,
-                confirmButtonText: 'Masuk',
-                confirmButtonColor: '#161e2e',
-                preConfirm: (pass) => {
-                    if (pass !== "1234") Swal.showValidationMessage('Kata laluan salah!');
-                    else sessionStorage.setItem('adminAuth', 'true');
-                }
-            });
-        }
-
-        // --- LOGOUT LOGIC ---
-        document.getElementById('btnLogout').addEventListener('click', () => {
-            sessionStorage.removeItem('adminAuth');
-            window.location.href = 'menu.html'; // Balik ke menu utama
-        });
-
-        // --- FUNGSI DOWNLOAD EXCEL (Mockup) ---
-        window.downloadExcel = function() {
-            Swal.fire('Excel', 'Fungsi download sedang diproses...', 'success');
-        }
-
-        // --- RENDER SENARAI ---
-        const listDiv = document.getElementById('list-container');
-        const dbRef = ref(db, 'serahan_aset');
-
-        onValue(dbRef, (snapshot) => {
-            listDiv.innerHTML = '';
-            const data = snapshot.val();
-
-            if (!data) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#94a3b8; margin-top:50px;">Tiada rekod dijumpai.</p>';
-                return;
-            }
-
-            // Filter status 'Baru Terima'
-            let items = Object.entries(data)
-                .map(([key, val]) => ({ id: key, ...val }))
-                .filter(item => item.status === 'Baru Terima');
-
-            if(items.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#94a3b8; margin-top:50px;">Tiada aset menunggu penerimaan.</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                const now = new Date().toLocaleString('en-US', { hour12: true });
-                
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="asset-title">${item.jenis} (${item.no_siri})</div>
-                    <div class="asset-meta">
-                        <strong>${item.nama}</strong><br>
-                        ${item.lokasi} - ${item.taska}
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Printer (Ypkt/kp/p/2033)</h5>
+                    <p class="text-muted">Hamzah <br> YPKT Dungun - Taska dungun</p>
+                    
+                    <div class="alert alert-danger">
+                        Masalah: Ink tak keluar
                     </div>
 
-                    <div class="issue-box">
-                        Masalah: ${item.masalah}
-                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label>Tarikh Terima (Auto)</label>
+                            <input type="text" class="form-control bg-light" value="1/15/2026, 9:26:43 PM" readonly>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Nama Admin</label>
+                            <input type="text" class="form-control" placeholder="Masukkan Nama Admin...">
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Tandatangan Admin</label>
+                            <div class="border border-dashed p-5 text-center bg-white" style="height: 150px; border-style: dashed;">
+                                <button type="button" class="btn btn-danger btn-sm float-end">Padam</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-4">Terima (Received)</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
 
-                    <label>Tarikh Terima (Auto)</label>
-                    <input type="text" class="input-readonly" value="${now}" readonly>
-
-                    <label>Nama Admin</label>
-                    <input type="text" id="admin_${item.id}" placeholder="Masukkan Nama Admin...">
-
-                    <label>Tandatangan Admin</label>
-                    <div class="canvas-wrapper">
-                        <canvas id="cvs_${item.id}"></canvas>
-                        <button class="btn-clear" onclick="clearSign('${item.id}')">Padam</button>
-                    </div>
-
-                    <button class="btn-submit" onclick="terima('${item.id}')">Terima (Received)</button>
-                `;
-                listDiv.appendChild(card);
-                setTimeout(() => initCanvas(item.id), 200);
-            });
-        });
-
-        // --- CANVAS & UPDATE LOGIC (Sama macam sebelum ini) ---
-        window.initCanvas = function(id) {
-            const canvas = document.getElementById(`cvs_${id}`);
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.offsetWidth;
-            canvas.height = canvas.parentElement.offsetHeight;
-            ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#000";
-            let drawing = false;
-
-            const getPos = (e) => {
-                const r = canvas.getBoundingClientRect();
-                return { x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top };
-            };
-
-            ['mousedown','touchstart'].forEach(ev => canvas.addEventListener(ev, e => {
-                if(ev=='touchstart') e.preventDefault(); drawing = true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y);
-            }, {passive:false}));
-
-            ['mousemove','touchmove'].forEach(ev => canvas.addEventListener(ev, e => {
-                if(ev=='touchmove') e.preventDefault(); if(!drawing) return; ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke();
-            }, {passive:false}));
-
-            ['mouseup','touchend'].forEach(() => drawing = false);
-        }
-
-        window.clearSign = function(id) {
-            const c = document.getElementById(`cvs_${id}`);
-            c.getContext('2d').clearRect(0, 0, c.width, c.height);
-        }
-
-        window.terima = function(id) {
-            const name = document.getElementById(`admin_${id}`).value;
-            const cvs = document.getElementById(`cvs_${id}`);
-            const blank = document.createElement('canvas'); blank.width=cvs.width; blank.height=cvs.height;
-            
-            if(cvs.toDataURL() === blank.toDataURL()) return Swal.fire('Error', 'Sila tandatangan dahulu.', 'warning');
-            if(!name) return Swal.fire('Error', 'Sila masukkan nama admin.', 'warning');
-
-            Swal.fire({
-                title: 'Sahkan?', text: "Tandakan aset sebagai diterima?", icon: 'question',
-                showCancelButton: true, confirmButtonColor: '#2563eb', confirmButtonText: 'Ya, Terima'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    update(ref(db, 'serahan_aset/' + id), {
-                        status: 'Diterima',
-                        nama_admin: name,
-                        sign_admin: cvs.toDataURL(),
-                        tarikh_terima_admin: new Date().toLocaleString()
-                    }).then(() => Swal.fire('Berjaya!', 'Aset telah diterima.', 'success'));
-                }
-            });
-        }
-    </script>
+<script src="script.js"></script>
 </body>
 </html>
