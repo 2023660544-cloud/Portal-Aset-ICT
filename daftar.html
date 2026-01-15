@@ -3,87 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Aset</title>
+    <title>Borang Serahan Aset</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
-        header { background: #2563eb; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; box-shadow: 0 4px 15px rgba(37,99,235,0.2); }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; color: #475569; }
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; color: white; background: #2563eb; }
-        /* Nav Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; }
-        .nav-item { text-align: center; font-size: 0.75rem; color: #64748b; text-decoration: none; width: 100%; }
-        .nav-item span { display: block; font-size: 1.2rem; margin-bottom: 2px; }
-        .nav-item.active { color: #2563eb; font-weight: 700; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        /* TOMBOL KEMBALI */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .btn-back:hover { color: #2563eb; transform: translateX(-5px); }
+
+        /* CARD STYLE */
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            border: 1px solid white;
+        }
+
+        .form-header { text-align: center; margin-bottom: 30px; }
+        .form-header h2 { margin: 0; color: #1e293b; font-size: 1.8rem; }
+        .form-header p { color: #94a3b8; margin-top: 5px; }
+
+        /* INPUT STYLES */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-family: inherit;
+            margin-bottom: 20px;
+            box-sizing: border-box; /* Penting supaya tak lari layout */
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* SECTION BOX */
+        .section-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        h4.section-title {
+            margin: 0 0 20px 0;
+            color: #2563eb;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* CANVAS TANDATANGAN */
+        .canvas-wrapper {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            touch-action: none; /* Penting untuk mobile */
+        }
+        
+        canvas {
+            width: 100%;
+            height: 200px;
+            display: block;
+            cursor: crosshair;
+        }
+
+        .btn-clear-sign {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        .btn-clear-sign:hover { opacity: 1; }
+
+        /* BUTTON SUBMIT */
+        .btn-blue {
+            width: 100%;
+            padding: 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .btn-blue:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <header><h1>Sistem Aset ICT</h1><p>Daftar Aduan Baru</p></header>
-    <div class="container">
-        <div class="card" style="display:flex; justify-content:space-between; text-align:center;">
-            <div><b id="c-pending" style="font-size:1.5rem; display:block">0</b><span style="font-size:0.8rem; color:#64748b">Baru</span></div>
-            <div><b id="c-process" style="font-size:1.5rem; color:#f59e0b; display:block">0</b><span style="font-size:0.8rem; color:#64748b">Proses</span></div>
-            <div><b id="c-ready" style="font-size:1.5rem; color:#8b5cf6; display:block">0</b><span style="font-size:0.8rem; color:#64748b">Siap</span></div>
-        </div>
 
-        <div class="card">
-            <h3>Borang Daftar</h3>
-            <label>Nama Pemilik</label><input type="text" id="inp-name" placeholder="Nama Anda...">
-            <label>Lokasi</label><input type="text" id="inp-loc" placeholder="Pejabat...">
-            <label>Unit/Taska</label><input type="text" id="inp-taska" placeholder="Jika ada...">
-            <label>Jenis</label>
-            <select id="inp-type"><option value="PC">PC</option><option value="Laptop">Laptop</option><option value="Printer">Printer</option><option value="Network">Wifi/Network</option></select>
-            <label>No. Siri</label><input type="text" id="inp-serial">
-            <label>Masalah</label><textarea id="inp-issue" rows="3"></textarea>
-            <button class="btn" id="btn-submit">Hantar Aduan</button>
-        </div>
+    <div style="max-width:600px; margin:0 auto;">
+        <a href="menu.html" class="btn-back">⬅ Kembali ke Menu</a>
     </div>
 
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item active"><span>🏠</span>Daftar</a>
-        <a href="terima.html" class="nav-item"><span>📥</span>Terima</a>
-        <a href="jejak.html" class="nav-item"><span>🔍</span>Jejak</a>
-        <a href="pulang.html" class="nav-item"><span>✅</span>Pulang</a>
-        <a href="nota.html" class="nav-item"><span>⚙️</span>Nota</a>
-    </nav>
+    <div class="card">
+        <div class="form-header">
+            <h2>📝 Borang Serahan Aset</h2>
+            <p>Sila isi maklumat aset dan lokasi dengan lengkap.</p>
+        </div>
+        
+        <div class="section-box">
+            <h4 class="section-title">👤 Maklumat Pemilik</h4>
+            
+            <label>Nama Cikgu / Staff</label>
+            <input type="text" id="c_name" placeholder="Nama Penuh Anda">
+            
+            <label>Lokasi YPKT</label>
+            <select id="c_loc">
+                <option value="">-- Sila Pilih Lokasi --</option>
+                <option>YPKT Ibu Pejabat</option>
+                <option>YPKT Kuala Nerus</option>
+                <option>YPKT Marang</option>
+                <option>YPKT Hulu Terengganu</option>
+                <option>YPKT Dungun</option>
+                <option>YPKT Kemaman</option>
+                <option>YPKT Besut</option>
+                <option>YPKT Setiu</option>
+            </select>
+
+            <label>Nama Taska / Unit (Jika ada)</label>
+            <input type="text" id="c_taska" placeholder="Cth: Taska Permata 1 / Unit Kewangan">
+        </div>
+
+        <div class="section-box">
+            <h4 class="section-title">💻 Maklumat Aset</h4>
+            
+            <label>Jenis Aset</label>
+            <select id="c_type">
+                <option>Laptop</option>
+                <option>PC</option>
+                <option>Printer</option>
+                <option>Lain-lain</option>
+            </select>
+            
+            <label>No Siri (Serial No.)</label>
+            <input type="text" id="c_serial" placeholder="Lihat sticker belakang/bawah aset">
+            
+            <label>Masalah / Kerosakan</label>
+            <textarea id="c_issue" rows="3" placeholder="Terangkan masalah yang dihadapi..."></textarea>
+        </div>
+
+        <label>Tarikh Hari Ini</label>
+        <input type="text" id="c_date" readonly style="background:#e2e8f0; color:#64748b; font-weight:bold;">
+        
+        <label>Tandatangan Pelapor</label>
+        <div class="canvas-wrapper">
+            <canvas id="cvs_cikgu"></canvas>
+            <div class="btn-clear-sign" onclick="clearCanvas()">Padam</div>
+        </div>
+
+        <button class="btn-blue" onclick="submitCikgu()">HANTAR BORANG</button>
+    </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        // 1. SETUP FIREBASE
+        // -----------------
+        // Sila copy paste CONFIG FIREBASE tuan di sini
+        // Kalau tak ingat, tengok fail lama tuan
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js";
 
-        // GANTI CONFIG DI SINI
-        const firebaseConfig = { apiKey: "API_KEY", authDomain: "PROJECT.firebaseapp.com", databaseURL: "https://PROJECT-default-rtdb.firebaseio.com", projectId: "PROJECT", storageBucket: "PROJECT.appspot.com", messagingSenderId: "SENDER", appId: "APP_ID" };
-        
+        const firebaseConfig = {
+            apiKey: "API_KEY_ANDA",
+            authDomain: "DOMAIN_ANDA",
+            databaseURL: "URL_DATABASE_ANDA",
+            projectId: "ID_PROJEK",
+            storageBucket: "BUCKET",
+            messagingSenderId: "ID",
+            appId: "APP_ID"
+        };
+
         const app = initializeApp(firebaseConfig);
-        const dbRef = getDatabase(app);
+        const db = getDatabase(app);
 
-        // Submit Form
-        document.getElementById('btn-submit').addEventListener('click', () => {
-            let name = document.getElementById('inp-name').value;
-            let issue = document.getElementById('inp-issue').value;
-            if(!name || !issue) return alert("Sila isi Nama & Masalah!");
+        // 2. SETUP TARIKH AUTO
+        // --------------------
+        window.onload = function() {
+            const today = new Date().toLocaleDateString('ms-MY', {
+                day: '2-digit', month: 'long', year: 'numeric'
+            });
+            document.getElementById('c_date').value = today;
+            resizeCanvas(); // Setup saiz canvas
+        };
 
-            push(ref(dbRef, 'assets'), {
-                name, loc: document.getElementById('inp-loc').value,
-                taska: document.getElementById('inp-taska').value,
-                type: document.getElementById('inp-type').value,
-                serial: document.getElementById('inp-serial').value,
-                issue, status: 'PENDING', date: new Date().toLocaleString(),
-                logs: [{ text: "Daftar Masuk", time: new Date().toLocaleString() }]
-            }).then(() => { alert("Berjaya!"); window.location.reload(); });
+        // 3. SETUP CANVAS TANDATANGAN
+        // ---------------------------
+        const canvas = document.getElementById('cvs_cikgu');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            // Bagi canvas saiz betul ikut kotak dia
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = 200;
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#000";
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+        canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } });
+        canvas.addEventListener('mouseup', () => { isDrawing = false; });
+
+        // Touch Events (Untuk Phone)
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            ctx.beginPath();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
         });
-
-        // Live Stats
-        onValue(ref(dbRef, 'assets'), (snap) => {
-            let d = snap.val(); if(!d) return;
-            let vals = Object.values(d);
-            document.getElementById('c-pending').innerText = vals.filter(x=>x.status=='PENDING').length;
-            document.getElementById('c-process').innerText = vals.filter(x=>x.status=='RECEIVED').length;
-            document.getElementById('c-ready').innerText = vals.filter(x=>x.status=='COMPLETED').length;
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.stroke();
         });
+        canvas.addEventListener('touchend', () => { isDrawing = false; });
+
+        // Fungsi Global untuk Clear Canvas
+        window.clearCanvas = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // 4. FUNCTION SUBMIT
+        // ------------------
+        window.submitCikgu = function() {
+            // Ambil Data
+            const nama = document.getElementById('c_name').value;
+            const lokasi = document.getElementById('c_loc').value;
+            const taska = document.getElementById('c_taska').value;
+            const type = document.getElementById('c_type').value;
+            const serial = document.getElementById('c_serial').value;
+            const issue = document.getElementById('c_issue').value;
+            const tarikh = document.getElementById('c_date').value;
+            const sign = canvas.toDataURL(); // Tukar lukisan jadi gambar
+
+            // Validasi (Check kosong tak)
+            if(!nama || !lokasi || !issue) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Borang Tak Lengkap',
+                    text: 'Sila isi Nama, Lokasi, dan Masalah.',
+                    confirmButtonColor: '#2563eb'
+                });
+                return;
+            }
+
+            // Hantar ke Firebase
+            const newRef = push(ref(db, 'aduan_rosak'));
+            set(newRef, {
+                nama: nama,
+                lokasi: lokasi,
+                taska: taska,
+                jenis: type,
+                no_siri: serial,
+                masalah: issue,
+                tarikh: tarikh,
+                sign_cikgu: sign,
+                status: 'Baru Terima', // Status asal
+                timestamp: Date.now()
+            })
+            .then(() => {
+                // Success
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berjaya!',
+                    text: 'Aduan anda telah direkodkan.',
+                    confirmButtonColor: '#10b981'
+                }).then(() => {
+                    window.location.href = 'menu.html'; // Balik ke menu
+                });
+            })
+            .catch((error) => {
+                Swal.fire({ icon: 'error', title: 'Ralat', text: error.message });
+            });
+        }
     </script>
 </body>
 </html>
