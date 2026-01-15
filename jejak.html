@@ -3,102 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jejak Aset</title>
+    <title>Admin - Jejak Aset</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
-        header { background: #2563eb; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid #2563eb; cursor: pointer; }
-        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        /* Modal */
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; }
-        .modal.active { display:flex; }
-        .modal-content { background:white; width:90%; max-width:400px; padding:20px; border-radius:15px; max-height:80vh; overflow-y:auto; }
-        /* Nav */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; }
-        .nav-item { text-align: center; font-size: 0.75rem; color: #64748b; text-decoration: none; width: 100%; }
-        .nav-item span { display: block; font-size: 1.2rem; margin-bottom: 2px; }
-        .nav-item.active { color: #2563eb; font-weight: 700; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            margin: 0; padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: #334155;
+        }
+
+        /* --- 1. SIDEBAR (KIRI - SAMA MACAM TERIMA.HTML) --- */
+        .sidebar {
+            width: 280px;
+            background-color: #161e2e; /* Warna Gelap */
+            color: white;
+            display: flex; flex-direction: column;
+            padding: 25px; flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            font-size: 1.2rem; font-weight: 700; margin-bottom: 30px;
+            color: #fff; display: flex; align-items: center; gap: 10px;
+        }
+
+        .nav-links { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+        .nav-item {
+            text-decoration: none; color: #94a3b8;
+            padding: 12px 15px; border-radius: 10px;
+            font-size: 0.95rem; font-weight: 500;
+            display: flex; align-items: center; gap: 12px;
+            transition: 0.3s;
+        }
+
+        .nav-item:hover { background-color: #2d3748; color: white; }
+
+        /* ACTIVE STATE (BIRU TERANG) */
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            font-weight: 600;
+        }
+
+        /* BUTTONS BAWAH SIDEBAR */
+        .action-buttons { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
+
+        .btn-action {
+            padding: 12px; border-radius: 8px; text-align: left;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            background: transparent; display: flex; align-items: center; gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-excel { border: 1px solid #10b981; color: #10b981; }
+        .btn-excel:hover { background: rgba(16, 185, 129, 0.1); }
+
+        .btn-logout { border: 1px solid #ef4444; color: #ef4444; }
+        .btn-logout:hover { background: rgba(239, 68, 68, 0.1); }
+
+        .footer-credit { margin-top: 20px; font-size: 0.7rem; color: #475569; text-align: center; }
+
+        /* --- 2. MAIN CONTENT (KANAN) --- */
+        .main-content {
+            flex: 1; padding: 30px; overflow-y: auto; position: relative;
+        }
+
+        h2.page-title {
+            font-size: 1.4rem; margin-top: 0; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px; color: #334155;
+        }
+
+        /* --- DESIGN UPDATE BOX (BIRU ATAS) --- */
+        .update-box {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .update-header { font-weight: 600; color: #1e40af; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        
+        select, input.search-input, textarea, input.note-input {
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; outline: none; background: white;
+        }
+        .input-group { margin-bottom: 15px; }
+        .btn-simpan { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; float: right; }
+        .btn-simpan:hover { background: #1d4ed8; }
+
+        /* --- SEARCH & LIST --- */
+        .search-wrapper { margin-bottom: 20px; }
+        .search-input { border-color: #94a3b8; }
+
+        .card-list { display: flex; flex-direction: column; gap: 15px; }
+        .card {
+            background: white; padding: 20px; border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 5px solid #10b981; /* Default Green */
+            cursor: pointer; transition: transform 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card-info h3 { margin: 0 0 5px 0; font-size: 1rem; color: #1e293b; }
+        .card-info p { margin: 0; font-size: 0.85rem; color: #64748b; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        
+        /* Warna Badge Status */
+        .badge-green { background: #d1fae5; color: #047857; } /* Siap/Pulang */
+        .badge-blue { background: #dbeafe; color: #1e40af; } /* Diterima */
+        .badge-orange { background: #ffedd5; color: #c2410c; } /* Baru Terima */
+
+        /* --- MODAL POPUP --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-card {
+            background: white; width: 90%; max-width: 500px;
+            border-radius: 16px; padding: 25px;
+            max-height: 90vh; overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; }
+        .modal-title { font-size: 1.2rem; font-weight: 700; color: #334155; }
+        .btn-close { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+
+        .info-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .info-owner { border-left: 4px solid #3b82f6; background: #eff6ff; }
+        .label { font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+        .value { font-size: 0.95rem; font-weight: 600; color: #1e293b; margin-bottom: 3px; display: block; }
+        .sub-value { font-size: 0.85rem; color: #475569; }
+        .problem-box { background: #fef2f2; border: 1px solid #fee2e2; color: #ef4444; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: 500; font-size: 0.9rem; }
+
+        .log-container { max-height: 200px; overflow-y: auto; border-top: 1px dashed #cbd5e1; padding-top: 10px; }
+        .log-item { display: flex; gap: 10px; margin-bottom: 12px; font-size: 0.9rem; }
+        .log-icon { font-size: 1.1rem; }
+        .log-content { flex: 1; }
+        .log-text { color: #334155; margin-bottom: 2px; }
+        .log-time { font-size: 0.75rem; color: #94a3b8; }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow: visible; }
+            .sidebar { width: 100%; padding: 15px; }
+            .nav-links { flex-direction: row; flex-wrap: wrap; gap: 5px; }
+            .nav-item { padding: 8px 12px; font-size: 0.8rem; }
+            .action-buttons { flex-direction: row; }
+            .main-content { padding: 15px; }
+        }
     </style>
 </head>
 <body>
-    <header><h1>Jejak Aset</h1><p>Cari Status Pembaikan</p></header>
-    <div class="container">
-        <input type="text" id="search" placeholder="🔍 Cari Nama / No Siri...">
-        <div id="list-jejak">Loading...</div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            Admin Panel 🔒
+        </div>
+
+        <nav class="nav-links">
+            <a href="terima.html" class="nav-item">
+                📥 1. Penerimaan
+            </a>
+            <a href="jejak.html" class="nav-item active">
+                📍 2. Jejak Aset
+            </a>
+            <a href="#" class="nav-item" onclick="Swal.fire('Info', 'Halaman Serahan Pulang belum siap.', 'info')">
+                📦 3. Serahan Pulang
+            </a>
+            <a href="#" class="nav-item" onclick="Swal.fire('Info', 'Halaman Nota sulit.', 'info')">
+                📌 4. Nota (Sulit)
+            </a>
+        </nav>
+
+        <div class="action-buttons">
+            <button class="btn-action btn-excel" onclick="downloadExcel()">
+                📊 Download Excel
+            </button>
+            <button class="btn-action btn-logout" id="btnLogout">
+                🚪 Log Keluar
+            </button>
+        </div>
+
+        <div class="footer-credit">
+            By Nurul syuhaida (intern)
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <h2 class="page-title">📍 Jejak & Kemaskini Aset</h2>
+
+        <div class="update-box">
+            <div class="update-header">✍️ Update Log & Nota</div>
+            <p style="font-size:0.8rem; color:#64748b; margin-top:-10px; margin-bottom:15px;">
+                Pilih aset untuk menambah nota atau status terkini.
+            </p>
+            
+            <div class="input-group">
+                <label style="font-size:0.8rem; font-weight:600; margin-bottom:5px; display:block;">Pilih Aset:</label>
+                <select id="assetDropdown">
+                    <option value="">-- Pilih Aset Untuk Tambah Nota --</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label style="font-size:0.8rem; font-weight:600; margin-bottom:5px; display:block;">Tambah Catatan Baru:</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="newNote" class="note-input" placeholder="Cth: Hantar repair, Menunggu barang, Siap format...">
+                    <button class="btn-simpan" onclick="addNote()">Simpan</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔎 Cari Aset (Nama / Siri / Jenis)...">
+        </div>
+
+        <div id="assetList" class="card-list">
+            <p style="text-align:center; color:#94a3b8;">Sedang memuatkan data...</p>
+        </div>
+    </main>
+
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title" id="mTitle">Info: Aset</div>
+                <button class="btn-close" onclick="document.getElementById('modalOverlay').style.display='none'">Tutup</button>
+            </div>
+
+            <div class="info-section info-owner">
+                <span class="label">INFO PEMILIK</span>
+                <span class="value" id="mOwner">Nama Pemilik</span>
+                <span class="sub-value" id="mLoc">Lokasi</span>
+                <span class="sub-value" id="mUnit">Unit</span>
+            </div>
+
+            <div class="info-section">
+                <span class="label">INFO ASET</span>
+                <span class="value" id="mAsset">Jenis Aset</span>
+                <div class="problem-box" id="mIssue">Masalah: -</div>
+            </div>
+
+            <div class="info-section" style="background:white; border:none; padding:0;">
+                <span class="label" style="margin-bottom:10px;">SEJARAH LOG (LATEST TOP)</span>
+                <div class="log-container" id="mLogs">
+                    </div>
+            </div>
+        </div>
     </div>
-
-    <div id="modal" class="modal"><div class="modal-content" id="m-content"></div></div>
-
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item"><span>🏠</span>Daftar</a>
-        <a href="terima.html" class="nav-item"><span>📥</span>Terima</a>
-        <a href="jejak.html" class="nav-item active"><span>🔍</span>Jejak</a>
-        <a href="pulang.html" class="nav-item"><span>✅</span>Pulang</a>
-        <a href="nota.html" class="nav-item"><span>⚙️</span>Nota</a>
-    </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // GANTI CONFIG
-        const firebaseConfig = { apiKey: "API_KEY", authDomain: "PROJECT.firebaseapp.com", databaseURL: "https://PROJECT-default-rtdb.firebaseio.com", projectId: "PROJECT", storageBucket: "PROJECT.appspot.com", messagingSenderId: "SENDER", appId: "APP_ID" };
+        // CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
+            authDomain: "aset-ypkt.firebaseapp.com",
+            databaseURL: "https://aset-ypkt-default-rtdb.firebaseio.com",
+            projectId: "aset-ypkt",
+            storageBucket: "aset-ypkt.firebasestorage.app",
+            messagingSenderId: "501863979091",
+            appId: "1:501863979091:web:adf72aa4de7db740498ea6"
+        };
+
         const app = initializeApp(firebaseConfig);
-        const dbRef = getDatabase(app);
+        const db = getDatabase(app);
         
-        let allData = [];
+        // AUTH CHECK
+        if(sessionStorage.getItem('adminAuth') !== 'true') { window.location.href = 'terima.html'; }
+        
+        // LOGOUT & EXCEL
+        document.getElementById('btnLogout').onclick = () => { sessionStorage.removeItem('adminAuth'); window.location.href = 'menu.html'; };
+        window.downloadExcel = function() { Swal.fire('Excel', 'Fungsi sedang dibangunkan.', 'info'); }
 
-        onValue(ref(dbRef, 'assets'), (snap) => {
-            let d = snap.val(); if(!d) return;
-            allData = Object.keys(d).map(k => ({id:k, ...d[k]})).filter(x => x.status !== 'PENDING').reverse();
-            render(allData);
-        });
+        let allAssets = [];
 
-        function render(list) {
-            let div = document.getElementById('list-jejak'); div.innerHTML = '';
-            list.forEach(i => {
-                let col = i.status === 'COMPLETED' ? '#8b5cf6' : '#2563eb';
-                let el = document.createElement('div'); el.className = 'card'; el.style.borderLeftColor = col;
-                el.innerHTML = `<b>${i.type}</b> (${i.serial})<br><small>${i.name} - ${i.status}</small>`;
-                el.onclick = () => showDetail(i);
-                div.appendChild(el);
-            });
-        }
-
-        document.getElementById('search').addEventListener('keyup', (e) => {
-            let val = e.target.value.toLowerCase();
-            let filtered = allData.filter(x => x.name.toLowerCase().includes(val) || x.serial.toLowerCase().includes(val));
-            render(filtered);
-        });
-
-        function showDetail(item) {
-            let logs = (item.logs || []).reverse().map(l => `<div style="border-bottom:1px solid #eee; padding:5px; font-size:0.9rem">${l.text}<br><small style="color:#888">${l.time}</small></div>`).join('');
-            let btnHtml = '';
-            
-            // ADMIN BOLEH UPDATE STATUS DALAM MODAL INI
-            if(sessionStorage.getItem('adminAuth') === 'true' && item.status === 'RECEIVED') {
-                btnHtml = `<br><button onclick="window.markSiap('${item.id}')" style="width:100%; padding:10px; background:#8b5cf6; color:white; border:none; border-radius:5px;">✅ Tanda SIAP (Completed)</button>`;
+        // 1. FETCH DATA
+        const dbRef = ref(db, 'serahan_aset');
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if(!data) {
+                document.getElementById('assetList').innerHTML = '<p style="text-align:center;">Tiada data.</p>';
+                return;
             }
 
-            document.getElementById('m-content').innerHTML = `
-                <div style="text-align:right; font-size:1.5rem; cursor:pointer" onclick="document.getElementById('modal').classList.remove('active')">&times;</div>
-                <h3>${item.type}</h3>
-                <p>Masalah: ${item.issue}</p>
-                <div style="background:#f8fafc; padding:10px; max-height:200px; overflow-y:auto; border-radius:8px;">${logs}</div>
-                ${btnHtml}
-            `;
-            document.getElementById('modal').classList.add('active');
+            // Convert to Array & Reverse (Latest first)
+            allAssets = Object.entries(data).map(([key, val]) => ({ id: key, ...val })).reverse();
+            
+            renderList(allAssets);
+            renderDropdown(allAssets);
+        });
+
+        // 2. RENDER LIST
+        function renderList(items) {
+            const container = document.getElementById('assetList');
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                // Determine Colors based on status
+                let borderCol = '#2563eb'; // Blue default (Diterima)
+                let badgeClass = 'badge-blue';
+                
+                if(item.status === 'Baru Terima') { 
+                    borderCol = '#f59e0b'; badgeClass = 'badge-orange'; 
+                }
+                else if(item.status === 'Siap' || item.status === 'Sudah Pulang') { 
+                    borderCol = '#10b981'; badgeClass = 'badge-green'; 
+                }
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.borderLeftColor = borderCol;
+                card.onclick = () => openModal(item.id);
+                
+                card.innerHTML = `
+                    <div class="card-info">
+                        <h3>${item.jenis} (${item.no_siri || '-'})</h3>
+                        <p>Milik: <b>${item.nama}</b> (${item.lokasi})</p>
+                        <p style="font-size:0.75rem; margin-top:3px;">${item.taska}</p>
+                    </div>
+                    <span class="badge ${badgeClass}">${item.status || 'Unknown'}</span>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        window.markSiap = function(id) {
-            if(!confirm("Dah siap baiki?")) return;
-            let item = allData.find(x => x.id === id);
-            let logs = item.logs || []; logs.push({text: "SIAP (COMPLETED)", time: new Date().toLocaleString()});
-            update(ref(dbRef, 'assets/'+id), { status:'COMPLETED', logs: logs }).then(()=>{
-                alert("Status Updated!"); document.getElementById('modal').classList.remove('active');
+        // 3. RENDER DROPDOWN
+        function renderDropdown(items) {
+            const dd = document.getElementById('assetDropdown');
+            const currentVal = dd.value;
+            
+            dd.innerHTML = '<option value="">-- Pilih Aset Untuk Tambah Nota --</option>';
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.text = `${item.nama} - ${item.jenis} (${item.status})`;
+                dd.appendChild(opt);
             });
+            if(currentVal) dd.value = currentVal;
+        }
+
+        // 4. SEARCH LOGIC
+        document.getElementById('searchInput').addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allAssets.filter(item => 
+                (item.nama && item.nama.toLowerCase().includes(term)) || 
+                (item.no_siri && item.no_siri.toLowerCase().includes(term)) ||
+                (item.jenis && item.jenis.toLowerCase().includes(term))
+            );
+            renderList(filtered);
+        });
+
+        // 5. ADD NOTE
+        window.addNote = function() {
+            const id = document.getElementById('assetDropdown').value;
+            const note = document.getElementById('newNote').value;
+
+            if(!id) return Swal.fire('Ops', 'Sila pilih aset dahulu.', 'warning');
+            if(!note) return Swal.fire('Ops', 'Sila tulis nota.', 'warning');
+
+            const item = allAssets.find(x => x.id === id);
+            const currentLogs = item.logs || []; 
+            
+            currentLogs.unshift({
+                text: note,
+                time: new Date().toLocaleString('ms-MY')
+            });
+
+            update(ref(db, 'serahan_aset/' + id), {
+                logs: currentLogs
+            }).then(() => {
+                document.getElementById('newNote').value = '';
+                Swal.fire({ icon: 'success', title: 'Berjaya', text: 'Nota ditambah!', timer: 1500, showConfirmButton: false });
+            });
+        }
+
+        // 6. MODAL LOGIC
+        window.openModal = function(id) {
+            const item = allAssets.find(x => x.id === id);
+            if(!item) return;
+
+            document.getElementById('mTitle').innerText = 'Info: ' + item.jenis;
+            document.getElementById('mOwner').innerText = item.nama;
+            document.getElementById('mLoc').innerText = item.lokasi || '';
+            document.getElementById('mUnit').innerText = item.taska || '';
+            document.getElementById('mAsset').innerText = `${item.jenis} (${item.no_siri})`;
+            document.getElementById('mIssue').innerText = "Masalah: " + (item.masalah || 'Tiada info');
+
+            const logContainer = document.getElementById('mLogs');
+            logContainer.innerHTML = '';
+
+            if(item.logs && item.logs.length > 0) {
+                item.logs.forEach(log => {
+                    logContainer.innerHTML += `
+                        <div class="log-item">
+                            <div class="log-icon">👉</div>
+                            <div class="log-content">
+                                <div class="log-text">${log.text}</div>
+                                <div class="log-time">${log.time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                logContainer.innerHTML = '<p style="font-size:0.8rem; color:#94a3b8; font-style:italic;">Tiada rekod log.</p>';
+            }
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        window.closeModal = function(e) {
+            if(e.target.id === 'modalOverlay') document.getElementById('modalOverlay').style.display = 'none';
         }
     </script>
 </body>
