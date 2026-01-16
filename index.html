@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASET YPKT | SUPREME PORTAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tsParticles/2.11.0/tsparticles.bundle.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Plus+Jakarta+Sans:wght@300;500;800&display=swap');
+
+        :root {
+            --color1: #F08787; /* Coral Pink */
+            --color2: #FFC7A7; /* Peach */
+            --color3: #FEE2AD; /* Soft Sand */
+            --color4: #F8FAB4; /* Pale Yellow */
+            --hotpink: #FF1493; /* Hot Pink */
+            --orange-bright: #FF8C00; /* Oren Terang */
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--color4);
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            color: #1e293b;
+        }
+
+        #tsparticles {
+            position: absolute;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+        }
+
+        /* --- TEXT UTAMA DENGAN WARNA BERGERAK (COLOR SHIFT) --- */
+        .title-main {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(4rem, 15vw, 8rem);
+            line-height: 0.8;
+            text-transform: uppercase;
+            font-weight: 900;
+            
+            /* Gradient yang panjang untuk digerakkan */
+            background: linear-gradient(
+                45deg, 
+                var(--hotpink), 
+                var(--orange-bright), 
+                #e11d48, 
+                var(--hotpink)
+            );
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            filter: drop-shadow(0 10px 20px rgba(255, 20, 147, 0.2));
+            
+            /* Gabungkan animasi apung dan animasi tukar warna */
+            animation: 
+                floating 4s ease-in-out infinite,
+                colorShift 8s ease infinite;
+        }
+
+        /* Animasi tukar warna slow-slow */
+        @keyframes colorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px) rotate(-1deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+
+        /* BUTTON PORTAL */
+        .btn-portal {
+            margin-top: 50px;
+            position: relative;
+            padding: 25px 70px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            border: none;
+            border-radius: 100px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            background: white;
+            color: var(--hotpink); 
+            border: 2px solid var(--hotpink);
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(255, 20, 147, 0.1);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-portal:hover {
+            transform: scale(1.1); 
+            background: var(--hotpink); 
+            color: white; 
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.6), 0 0 60px rgba(255, 20, 147, 0.3); 
+            letter-spacing: 6px;
+        }
+
+        .btn-portal i { transition: 0.3s; }
+        .btn-portal:hover i { transform: translateX(10px); }
+
+        /* HUD ELEMENTS */
+        .hud-line {
+            position: absolute;
+            background: var(--hotpink);
+            opacity: 0.3;
+        }
+        .v-line { width: 2px; height: 100px; }
+        .h-line { height: 2px; width: 100px; }
+
+        .scanline {
+            width: 100%;
+            height: 150px;
+            z-index: 5;
+            background: linear-gradient(0deg, transparent, rgba(255, 20, 147, 0.1), transparent);
+            position: absolute;
+            animation: scanning 6s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanning {
+            0% { top: -20% }
+            100% { top: 120% }
+        }
+
+        .system-badge {
+            background: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 20, 147, 0.2);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tsparticles"></div>
+    <div class="scanline"></div>
+
+    <div class="hud-line v-line top-10 left-10"></div>
+    <div class="hud-line h-line top-10 left-10"></div>
+    <div class="hud-line v-line bottom-10 right-10"></div>
+    <div class="hud-line h-line bottom-10 right-10"></div>
+
+    <div class="main-container">
+        <div class="mb-6">
+            <div class="system-badge inline-block">
+                <span class="text-[#FF1493] tracking-[0.5em] text-xs font-extrabold uppercase animate-pulse">
+                    YPKT ICT MANAGEMENT
+                </span>
+            </div>
+        </div>
+        
+        <h1 class="title-main">ASSET<br>PORTAL</h1>
+        
+        <p class="mt-8 text-slate-500 tracking-[0.4em] font-bold text-sm max-w-lg">
+            PRESTIJ • INTEGRITI • TEKNOLOGI
+        </p>
+
+        <button class="btn-portal" onclick="window.location.href='menu.html'">
+            MASUK SISTEM <i class="fa-solid fa-arrow-right-long ml-4"></i>
+        </button>
+
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col gap-2 items-center text-[10px] text-slate-400 tracking-widest font-bold">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div> 
+                SISTEM BEROPERASI SEPERTI BIASA
+            </div>
+            <div class="opacity-60 text-[#FF1493]">UNIT PENGURUSAN MAKLUMAT YPKT</div>
+        </div>
+    </div>
+
+    <script>
+        tsParticles.load("tsparticles", {
+            particles: {
+                number: { value: 60 },
+                color: { value: ["#FF1493", "#F08787", "#FF8C00"] },
+                links: {
+                    enable: true,
+                    distance: 200,
+                    color: "#FF1493",
+                    opacity: 0.2,
+                    width: 1.5
+                },
+                move: { enable: true, speed: 1.5, direction: "none" },
+                size: { value: 3 }
+            },
+            interactivity: {
+                events: { onHover: { enable: true, mode: "grab" } }
+            }
+        });
+
+        gsap.from(".title-main", { duration: 2.5, y: 80, opacity: 0, ease: "power4.out" });
+        gsap.from(".btn-portal", { duration: 1.5, delay: 1, opacity: 0, y: 30, ease: "back.out(1.7)" });
+        gsap.from(".hud-line", { duration: 2, opacity: 0, stagger: 0.2 });
+    </script>
+</body>
+</html>
