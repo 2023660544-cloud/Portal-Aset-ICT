@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistem Aset YPKT - V26 (Taska & UI Update)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root {
+            --primary: #3b82f6;       /* Biru Terang Sikit */
+            --primary-dark: #2563eb;  /* Biru Gelap sikit */
+            --secondary: #64748b;     /* Kelabu Teks */
+            --bg-body: #f1f5f9;       /* Background Page */
+            --sidebar-bg: #1e293b;    /* Sidebar Gelap Moden */
+            --sidebar-active: #334155;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg-body); height: 100vh; overflow: hidden; color: #334155; }
+        * { box-sizing: border-box; }
+
+        .hide-scroll { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+
+        /* --- LANDING PAGE --- */
+        #landing-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: transform 0.4s ease;
+        }
+        .landing-grid { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 340px; }
+        .landing-card {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            padding: 20px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: white;
+            backdrop-filter: blur(12px); transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .landing-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.2); }
+        .icon-box { font-size: 1.8rem; width: 50px; text-align: center; }
+        .card-title { font-weight: 700; font-size: 1rem; }
+        .card-sub { font-size: 0.8rem; color: #cbd5e1; }
+        .card-fast { border-color: rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.15); }
+
+        #app-container { display: none; height: 100vh; width: 100%; }
+        #app-container.active { display: flex; }
+
+        /* --- NEW SIDEBAR DESIGN --- */
+        .sidebar {
+            width: 270px; background: var(--sidebar-bg); color: #94a3b8;
+            display: flex; flex-direction: column; flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 1000; box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+        }
+        .brand { 
+            padding: 30px 25px; font-size: 1.4rem; font-weight: 800; color: white; 
+            letter-spacing: -0.5px; border-bottom: 1px solid #334155;
+            background: linear-gradient(to right, #1e293b, #0f172a);
+        }
+        .nav-links { padding: 25px 15px; flex: 1; }
+        .nav-item {
+            padding: 16px 20px; margin-bottom: 8px; border-radius: 10px; cursor: pointer;
+            display: flex; align-items: center; gap: 15px; font-weight: 500; font-size: 0.95rem;
+            transition: all 0.2s ease; border: 1px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; transform: translateX(5px); }
+        .nav-item.active { 
+            background: var(--primary); color: white; 
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 20px; text-align: center; font-size: 0.75rem; color: #475569;
+            border-top: 1px solid #334155; background: #0f172a;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; position: relative; display: flex; flex-direction: column; background: var(--bg-body); }
+        
+        .top-header {
+            height: 70px; background: rgba(255,255,255,0.9); padding: 0 25px; 
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-shrink: 0; backdrop-filter: blur(8px);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .menu-toggle { display: none; font-size: 1.6rem; cursor: pointer; color: var(--sidebar-bg); margin-right: 15px; }
+        
+        .page-area { flex: 1; padding: 25px; overflow-y: auto; scroll-behavior: smooth; }
+        .page-section { display: none; max-width: 800px; margin: 0 auto; animation: fadeUp 0.4s ease-out; }
+        .page-section.active { display: block; }
+
+        /* --- CARD & FORM DESIGN --- */
+        .card { 
+            background: white; padding: 30px; border-radius: 16px; 
+            box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid #e2e8f0;
+        }
+        
+        .form-header {
+            text-align: center; margin-bottom: 30px;
+        }
+        .form-header h2 { margin: 0; color: var(--primary-dark); font-size: 1.5rem; letter-spacing: -0.5px; }
+        .form-header p { color: #64748b; margin-top: 5px; font-size: 0.9rem; }
+
+        label { display: block; font-weight: 600; font-size: 0.9rem; color: #334155; margin-bottom: 8px; margin-top: 20px; }
+        input, select, textarea { 
+            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; 
+            font-size: 1rem; background: #f8fafc; font-family: inherit; transition: all 0.3s;
+            color: #1e293b;
+        }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--primary); background: white; outline: none; 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn { 
+            width: 100%; padding: 16px; border: none; border-radius: 10px; color: white; 
+            font-weight: 600; cursor: pointer; margin-top: 25px; font-size: 1rem; letter-spacing: 0.5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-blue { background: var(--primary-dark); box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
+        .btn-green { background: #10b981; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); }
+        .btn-purple { background: #8b5cf6; box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3); }
+        
+        .canvas-wrapper {
+            border: 2px dashed #94a3b8; border-radius: 10px; height: 180px; background: #f8fafc;
+            position: relative; touch-action: none; overflow: hidden;
+        }
+        canvas { width: 100%; height: 100%; display: block; }
+        .btn-clear-sign {
+            position: absolute; bottom: 10px; right: 10px; background: #ef4444; color: white;
+            font-size: 0.75rem; padding: 6px 12px; border-radius: 6px; cursor: pointer; z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* --- MODAL --- */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7); z-index: 2000; justify-content: center; align-items: center;
+            padding: 20px; backdrop-filter: blur(5px);
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; width: 100%; max-width: 600px; border-radius: 16px;
+            max-height: 85vh; overflow-y: auto; padding: 30px; position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: fadeUp 0.3s;
+        }
+        .info-block { margin-bottom: 20px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .info-label { font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display:block; }
+        .info-val { font-size: 1rem; color: #1e293b; font-weight: 500; margin-bottom: 15px; display:block; }
+        
+        /* --- SEARCH STYLE --- */
+        .search-hero {
+            background: white; border-radius: 20px; padding: 40px 20px; 
+            text-align: center; box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        .search-input-group { position: relative; max-width: 450px; margin: 25px auto 0; }
+        .search-input { border-radius: 50px; padding-right: 60px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .search-btn-icon {
+            position: absolute; right: 8px; top: 8px; height: 44px; width: 44px;
+            background: var(--primary); color: white; border-radius: 50%;
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .search-btn-icon:hover { transform: scale(1.1); background: var(--primary-dark); }
+        .card-track-clickable { cursor: pointer; transition: all 0.2s; border-left: 6px solid var(--primary); }
+        .card-track-clickable:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: 100%; left: -270px; width: 270px; }
+            .sidebar.open { transform: translateX(270px); }
+            .menu-toggle { display: block; }
+            .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 900; }
+            .overlay.active { display: block; }
+        }
+        @keyframes fadeUp { from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);} }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <div id="detail-modal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:15px; margin-bottom:20px;">
+                <span id="m-title" style="font-size:1.25rem; font-weight:700; color:#1e293b">Detail Aset</span>
+                <button onclick="closeModal()" style="background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:600">Tutup</button>
+            </div>
+            <div id="m-body"></div>
+            <div id="m-actions" style="margin-top:25px; border-top:1px solid #e2e8f0; padding-top:20px"></div>
+        </div>
+    </div>
+
+    <div id="landing-page">
+        <h1 style="color:white; margin-bottom:5px; font-weight:800; font-size:2rem;">Sistem Aset YPKT</h1>
+        <p></p>
+
+        <div class="landing-grid">
+            <div class="landing-card" onclick="openMode('public')">
+                <div class="icon-box">📝</div>
+                <div><div class="card-title">Cikgu / Staff</div><div class="card-sub">Isi Borang Serahan</div></div>
+            </div>
+            <div class="landing-card card-fast" onclick="authFastTrack()">
+                <div class="icon-box">📦</div>
+                <div><div class="card-title">Serahan Pulang</div><div class="card-sub">Fast Track (Berkunci)</div></div>
+            </div>
+            <div class="landing-card" onclick="authAdmin()">
+                <div class="icon-box">🛡️</div>
+                <div><div class="card-title">Admin Dashboard</div><div class="card-sub">Full Access + Excel</div></div>
+            </div>
+        </div>
+
+        <div class="landing-credit">Developed by: Nurul Syuhaida (Intern)</div>
+    </div>
+
+    <div id="app-container">
+        
+        <div class="sidebar" id="sidebar" style="display:none">
+            <div class="brand">Admin Panel 🔒</div>
+            <div class="nav-links hide-scroll">
+                <div class="nav-item active" onclick="navTo('adm-terima', this)">📥 1. Penerimaan</div>
+                <div class="nav-item" onclick="navTo('adm-jejak', this)">📍 2. Jejak Aset</div>
+                <div class="nav-item" onclick="navTo('adm-pulang', this)">📦 3. Serahan Pulang</div>
+                <div class="nav-item" onclick="navTo('adm-nota', this)">📌 4. Nota (Sulit)</div>
+                <div style="height:30px"></div>
+                <div class="nav-item" onclick="downloadExcelAll()" style="color:#4ade80; border:1px solid rgba(74, 222, 128, 0.2)">📊 Download Excel</div>
+                <div class="nav-item" onclick="location.reload()" style="color:#f87171; border:1px solid rgba(248, 113, 113, 0.2)">🚪 Log Keluar</div>
+            </div>
+            <div class="sidebar-footer">By Nurul syuhaida (intern) </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <div style="display:flex; align-items:center;">
+                    <div class="menu-toggle" id="menu-btn" onclick="toggleSidebar()">☰</div>
+                    <h3 style="margin:0; color:#1e293b; font-weight:700" id="header-title">Menu</h3>
+                </div>
+                <button onclick="location.reload()" style="background:none; border:none; color:var(--primary); font-weight:600; cursor:pointer; font-size:0.95rem">🏠 Utama</button>
+            </div>
+
+            <div class="page-area hide-scroll">
+                
+                <div id="page-cikgu" class="page-section">
+                    <div class="card" style="max-width:600px; margin:0 auto; padding:40px;">
+                        <div class="form-header">
+                            <h2>📝 Borang Serahan Aset</h2>
+                            <p>Sila isi maklumat aset dan lokasi dengan lengkap.</p>
+                        </div>
+                        
+                        <div style="background:#f1f5f9; padding:20px; border-radius:12px; margin-bottom:20px;">
+                            <h4 style="margin:0 0 15px 0; color:#475569; border-bottom:1px solid #cbd5e1; padding-bottom:10px;">👤 Maklumat Pemilik</h4>
+                            
+                            <label>Nama Cikgu / Staff</label>
+                            <input type="text" id="c_name" placeholder="Nama Penuh Anda">
+                            
+                            <label>Lokasi YPKT</label>
+                            <select id="c_loc">
+                                <option value="">-- Sila Pilih Lokasi --</option>
+                                <option>YPKT Ibu Pejabat</option>
+                                <option>YPKT Kuala Nerus</option>
+                                <option>YPKT Marang</option>
+                                <option>YPKT Hulu Terengganu</option>
+                                <option>YPKT Dungun</option>
+                                <option>YPKT Kemaman</option>
+                                <option>YPKT Besut</option>
+                                <option>YPKT Setiu</option>
+                            </select>
+
+                            <label>Nama Taska / Unit (Jika ada)</label>
+                            <input type="text" id="c_taska" placeholder="Cth: Taska Permata 1 / Unit Kewangan">
+                        </div>
+
+                        <div style="background:#f1f5f9; padding:20px; border-radius:12px; margin-bottom:20px;">
+                            <h4 style="margin:0 0 15px 0; color:#475569; border-bottom:1px solid #cbd5e1; padding-bottom:10px;">💻 Maklumat Aset</h4>
+                            
+                            <label>Jenis Aset</label>
+                            <select id="c_type">
+                                <option>Laptop</option>
+                                <option>PC</option>
+                                <option>Printer</option>
+                                <option>Lain-lain</option>
+                            </select>
+                            
+                            <label>No Siri (Serial No.)</label>
+                            <input type="text" id="c_serial" placeholder="Lihat sticker belakang/bawah aset">
+                            
+                            <label>Masalah / Kerosakan</label>
+                            <textarea id="c_issue" rows="3" placeholder="Terangkan masalah yang dihadapi..."></textarea>
+                        </div>
+
+                        <label>Tarikh Hari Ini</label>
+                        <input type="text" id="c_date" readonly style="background:#e2e8f0; color:#64748b">
+                        
+                        <label>Tandatangan</label>
+                        <div class="canvas-wrapper">
+                            <canvas id="cvs_cikgu"></canvas>
+                            <div class="btn-clear-sign" onclick="clearCanvas('cvs_cikgu')">Padam</div>
+                        </div>
+                        <button class="btn btn-blue" onclick="submitCikgu()">HANTAR BORANG</button>
+                    </div>
+                </div>
+
+                <div id="page-fast-track" class="page-section">
+                    <div class="search-hero">
+                        <div style="font-size:3.5rem; margin-bottom:10px">📦</div>
+                        <h2 style="margin:0; color:var(--sidebar-bg)">Sistem Serahan Pintar</h2>
+                        <p style="color:#64748b; margin-top:5px">Cari aset anda untuk pengesahan pengambilan.</p>
+                        
+                        <div class="search-input-group">
+                            <input type="text" id="search-keyword" class="search-input" placeholder="Taip Nama Pemilik Aset...">
+                            <button class="search-btn-icon" onclick="searchMyAsset()">🔍</button>
+                        </div>
+                        <div style="margin-top:15px; font-size:0.85rem; color:#94a3b8">
+                            *Hanya aset berstatus <b>SIAP (Completed)</b> akan dipaparkan.
+                        </div>
+                    </div>
+                    <div id="search-results-area" style="margin-top:40px"></div>
+                </div>
+
+                <div id="adm-terima" class="page-section">
+                    <h2 style="margin-top:0">📥 Menunggu Penerimaan</h2>
+                    <div id="list-terima">Loading data...</div>
+                </div>
+
+                <div id="adm-jejak" class="page-section">
+                    <h2 style="margin-top:0">📍 Jejak & Kemaskini Aset</h2>
+                    
+                    <div class="card" style="background:#eff6ff; border:1px solid #bfdbfe; box-shadow:none;">
+                        <h3 style="margin-top:0; color:#1d4ed8; font-size:1.1rem">✍️ Update Log & Nota</h3>
+                        <p style="font-size:0.85rem; color:#64748b; margin-bottom:15px">
+                            Pilih aset untuk melihat nota lama dan menambah nota baru.
+                        </p>
+                        
+                        <label>Pilih Aset:</label>
+                        <select id="track-sel" style="background:white" onchange="previewLogs()"></select>
+                        
+                        <div id="log-preview" style="margin-top:10px; padding:15px; background:white; border-radius:8px; border:1px dashed #94a3b8; max-height:150px; overflow-y:auto; display:none;">
+                            <small style="color:#94a3b8"><i>Pilih aset untuk lihat sejarah nota...</i></small>
+                        </div>
+
+                        <label>Tambah Catatan Baru:</label>
+                        <div style="display:flex; gap:10px; align-items:flex-start">
+                            <textarea id="track-txt" rows="2" placeholder="Cth: Hantar repair, Menunggu barang, Siap format..." style="resize:none"></textarea>
+                            <button onclick="addTrack()" class="btn btn-blue" style="margin-top:0; width:120px; height:auto">Simpan</button>
+                        </div>
+                    </div>
+
+                    <input type="text" id="search-jejak" placeholder="🔎 Cari Aset (Nama / Siri / Jenis)..." oninput="renderJejakListOnly()" style="margin-top:20px; width:100%; padding:15px; border:2px solid #93c5fd; border-radius:10px;">
+
+                    <div id="list-jejak" style="margin-top:20px;">Loading data...</div>
+                </div>
+
+                <div id="adm-pulang" class="page-section">
+                    <h2>📦 Senarai Sedia Untuk Diambil (Completed)</h2>
+                    <p style="color:#64748b; margin-top:-10px; margin-bottom:20px; font-size:0.9rem">
+                        Hanya aset yang telah ditanda <b>SIAP</b> akan muncul di sini.
+                    </p>
+                    <div id="list-pulang-admin">Loading data...</div>
+                </div>
+
+                <div id="adm-nota" class="page-section">
+                    <div class="card">
+                        <h2>📌 Nota Sulit Admin</h2>
+                        <textarea id="notepad" rows="15" oninput="saveNote()"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7IAhAB-PzCcGIixuS7aiUsR1Zp--7WHY",
+            authDomain: "aset-ypkt.firebaseapp.com",
+            databaseURL: "https://aset-ypkt-default-rtdb.firebaseio.com",
+            projectId: "aset-ypkt",
+            storageBucket: "aset-ypkt.firebasestorage.app",
+            messagingSenderId: "501863979091",
+            appId: "1:501863979091:web:adf72aa4de7db740498ea6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const dbRef = getDatabase(app);
+
+        window.dbRef = dbRef;
+        window.push = push;
+        window.ref = ref;
+        window.update = update;
+        window.db = []; 
+
+        onValue(ref(dbRef, 'assets'), (snapshot) => {
+            const data = snapshot.val();
+            window.db = data ? Object.keys(data).map(key => ({...data[key], id: key})) : [];
+            
+            if(document.getElementById('adm-terima').classList.contains('active')) window.renderTerima();
+            if(document.getElementById('adm-jejak').classList.contains('active')) window.renderJejak();
+            if(document.getElementById('adm-pulang').classList.contains('active')) window.renderListPulang('list-pulang-admin');
+        });
+    </script>
+
+    <script>
+        // --- NAVIGASI ---
+        function openMode(mode) {
+            document.getElementById('landing-page').style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                document.getElementById('app-container').classList.add('active');
+                document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+
+                if(mode === 'public') {
+                    document.getElementById('sidebar').style.display = 'none';
+                    document.getElementById('menu-btn').style.display = 'none';
+                    document.getElementById('page-cikgu').classList.add('active');
+                    document.getElementById('header-title').innerText = 'Borang Cikgu';
+                    document.getElementById('c_date').value = new Date().toLocaleString();
+                    initCanvas('cvs_cikgu');
+                }
+            }, 300);
+        }
+
+        function authFastTrack() {
+            let p = prompt("Masukkan Password Fast Track (Cth: 1234):");
+            if(p === "1234") { 
+                document.getElementById('landing-page').style.transform = 'translateY(-100%)';
+                setTimeout(() => {
+                    document.getElementById('app-container').classList.add('active');
+                    document.getElementById('sidebar').style.display = 'none';
+                    document.getElementById('menu-btn').style.display = 'none';
+                    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+                    
+                    document.getElementById('page-fast-track').classList.add('active');
+                    document.getElementById('header-title').innerText = 'Fast Track Pulang';
+                    document.getElementById('search-keyword').value = '';
+                    document.getElementById('search-results-area').innerHTML = '';
+                }, 300);
+            } else { alert("Password Salah!"); }
+        }
+
+        function authAdmin() {
+            let p = prompt("Masukkan Password Admin:");
+            if(p === "admin123") {
+                document.getElementById('landing-page').style.transform = 'translateY(-100%)';
+                setTimeout(() => {
+                    document.getElementById('app-container').classList.add('active');
+                    document.getElementById('sidebar').style.display = 'flex'; 
+                    document.getElementById('menu-btn').style.display = 'block';
+                    navTo('adm-terima', document.querySelector('.nav-item')); 
+                }, 300);
+            } else { alert("Akses Ditolak!"); }
+        }
+
+        function navTo(pageId, el) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.getElementById('sidebar').classList.remove('open');
+            document.querySelector('.overlay').classList.remove('active');
+
+            if(pageId === 'adm-terima') renderTerima();
+            if(pageId === 'adm-jejak') renderJejak();
+            if(pageId === 'adm-pulang') renderListPulang('list-pulang-admin');
+            if(pageId === 'adm-nota') document.getElementById('notepad').value = localStorage.getItem('nota_v26') || '';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
+        // --- SEARCH FAST TRACK ---
+        function searchMyAsset() {
+            let keyword = document.getElementById('search-keyword').value.trim().toLowerCase();
+            let div = document.getElementById('search-results-area');
+            div.innerHTML = '';
+
+            if(keyword.length < 3) return alert("Sila masukkan sekurang-kurangnya 3 huruf nama pemilik.");
+            div.innerHTML = '<p style="text-align:center; color:#64748b">Sedang mencari...</p>';
+
+            let matches = window.db.filter(x => 
+                x.status === 'COMPLETED' && 
+                x.name.toLowerCase().includes(keyword)
+            );
+
+            div.innerHTML = '';
+            
+            if(matches.length === 0) {
+                div.innerHTML = `
+                <div style="text-align:center; padding:40px; background:white; border-radius:12px; border:2px dashed #cbd5e1">
+                    <div style="font-size:3rem; margin-bottom:10px;">🤷‍♂️</div>
+                    <p style="font-size:1.1rem; font-weight:600;">Tiada Rekod Dijumpai</p>
+                    <p>Maaf, tiada aset SIAP atas nama <b>"${keyword}"</b>.</p>
+                </div>`;
+            } else {
+                let now = new Date().toLocaleString();
+                matches.forEach(i => {
+                    div.innerHTML += `
+                    <div class="card result-card" style="border-left:6px solid #8b5cf6; border-top:1px solid #e2e8f0">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px">
+                            <div style="background:#f3e8ff; color:#6b21a8; padding:5px 12px; border-radius:20px; font-size:0.8rem; font-weight:bold">✅ Sedia Diambil</div>
+                        </div>
+                        <h3 style="margin:0">${i.type} (${i.serial})</h3>
+                        <p style="margin-top:5px; color:#475569">Milik: <b>${i.name}</b> (${i.loc})</p>
+                        <hr style="border:0; border-top:1px solid #e2e8f0; margin:15px 0;">
+                        <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0">
+                            <h4 style="margin-top:0; color:#1e293b">Pengesahan Serahan</h4>
+                            <label>Tarikh Serahan</label>
+                            <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
+                            
+                            <label>Nama Penerima / Wakil</label>
+                            <input id="ret_n_pub_${i.id}" value="" placeholder="Masukkan nama penerima (Pemandu/Wakil)...">
+                            
+                            <label>Tandatangan Digital</label>
+                            <div class="canvas-wrapper" style="height:140px">
+                                <canvas id="cvs_ret_pub_${i.id}"></canvas>
+                                <div class="btn-clear-sign" onclick="clearCanvas('cvs_ret_pub_${i.id}')">Padam</div>
+                            </div>
+                            <button class="btn btn-green" onclick="savePulangPublic('${i.id}')">SAHKAN PENGAMBILAN</button>
+                        </div>
+                    </div>`;
+                    setTimeout(()=>initCanvas(`cvs_ret_pub_${i.id}`),100);
+                });
+            }
+        }
+
+        function savePulangPublic(id) {
+            let n = document.getElementById(`ret_n_pub_${id}`).value;
+            if(!n) return alert("Sila isikan nama penerima/wakil!"); 
+            
+            let item = window.db.find(x => x.id === id);
+            let currentLogs = item.logs || [];
+            currentLogs.push({text: `Diambil oleh wakil/sendiri: ${n}`, time: new Date().toLocaleString()});
+
+            window.update(window.ref(window.dbRef, 'assets/' + id), {
+                status: 'RETURNED',
+                retName: n,
+                retTime: new Date().toLocaleString(),
+                logs: currentLogs
+            }).then(() => {
+                alert("Terima kasih! Serahan telah direkodkan.");
+                document.getElementById('search-results-area').innerHTML = ''; 
+                document.getElementById('search-keyword').value = '';
+            });
+        }
+
+        // --- SUBMIT CIKGU (ADA TASKA FIELD BARU) ---
+        function submitCikgu() {
+            let n = document.getElementById('c_name').value;
+            let l = document.getElementById('c_loc').value;
+            let t = document.getElementById('c_taska').value; // Ambil nilai Taska
+            let s = document.getElementById('c_serial').value;
+            
+            if(!n || !l || !s) return alert("Sila isi maklumat wajib!");
+
+            window.push(window.ref(window.dbRef, 'assets'), {
+                date: document.getElementById('c_date').value,
+                name: n, 
+                loc: l, 
+                taska: t || '-', // Simpan ke database
+                type: document.getElementById('c_type').value,
+                serial: s, 
+                issue: document.getElementById('c_issue').value,
+                status: 'PENDING',
+                logs: [{text: "Borang dihantar", time: new Date().toLocaleString()}],
+                admName: '', admTime: '', retName: '', retTime: ''
+            }).then(() => {
+                alert("Borang Berjaya Dihantar Ke HQ!");
+                location.reload();
+            }).catch(e => alert("Error internet: " + e));
+        }
+
+        function renderTerima() {
+            let div = document.getElementById('list-terima');
+            div.innerHTML = '';
+            let list = window.db.filter(x => x.status === 'PENDING').reverse();
+            if(list.length === 0) div.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8">Tiada serahan baru.</div>';
+            let now = new Date().toLocaleString(); 
+            list.forEach(i => {
+                div.innerHTML += `
+                <div class="card" style="border-left:6px solid #f59e0b">
+                    <h3>${i.type} (${i.serial})</h3>
+                    <p style="margin-bottom:5px"><b>${i.name}</b></p>
+                    <p style="font-size:0.9rem; color:#64748b; margin-top:0">${i.loc} ${i.taska ? ' - ' + i.taska : ''}</p>
+                    <p style="background:#fef2f2; color:#ef4444; padding:10px; border-radius:8px; font-size:0.9rem;">Masalah: ${i.issue}</p>
+                    <hr style="margin:15px 0; border:0; border-top:1px solid #e2e8f0;">
+                    <label>Tarikh Terima (Auto)</label>
+                    <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
+                    <label>Nama Admin</label>
+                    <input id="adm_n_${i.id}" placeholder="Masukkan Nama Admin...">
+                    <label>Tandatangan Admin</label>
+                    <div class="canvas-wrapper" style="height:120px">
+                        <canvas id="cvs_adm_${i.id}"></canvas>
+                        <div class="btn-clear-sign" onclick="clearCanvas('cvs_adm_${i.id}')">Padam</div>
+                    </div>
+                    <button class="btn btn-blue" onclick="saveTerima('${i.id}')">Terima (Received)</button>
+                </div>`;
+                setTimeout(()=>initCanvas(`cvs_adm_${i.id}`),100);
+            });
+        }
+
+        function saveTerima(id) {
+            let n = document.getElementById(`adm_n_${id}`).value;
+            if(!n) return alert("Nama Admin wajib isi!");
+            let item = window.db.find(x => x.id === id);
+            let currentLogs = item.logs || [];
+            currentLogs.push({text: `Diterima Admin: ${n}`, time: new Date().toLocaleString()});
+            window.update(window.ref(window.dbRef, 'assets/' + id), {
+                status: 'RECEIVED', admName: n, admTime: new Date().toLocaleString(), logs: currentLogs
+            });
+        }
+
+        // --- JEJAK ASET (UPDATED) ---
+        function renderJejak() {
+            let sel = document.getElementById('track-sel');
+            let oldVal = sel.value;
+            sel.innerHTML = '<option value="">-- Pilih Aset Untuk Tambah Nota --</option>';
+            window.db.filter(x => x.status !== 'RETURNED' && x.status !== 'PENDING').forEach(x => {
+                sel.innerHTML += `<option value="${x.id}">${x.type} - ${x.name} (${x.serial})</option>`;
+            });
+            sel.value = oldVal; 
+            renderJejakListOnly();
+            if(sel.value) previewLogs();
+        }
+
+        window.renderJejakListOnly = function() {
+            let keyword = document.getElementById('search-jejak').value.toLowerCase();
+            let div = document.getElementById('list-jejak');
+            div.innerHTML = '';
+            
+            let list = window.db.filter(x => x.status !== 'PENDING');
+
+            if(keyword) {
+                list = list.filter(x => 
+                    x.name.toLowerCase().includes(keyword) || 
+                    x.serial.toLowerCase().includes(keyword) ||
+                    x.type.toLowerCase().includes(keyword)
+                );
+            }
+
+            if(list.length === 0) {
+                div.innerHTML = '<p style="text-align:center; color:#94a3b8">Tiada rekod dijumpai.</p>';
+                return;
+            }
+
+            list.reverse().forEach(i => {
+                let sColor = '#3b82f6'; let sText = 'DALAM PROSES';
+                if(i.status === 'COMPLETED') { sColor = '#8b5cf6'; sText = 'SIAP (READY)'; }
+                if(i.status === 'RETURNED') { sColor = '#10b981'; sText = 'SUDAH PULANG'; }
+
+                div.innerHTML += `
+                <div class="card card-track-clickable" onclick="showDetails('${i.id}')" style="border-left:6px solid ${sColor}">
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <b>${i.type} (${i.serial})</b>
+                        <span style="font-size:0.7rem; background:${sColor}20; color:${sColor}; padding:4px 10px; border-radius:20px; font-weight:700">${sText}</span>
+                    </div>
+                    <div style="font-size:0.95rem; margin-top:8px; color:#475569">
+                        Milik: <b>${i.name}</b> (${i.loc})
+                    </div>
+                     <div style="font-size:0.85rem; color:#64748b; margin-top:5px">
+                        ${i.taska ? 'Unit/Taska: ' + i.taska : ''}
+                    </div>
+                </div>`;
+            });
+        }
+
+        window.previewLogs = function() {
+            let id = document.getElementById('track-sel').value;
+            let previewDiv = document.getElementById('log-preview');
+            
+            if(!id) {
+                previewDiv.style.display = 'none';
+                return;
+            }
+
+            let item = window.db.find(x => x.id === id);
+            if(item && item.logs) {
+                previewDiv.style.display = 'block';
+                previewDiv.innerHTML = '<strong style="display:block; margin-bottom:10px; font-size:0.8rem; color:#64748b; letter-spacing:0.5px;">SEJARAH NOTA (TERKINI DI ATAS):</strong>';
+                [...item.logs].reverse().forEach(l => {
+                    previewDiv.innerHTML += `<div style="font-size:0.9rem; border-bottom:1px solid #f1f5f9; padding:8px 0; display:flex; gap:10px;">
+                        <span>👉</span>
+                        <div>${l.text} <br><span style="color:#94a3b8; font-size:0.75rem">${l.time}</span></div>
+                    </div>`;
+                });
+            } else {
+                previewDiv.style.display = 'none';
+            }
+        }
+
+        function addTrack() {
+            let id = document.getElementById('track-sel').value;
+            let txt = document.getElementById('track-txt').value;
+            if(!id || !txt) return alert("Sila pilih aset dan tulis status!");
+            
+            let item = window.db.find(x => x.id === id);
+            let currentLogs = item.logs || [];
+            currentLogs.push({text: txt, time: new Date().toLocaleString()});
+
+            window.update(window.ref(window.dbRef, 'assets/' + id), { logs: currentLogs }).then(() => {
+                document.getElementById('track-txt').value = ''; 
+                previewLogs(); 
+            });
+        }
+
+        function showDetails(id) {
+            let item = window.db.find(x => x.id == id);
+            if(!item) return;
+
+            let logsHTML = '';
+            if(item.logs && Array.isArray(item.logs)) {
+                [...item.logs].reverse().forEach(log => {
+                    logsHTML += `<div class="log-item" style="padding:10px 0; border-bottom:1px dashed #e2e8f0">👉 ${log.text} <div style="color:#94a3b8; font-size:0.8rem; margin-top:2px;">${log.time}</div></div>`;
+                });
+            }
+
+            let html = `
+                <div class="info-block" style="border-left:4px solid #2563eb; background:#eff6ff;">
+                    <span class="info-label" style="color:#2563eb">INFO PEMILIK</span>
+                    <span class="info-val"><b>${item.name}</b></span>
+                    <span class="info-val" style="margin-bottom:5px">${item.loc}</span>
+                    <span class="info-val" style="font-size:0.9rem; color:#64748b">${item.taska ? 'Unit/Taska: ' + item.taska : '(Tiada info taska)'}</span>
+                </div>
+                <div class="info-block">
+                    <span class="info-label">INFO ASET</span>
+                    <span class="info-val">${item.type} (${item.serial})</span>
+                    <span class="info-val" style="color:#ef4444; background:#fef2f2; padding:10px; border-radius:6px; display:inline-block; border:1px solid #fecaca">Masalah: ${item.issue}</span>
+                </div>
+                <div class="info-block">
+                    <span class="info-label">SEJARAH LOG (MULTIPLE)</span>
+                    <div style="max-height:200px; overflow-y:auto">${logsHTML}</div>
+                </div>
+            `;
+
+            document.getElementById('m-title').innerText = `Info: ${item.type}`;
+            document.getElementById('m-body').innerHTML = html;
+            
+            let btnArea = document.getElementById('m-actions');
+            if(item.status === 'RECEIVED') {
+                btnArea.innerHTML = `
+                    <p style="font-size:0.9rem; color:#64748b; margin-bottom:15px; text-align:center;">Adakah aset ini sudah siap dibaiki sepenuhnya?</p>
+                    <button class="btn btn-purple" onclick="markAsComplete('${item.id}')">✅ TANDA ASET SEBAGAI SIAP (COMPLETE)</button>
+                `;
+            } else if (item.status === 'COMPLETED') {
+                btnArea.innerHTML = `<div style="text-align:center; padding:15px; background:#f3e8ff; border-radius:8px; color:#7c3aed; font-weight:bold; border:1px solid #ddd6fe">Status: SIAP (Menunggu Pengambilan)</div>`;
+            } else {
+                btnArea.innerHTML = '';
+            }
+
+            document.getElementById('detail-modal').classList.add('active');
+        }
+
+        function markAsComplete(id) {
+            if(!confirm("Anda pasti aset ini telah SIAP dan boleh diambil user?")) return;
+            let item = window.db.find(x => x.id === id);
+            let currentLogs = item.logs || [];
+            currentLogs.push({text: "STATUS: SIAP (COMPLETED). Sedia diambil.", time: new Date().toLocaleString()});
+
+            window.update(window.ref(window.dbRef, 'assets/' + id), {
+                status: 'COMPLETED',
+                logs: currentLogs
+            }).then(() => {
+                alert("Aset ditanda SIAP! Kini boleh dilihat di skrin Serahan Pulang.");
+                closeModal();
+            });
+        }
+
+        function closeModal() { document.getElementById('detail-modal').classList.remove('active'); }
+
+        function renderListPulang(targetId) {
+            let div = document.getElementById(targetId);
+            div.innerHTML = '';
+            let list = window.db.filter(x => x.status === 'COMPLETED').reverse();
+            let now = new Date().toLocaleString(); 
+            
+            if(list.length === 0) div.innerHTML = '<p>Tiada aset berstatus SIAP (Completed) untuk diambil.</p>';
+
+            list.forEach(i => {
+                div.innerHTML += `
+                <div class="card" style="border-left:6px solid #8b5cf6">
+                    <h3>${i.type} (${i.serial})</h3>
+                    <p>Milik: ${i.name} (${i.loc})</p>
+                    <div style="background:#f3e8ff; padding:20px; border-radius:12px; margin-top:15px;">
+                        <label>Tarikh Serahan (Auto)</label>
+                        <input value="${now}" readonly style="background:#e2e8f0; color:#475569">
+                        <label>Nama Penerima</label>
+                        <input id="ret_n_${i.id}" placeholder="Nama Penerima...">
+                        <label>Sign Penerima:</label>
+                        <div class="canvas-wrapper" style="height:140px"><canvas id="cvs_ret_${i.id}"></canvas><div class="btn-clear-sign" onclick="clearCanvas('cvs_ret_${i.id}')">Padam</div></div>
+                        <button class="btn btn-green" onclick="savePulang('${i.id}', '${targetId}')">Sahkan Serahan</button>
+                    </div>
+                </div>`;
+                setTimeout(()=>initCanvas(`cvs_ret_${i.id}`),100);
+            });
+        }
+
+        function savePulang(id, viewId) {
+            let n = document.getElementById(`ret_n_${id}`).value;
+            if(!n) return alert("Nama Penerima wajib isi!");
+            
+            let item = window.db.find(x => x.id === id);
+            let currentLogs = item.logs || [];
+            currentLogs.push({text: `Dipulangkan kpd: ${n}`, time: new Date().toLocaleString()});
+
+            window.update(window.ref(window.dbRef, 'assets/' + id), {
+                status: 'RETURNED',
+                retName: n,
+                retTime: new Date().toLocaleString(),
+                logs: currentLogs
+            });
+        }
+
+        // --- EXCEL DOWNLOAD (ADA TASKA) ---
+        function downloadExcelAll() {
+            if(window.db.length === 0) return alert("Tiada data.");
+            // Added "Taska/Unit" column
+            let headers = ["ID", "Tarikh", "Nama", "Lokasi", "Taska/Unit", "Jenis", "Siri", "Masalah", "Status", "Admin", "Penerima", "Tarikh Pulang"];
+            let csvRows = [headers.join(",")];
+            window.db.forEach(row => {
+                const clean = (t) => `"${String(t||'').replace(/"/g, '""').replace(/\n/g, ' ')}"`;
+                let values = [
+                    row.id, clean(row.date), clean(row.name), clean(row.loc), clean(row.taska), // Included row.taska
+                    clean(row.type), clean(row.serial), clean(row.issue), clean(row.status), clean(row.admName),
+                    clean(row.retName), clean(row.retTime)
+                ];
+                csvRows.push(values.join(","));
+            });
+            let a = document.createElement('a');
+            a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvRows.join("\n"));
+            a.download = 'Data_Aset_Lengkap_V26.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function saveNote() { localStorage.setItem('nota_v26', document.getElementById('notepad').value); }
+
+        function initCanvas(id) {
+            let c = document.getElementById(id);
+            if(!c) return;
+            let rect = c.getBoundingClientRect();
+            c.width = rect.width; c.height = rect.height;
+            let ctx = c.getContext('2d');
+            ctx.lineWidth = 2; ctx.strokeStyle = '#000';
+            let drawing = false;
+            const getPos = (e) => {
+                let r = c.getBoundingClientRect();
+                return { x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top };
+            };
+            ['mousedown','touchstart'].forEach(evt => c.addEventListener(evt, (e)=>{ if(evt=='touchstart') e.preventDefault(); drawing=true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); }));
+            ['mousemove','touchmove'].forEach(evt => c.addEventListener(evt, (e)=>{ if(evt=='touchmove') e.preventDefault(); if(drawing){ ctx.lineTo(getPos(e).x, getPos(e).y); ctx.stroke(); } }));
+            ['mouseup','touchend'].forEach(evt => c.addEventListener(evt, ()=>{ drawing=false; }));
+        }
+        function clearCanvas(id) { let c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+
+    </script>
+</body>
+</html>
